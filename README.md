@@ -16,7 +16,7 @@ Reversion preserves MarkText's application data directory and bundle identifier 
 
 ## Download
 
-Prebuilt `arm64` macOS DMGs are published on the [Releases page](https://github.com/mjlens-spec/Marktext-modified-by-Lens/releases). Starting with `1.1.0`, release files use the name `Reversion-<version>-arm64.dmg` and include Reversion, its Quick Look extension, licenses, and notices.
+Prebuilt `arm64` macOS DMGs are published on the [Releases page](https://github.com/mjlens-spec/Reversion/releases). Starting with `1.1.0`, release files use the name `Reversion-<version>-arm64.dmg` and include Reversion, its Quick Look extension, licenses, and notices.
 
 The app silently checks this repository's latest stable release 15 seconds after the first window opens. It asks before downloading and installing a newer version and stays quiet when already current. Reversion's Check for Updates menu remains available.
 

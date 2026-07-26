@@ -1,0 +1,17 @@
+{
+  "name": "reversion-tools",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Build, packaging and theme tooling for Reversion (反文).",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "test:e2e": "playwright test -c tests-e2e/playwright.config.ts",
+    "test:e2e:ime": "playwright test -c tests-e2e/playwright.ime.config.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.0",
+    "postcss": "^8.4.47"
+  }
+}

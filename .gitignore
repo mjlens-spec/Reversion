@@ -27,3 +27,16 @@ icon/lens-marktext-reference-refined-margin-preview*.png
 
 # Local backups created by installer scripts.
 *.lens-backup-*
+
+# Upstream source checkout (marktext monorepo, managed separately).
+upstream/
+
+# Playwright e2e suite (tests-e2e/): local artifacts and any release .app
+# extracted from releases/*/*.zip for driving without a .tmp/ staged build.
+tests-e2e/.artifacts/
+tests-e2e/.cache/
+
+# Local execution reports and scratch build output (working notes, kept out of
+# the public repo; the durable plans live in 开发规划_*.md / 编程规划_*.md).
+outputs/
+output/

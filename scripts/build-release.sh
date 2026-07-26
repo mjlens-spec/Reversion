@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# SUPERSEDED by scripts/build-release-from-source.sh, which builds the shipping
+# artifacts from upstream/marktext sources instead of re-patching an installed
+# binary. Kept for reference and for reproducing pre-1.2.0 releases; note that
+# its `npx asar pack` step silently drops the electron-builder asarUnpack rules.
+
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 VERSION="${1:-1.1.0}"
 DEFAULT_SOURCE_APP="/Applications/Reversion.app"

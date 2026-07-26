@@ -61,15 +61,31 @@ test('Reversion branding is localized and applied to app and ASAR metadata', () 
   const simplifiedChinese = read('config/InfoPlist.zh-Hans.strings')
   const traditionalChinese = read('config/InfoPlist.zh-Hant.strings')
 
-  assert.match(brandScript, /CFBundleDisplayName Reversion/)
-  assert.match(brandScript, /CFBundleName marktext/)
+  // B2 productName migration: brand-app.sh no longer *sets* the bundle names.
+  // electron-builder derives CFBundleName / CFBundleDisplayName /
+  // CFBundleExecutable and the four Helper bundles from
+  // `productName: Reversion`, so the script's remaining job on that front is to
+  // verify them (a productName regression must fail the release, not ship a
+  // bundle that silently reverts to "marktext" in the menu bar and Dock).
+  assert.doesNotMatch(brandScript, /Set :CFBundleName/)
+  assert.doesNotMatch(brandScript, /Set :CFBundleDisplayName/)
+  assert.match(brandScript, /PRODUCT_NAME="Reversion"/)
+  assert.match(brandScript, /for key in CFBundleName CFBundleDisplayName CFBundleExecutable/)
+  assert.match(brandScript, /Contents\/Frameworks\/\$PRODUCT_NAME Helper\$helper\.app/)
   assert.match(brandScript, /UTImportedTypeDeclarations/)
   assert.match(brandScript, /net\.daringfireball\.markdown/)
   assert.match(brandScript, /LSItemContentTypes/)
   assert.match(english, /"CFBundleDisplayName" = "Reversion"/)
   assert.match(simplifiedChinese, /"CFBundleDisplayName" = "反文"/)
   assert.match(traditionalChinese, /"CFBundleDisplayName" = "反文"/)
-  assert.doesNotMatch(english, /CFBundleName/)
+  // Stage-2 boundary (deliberately out of B2's scope): none of the three
+  // InfoPlist.strings files may localize CFBundleName. Electron resolves helper
+  // apps from CFBundleName, and a *localized* override is an untested variant of
+  // the crash B1 reproduced -- it would only break on Chinese systems. Menu bar
+  // stays "Reversion" until that is verified separately.
+  for (const strings of [english, simplifiedChinese, traditionalChinese]) {
+    assert.doesNotMatch(strings, /CFBundleName/)
+  }
   assert.match(patcher, /electron\.app\.setName\("Reversion"\)/)
   assert.match(patcher, /electron\.app\.setPath\("userData", reversionLegacyUserDataPath\)/)
   assert.match(patcher, /getPath\("appData"\), "marktext"/)

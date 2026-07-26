@@ -104,7 +104,7 @@ test('Lens release feed points electron-updater at this GitHub repository', () =
   assert.ok(fs.existsSync(updateConfig), 'config/app-update.yml must exist')
   const contents = fs.readFileSync(updateConfig, 'utf8')
   assert.match(contents, /^owner: mjlens-spec$/m)
-  assert.match(contents, /^repo: Marktext-modified-by-Lens$/m)
+  assert.match(contents, /^repo: Reversion$/m)
   assert.match(contents, /^provider: github$/m)
 })
 
@@ -152,7 +152,7 @@ test('macOS update manifest uses the electron-updater latest-mac.yml contract', 
   const { createMacUpdateManifest } = await import(pathToFileURL(modulePath))
   const manifest = createMacUpdateManifest({
     version: '1.0.0',
-    fileName: 'Marktext-modified-by-Lens-1.0.0-arm64-mac.zip',
+    fileName: 'Reversion-1.0.0-arm64-mac.zip',
     size: 123456,
     sha512: 'example-base64-digest',
     releaseDate: '2026-07-13T12:00:00.000Z'
@@ -161,10 +161,10 @@ test('macOS update manifest uses the electron-updater latest-mac.yml contract', 
   assert.equal(manifest, [
     'version: 1.0.0',
     'files:',
-    '  - url: Marktext-modified-by-Lens-1.0.0-arm64-mac.zip',
+    '  - url: Reversion-1.0.0-arm64-mac.zip',
     '    sha512: example-base64-digest',
     '    size: 123456',
-    'path: Marktext-modified-by-Lens-1.0.0-arm64-mac.zip',
+    'path: Reversion-1.0.0-arm64-mac.zip',
     'sha512: example-base64-digest',
     'releaseDate: 2026-07-13T12:00:00.000Z',
     ''

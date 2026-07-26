@@ -16,7 +16,7 @@ Reversion 的中文名称是「反文」。它是一款面向 macOS 的所见即
 
 ## 下载
 
-预构建的 `arm64` macOS DMG 发布在 [Releases 页面](https://github.com/mjlens-spec/Marktext-modified-by-Lens/releases)。`1.1.0` 起的文件名使用 `Reversion-<版本>-arm64.dmg`，内含 Reversion 应用、Quick Look 扩展、许可证与声明文件。
+预构建的 `arm64` macOS DMG 发布在 [Releases 页面](https://github.com/mjlens-spec/Reversion/releases)。`1.1.0` 起的文件名使用 `Reversion-<版本>-arm64.dmg`，内含 Reversion 应用、Quick Look 扩展、许可证与声明文件。
 
 应用会在首个窗口打开 15 秒后静默检查本仓库的最新稳定版。发现新版时会询问是否下载并安装；没有新版时不打扰。也可以随时使用 Reversion 菜单中的「检查更新」。
 

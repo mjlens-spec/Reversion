@@ -1,0 +1,134 @@
+/* Fixture: a compact synthetic Typora theme that exercises every pipeline layer.
+ * Not a real theme — hand-written for tests/typora-import-*.test.mjs.
+ */
+:root {
+    --bg-color: #ffffff;
+    --text-color: #222222;
+    --control-text-color: #777777;
+    --border-color: #dddddd;
+    --accent-color: #0066cc;
+    --heading-color: #111111;
+    --quote-bg-color: #f5f5f5;
+    --quote-border-color: #cccccc;
+    --quote-text-color: #555555;
+    --code-bg-color: #f8f8f8;
+    --code-border-color: #e0e0e0;
+    --code-keyword-color: #aa00aa;
+    --inline-code-color: #b14a40;
+    --window-bg-color: #eeeeee;
+    --table-alt-color: #fafafa;
+    --font-body: Georgia, serif;
+    --font-ui: "Helvetica Neue", sans-serif;
+    --font-mono: Menlo, monospace;
+}
+
+html {
+    background-color: var(--bg-color);
+}
+
+body {
+    font-family: var(--font-body);
+    color: var(--text-color);
+}
+
+#write {
+    max-width: 700px;
+    padding: 24px;
+}
+
+h1,
+h2,
+h3 {
+    font-family: var(--font-body);
+    color: var(--heading-color);
+}
+
+a {
+    color: var(--accent-color);
+}
+
+blockquote {
+    border-left: 2px solid var(--quote-border-color);
+    background-color: var(--quote-bg-color);
+    color: var(--quote-text-color);
+}
+
+table th {
+    color: var(--heading-color);
+}
+
+code,
+tt {
+    font-family: var(--font-mono);
+    background-color: var(--code-bg-color);
+    color: var(--inline-code-color);
+}
+
+.md-fences {
+    font-family: var(--font-mono);
+    border: 1px solid var(--code-border-color);
+}
+
+.md-fences code {
+    background: transparent;
+}
+
+.md-fences .cm-keyword {
+    color: var(--code-keyword-color) !important;
+}
+
+.md-fences .CodeMirror pre {
+    font-family: var(--font-mono) !important;
+}
+
+hr {
+    height: 1px;
+    margin: 20px 0;
+    background-color: var(--border-color);
+    border: 0 none;
+}
+
+mark {
+    background: yellow;
+}
+
+.md-toc {
+    background-color: var(--quote-bg-color);
+}
+
+.md-task-list-item > input {
+    margin-left: -1.2em;
+    accent-color: var(--accent-color);
+}
+
+li p.first {
+    display: inline-block;
+}
+
+#typora-sidebar {
+    background-color: #f0f0f0;
+}
+
+#file-library-list {
+    color: red;
+}
+
+.megamenu-content {
+    font-family: var(--font-ui);
+}
+
+.on-focus-mode blockquote {
+    border-left-color: #eeeeee;
+}
+
+@media print {
+    pre {
+        page-break-inside: avoid;
+    }
+}
+
+@media only screen and (min-width: 1400px) {
+    #write {
+        max-width: 820px;
+    }
+}
