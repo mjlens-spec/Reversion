@@ -4,102 +4,116 @@
 
 <img src="icon/lens-marktext-icon.png" alt="Reversion icon" width="128" align="right" />
 
-Reversion, Chinese name `反文`, is a macOS WYSIWYG Markdown editor based on [MarkText](https://github.com/marktext/marktext) `0.19.1`. Version `1.1.0` adds inline live rendering, Finder Quick Look, two editor and export themes, and an app icon built around the calligraphic Chinese radical `攵`.
+Reversion, Chinese name `反文`, is a macOS WYSIWYG Markdown editor for Chinese-language writing. It is a fork of [MarkText](https://github.com/marktext/marktext) `0.19.1` with inline live rendering, a native Finder Quick Look extension, two typographic themes, an importer for Typora themes, and an app icon built around the calligraphic Chinese radical `攵`.
 
-Reversion preserves MarkText's application data directory and bundle identifier so existing preferences, history, and updater continuity survive migration. The source tree does not commit MarkText binaries or `app.asar`; see [Download](#download) for the prebuilt DMG.
+Current release: **1.2.0** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
 
 ## Core features
 
-- **Inline live rendering**: Muya remains in WYSIWYG mode by default. Bold, italic, links, inline code, math, and other syntax render as you type; Markdown markers appear within the active syntax range and collapse when the caret leaves it.
-- **Finder Quick Look**: `Reversion.app` embeds a native macOS Quick Look Preview Extension. Select a Markdown file in Finder and press Space to preview headings, lists, block quotes, code blocks, tables, and inline formatting.
-- **Bilingual product name**: English systems display `Reversion`; Simplified and Traditional Chinese systems display `反文`. The About view uses `Reversion · 反文`.
+- **Inline live rendering** — Muya stays in WYSIWYG mode by default. Bold, italic, links, inline code, and math render as you type; Markdown markers appear inside the active syntax range and collapse once the caret leaves it.
+- **Typography-first themes** — two built-in themes, each with three independent reading font slots so large titles, smaller headings, and body copy can use different faces, with a CJK fallback chain that does not break Latin metrics.
+- **Typora theme import** — `scripts/import-typora-theme.mjs` transpiles a Typora theme's CSS into a Reversion editor theme plus a matching HTML/PDF export theme, and writes a compatibility report listing anything it could not map. Verified against six of Typora's built-in themes.
+- **Finder Quick Look** — the app bundles a native macOS Quick Look Preview Extension. Select a Markdown file in Finder and press Space to preview headings, lists, block quotes, code blocks, tables, and inline formatting.
+- **Diagrams and math** — Mermaid 11, Vega-Lite, PlantUML, flowchart.js, and KaTeX.
+- **Full-text search** — ripgrep-backed project search with exclusion rules and symlink handling.
+- **Bilingual product name** — English systems show `Reversion`, Simplified and Traditional Chinese systems show `反文`. The About view uses `Reversion · 反文`.
 
 ## Download
 
-Prebuilt `arm64` macOS DMGs are published on the [Releases page](https://github.com/mjlens-spec/Reversion/releases). Starting with `1.1.0`, release files use the name `Reversion-<version>-arm64.dmg` and include Reversion, its Quick Look extension, licenses, and notices.
+Prebuilt `arm64` DMGs are on the [Releases page](https://github.com/mjlens-spec/Reversion/releases). Each release ships `Reversion-<version>-arm64.dmg` together with the updater ZIP, `latest-mac.yml`, and SHA-256 sidecars.
 
-The app silently checks this repository's latest stable release 15 seconds after the first window opens. It asks before downloading and installing a newer version and stays quiet when already current. Reversion's Check for Updates menu remains available.
+The app checks this repository for a newer stable release 15 seconds after the first window opens, asks before downloading, and stays quiet when already current. **Reversion → Check for Updates** works at any time.
 
-The app uses an ad-hoc signature with a stable application requirement and is **not Apple notarized**. That stable requirement lets releases validate one another; downloads are also protected by GitHub HTTPS and the SHA-512 digest in `latest-mac.yml`. On first launch, macOS Gatekeeper may require opening it from Finder with Control-click → Open.
+The app is ad-hoc signed with a stable application requirement and is **not Apple notarized**. The stable requirement is what lets one release validate the next; downloads are additionally covered by GitHub HTTPS and the SHA-512 digest in `latest-mac.yml`. On first launch macOS Gatekeeper may require Control-click → Open in Finder.
+
+## What's new in 1.2.0
+
+1.2.0 is the first release built from source. Earlier versions were produced by patching a prebuilt MarkText `app.asar`; every customization is now a source commit on a fork of upstream, and one command produces the release artifacts.
+
+- macOS menu bar, Dock, and Force Quit now say **Reversion** — the bundle and its four helper processes are natively renamed.
+- Writing invalid preference values no longer raises a main-process error dialog, and an out-of-range `preferences.json` no longer prevents the app from starting.
+- Pressing Backspace or Delete mid-composition in an IME no longer deletes committed characters or misplaces the caret.
+- Custom title / heading / body fonts survive a restart; a fresh install now opens in Lens Design as intended.
+- Installer is about 6 MB smaller — native modules are no longer inlined into `app.asar`.
+
+Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.2.0).
+
+## Roadmap
+
+**1.3.0 — editor engine migration.** Upstream MarkText has rewritten its editor engine (`@muyajs/core`) in TypeScript and moved its own desktop app onto it, while the engine Reversion currently ships is frozen. 1.3.0 rebases Reversion onto the new engine so that upstream's editing fixes — several IME defects among them — land in Reversion instead of being maintained twice. In scope: porting the inline live-rendering layer to the new DOM vocabulary, regenerating both themes through the theme transpiler's mapping tables, adopting upstream's IME fixes, and a long-document performance pass with a 10,000-line benchmark.
+
+**Later.** Inline live rendering behavior parity with Typora (caret anchoring, click targeting, link editing), table editing (row/column handles, Excel/CSV paste, wide-table scrolling), PDF export outline and page-break control, and Chinese typography refinements (CJK/Latin spacing, punctuation compression, smart quotes).
+
+Known limitations are tracked in the repository's planning documents; a handful of IME edge cases are recorded with reproduction notes in `tests-e2e/helpers/known-issues.ts`.
 
 ## Themes
 
 | Theme | Style |
 | --- | --- |
-| **Lens Design** | Peacock blue / wine / gold accents on a cool paper background, built on the Lens Design typography system. Large titles use Cormorant Garamond with LXGW WenKai as the CJK fallback, smaller headings use Spectral with the same LXGW WenKai fallback, and body copy uses Noto Sans / Noto Sans SC at 17 px with a 1.7 line height. |
+| **Lens Design** | Peacock blue / wine / gold accents on cool paper, built on the Lens Design typography system. Large titles use Cormorant Garamond with LXGW WenKai as the CJK fallback, smaller headings use Spectral with the same fallback, and body copy uses Noto Sans / Noto Sans SC at 17 px with a 1.7 line height. |
 | **Claude-like** | Warm cream paper with a terracotta accent, adapted from the Typora [Claude-like theme](https://github.com/Muyiiiii/Typora_Claude-Like_Theme). Headings use Source Serif 4 with LXGW WenKai as the CJK fallback; body text uses Source Han Sans / Noto Sans SC. |
 
-Both themes ship in two forms:
+Both themes exist in two forms: a built-in editor theme in the theme picker, and an HTML/PDF export theme under `themes/export/`. Each exposes `--reading-font-title`, `--reading-font-heading`, and `--reading-font-body`; override those three variables to change title, heading, and body faces independently. The sidebar opens to the current document's table of contents on startup.
 
-- Built-in editor themes (`themes/lens-design-marktext.css`, `themes/claude-like-marktext.css`), injected into Reversion's theme picker.
-- HTML/PDF export themes (`themes/export/lens-design.css`, `themes/export/claude-like.css`).
-- Three independent reading font slots (`--reading-font-title`, `--reading-font-heading`, and `--reading-font-body`) let each theme control large titles, smaller headings, and body copy separately.
-- The left sidebar opens to the current document's table of contents on startup.
+### Importing a Typora theme
+
+```bash
+node scripts/import-typora-theme.mjs <typora-theme.css> --name <name> --out-dir <dir>
+```
+
+This writes `<name>-marktext.css` (editor), `export/<name>.css` (HTML/PDF), and `<name>-report.md` — the report lists dropped rules, unmapped selectors and variables, and a coverage figure. Themes that lean on Typora-specific DOM structure or bundled JavaScript will need manual touch-up; the report says which rules those are. The selector, variable, and strip tables live in `scripts/typora-map/` as plain data modules so they can be swapped wholesale when the editor engine changes.
+
+## Building from source
+
+The build resolves the upstream source tree, applies Reversion's commits, and produces signed artifacts. It pins Node to the version upstream releases with (see `.nvmrc`) and pnpm to the version in upstream's `packageManager` field.
+
+```bash
+./scripts/build-release-from-source.sh 1.2.0
+```
+
+Artifacts land in `releases/<version>/`: DMG, updater ZIP, `latest-mac.yml`, and SHA-256 sidecars.
+
+Tests:
+
+```bash
+npm test          # contract tests: source migration, branding, release pipeline, theme transpiler
+npm run test:e2e  # Playwright: launch smoke + branding checks against a packaged .app
+```
+
+The e2e suites drive a real packaged application and assert that the user's actual `~/Library/Application Support/marktext` directory is left byte-for-byte unchanged.
 
 ## Repository layout
 
 - `themes/` — editor and export CSS themes.
-- `icon/` — app icon sources and outputs: `lens-marktext-pu-v1-source.png` (original generated source), `lens-marktext-pu-v1-alpha.png` (production source with transparent corners), `lens-marktext-icon.png` (1024 px), `lens-marktext-icon.icns`, the 1.0 production spec, and earlier drafts kept for reference.
-- `patches/` — runtime CSS for inline live rendering.
-- `quicklook/` — Swift source and XcodeGen definition for the native Finder Quick Look Preview Extension.
-- `scripts/install-builtin-themes.sh` — backs up `app.asar`, installs the Reversion runtime, themes, bilingual branding, and Quick Look extension, then ad-hoc signs the app.
-- `scripts/install-theme.sh` — backs up `preferences.json`, installs the export themes, clears Custom CSS, and selects `lens-design`.
-- `scripts/build-icon.sh` — builds the `.icns` from a PNG source (requires ImageMagick: `brew install imagemagick`).
-- `scripts/install-icon.sh` — backs up the Reversion app icon files, replaces them, ad-hoc signs the app, and refreshes the icon cache.
-- `scripts/build-release.sh` — builds the app with a stable application requirement, updater ZIP, `latest-mac.yml`, DMG, and checksum files.
+- `scripts/build-release-from-source.sh` — source → DMG / ZIP / `latest-mac.yml` / checksums.
+- `scripts/import-typora-theme.mjs`, `scripts/typora-import/`, `scripts/typora-map/` — Typora theme transpiler: six-stage pipeline plus the replaceable mapping data.
+- `scripts/brand-app.sh`, `scripts/build-icon.sh`, `scripts/install-icon.sh` — bundle localization and icon tooling.
+- `quicklook/` — Swift source and XcodeGen definition for the Finder Quick Look Preview Extension.
+- `icon/` — app icon sources and outputs, including the 1.0 production spec and earlier drafts.
+- `tests/`, `tests-e2e/` — contract tests and Playwright suites.
+- `config/` — `app-update.yml` (the single source of truth for the update feed) and the bundle's localized `InfoPlist` strings.
+- `patches/` — runtime CSS for inline live rendering, kept in sync with the source tree.
 
-## Install from source
-
-Install the Reversion runtime, built-in themes, branding, and Quick Look extension:
-
-```bash
-./scripts/install-builtin-themes.sh
-```
-
-Install user preferences and export themes:
-
-```bash
-./scripts/install-theme.sh
-```
-
-Build and install the icon:
-
-```bash
-./scripts/build-icon.sh
-./scripts/install-icon.sh
-```
-
-The default icon source is the version 1.0 calligraphic `攵` asset. Pass another PNG or SVG path to `build-icon.sh` to build an alternate icon without changing the default.
-
-Restart Reversion after installation. Finder and Dock icon caches can lag; quit and relaunch Reversion once if the old icon is still visible.
+Editor source lives in a fork of upstream MarkText that is not committed here; this repository holds the customizations, themes, tooling, tests, and release pipeline.
 
 ## Lens Design palette
 
-- Peacock blue: `#1F566B`
-- Wine: `#8E3B46`
-- Gold: `#B0883E`
-- Paper: `#F4F6F8`
-- Text: `#15181C`
-- CJK editorial font: `LXGW WenKai` (霞鹜文楷), with `Noto Serif SC` and `Songti SC` fallbacks
-- Title font: `Cormorant Garamond`; heading font: `Spectral`; both fall back to LXGW WenKai for CJK glyphs
-- Body/UI fonts: `Noto Sans`, `Noto Sans SC`, Apple/PingFang fallback
-- Mono: `JetBrains Mono`, `SF Mono`, Menlo fallback
-- Reading roles: wordmark for large titles, display for smaller headings, and sans for body copy. The editor defaults are `Cormorant Garamond`, `Spectral`, and `Noto Sans SC`, with the theme's LXGW WenKai CJK fallback chain. Override the three `--reading-font-*` variables to change them independently.
-- Lens Design editor H1 uses a 700 weight so Latin and LXGW WenKai CJK titles carry the same visual weight.
+- Peacock blue `#1F566B` · Wine `#8E3B46` · Gold `#B0883E` · Paper `#F4F6F8` · Text `#15181C`
+- CJK editorial font: `LXGW WenKai` (霞鹜文楷), falling back to `Noto Serif SC` and `Songti SC`
+- Title font `Cormorant Garamond`, heading font `Spectral` — both fall back to LXGW WenKai for CJK glyphs
+- Body / UI: `Noto Sans`, `Noto Sans SC`, Apple / PingFang fallback · Mono: `JetBrains Mono`, `SF Mono`, Menlo
+- Lens Design H1 uses a 700 weight so Latin and LXGW WenKai CJK titles carry the same visual weight
 
 ## Compatibility
 
-Reversion `1.1.0` uses the MarkText `0.19.1` macOS bundle structure:
-
-- Default app path: `/Applications/Reversion.app`; `/Applications/MarkText.app` is accepted during initial migration
-- User data: `~/Library/Application Support/marktext`
-- Bundled app archive: `/Applications/Reversion.app/Contents/Resources/app.asar`
-
-The original data path and bundle identifier are intentionally preserved for compatibility. Inspect the patcher before upgrading if upstream MarkText changes its bundle structure.
+- App path: `/Applications/Reversion.app`
+- User data: `~/Library/Application Support/marktext` — deliberately unchanged from MarkText, which is what preserves existing preferences and the update chain
+- Bundle identifier: `com.github.marktext.marktext`, also unchanged for the same reason
+- Apple Silicon only; Intel and Universal builds are not currently produced
 
 ## License and notices
 
-This project is MIT licensed. See [`LICENSE`](LICENSE) and [`NOTICE.md`](NOTICE.md) for upstream copyright, license, font, and trademark notes.
+MIT licensed. See [`LICENSE`](LICENSE) and [`NOTICE.md`](NOTICE.md) for upstream copyright, license, font, and trademark notes.
 
 Sources:
 
