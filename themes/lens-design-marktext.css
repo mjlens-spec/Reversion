@@ -249,9 +249,16 @@
     border-right: 1px solid var(--lens-line) !important;
   }
 
-  .mu-editor,
+  /* Width belongs to the content column only: `.mu-editor` is the scroll
+     viewport and must fill the window, while `.mu-container` centers itself
+     inside it (engine sets `margin: 0 auto`). Clamping `.mu-editor` too
+     leaves a dead zone on the right with the scrollbar mid-window. */
   .mu-container {
     max-width: var(--editor-area-width) !important;
+  }
+
+  .mu-editor,
+  .mu-container {
     font-family: var(--editor-body-font-family, var(--reading-font-body)), var(--lens-font-sans) !important;
     /* Lens CJK rule: Chinese body runs 17px at 1.7 line height. */
     font-size: 17px !important;
