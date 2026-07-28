@@ -174,10 +174,14 @@ test('the first-run preference seed (not just the validation schema) defaults to
   const staticSeed = JSON.parse(read('static/preference.json'))
   assert.equal(staticSeed.theme, 'lens-design')
   assert.equal(staticSeed.lightModeTheme, 'lens-design')
-  // darkModeTheme / followSystemTheme are intentionally out of scope (see
-  // E1任务3 report §2.4) -- only asserting they weren't touched.
   assert.equal(staticSeed.darkModeTheme, 'dark')
-  assert.equal(staticSeed.followSystemTheme, true)
+  // followSystemTheme was upstream's `true` through 1.3.0 (E1任务3 report
+  // §2.4 left it out of scope). That silently defeated the two assertions
+  // above on any dark-appearance Mac: startup ran selectTheme(darkModeTheme),
+  // so a fresh install never actually showed Lens Design. Seeding it off is
+  // what makes the seeded default real; following the system stays available
+  // as an opt-in preference, with the light/dark mappings above intact.
+  assert.equal(staticSeed.followSystemTheme, false)
   // Same failure class, found by the beta.2 preference-crash diagnosis:
   // `Preference.init()` deletes stored keys that are absent from the seed
   // file, so the three font-role keys must exist here or every restart

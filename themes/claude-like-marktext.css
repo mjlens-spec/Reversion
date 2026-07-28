@@ -154,9 +154,16 @@
     color: var(--claude-text-muted) !important;
   }
 
-  .mu-editor,
+  /* Width belongs to the content column only: `.mu-editor` is the scroll
+     viewport and must fill the window, while `.mu-container` centers itself
+     inside it (engine sets `margin: 0 auto`). Clamping `.mu-editor` too
+     leaves a dead zone on the right with the scrollbar mid-window. */
   .mu-container {
     max-width: var(--editor-area-width) !important;
+  }
+
+  .mu-editor,
+  .mu-container {
     font-family: var(--editor-body-font-family, var(--reading-font-body)), var(--claude-font-reading) !important;
     font-size: 16px !important;
     line-height: 1.78 !important;

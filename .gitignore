@@ -40,3 +40,4 @@ tests-e2e/.cache/
 # the public repo; the durable plans live in 开发规划_*.md / 编程规划_*.md).
 outputs/
 output/
+.pnpm-store/
