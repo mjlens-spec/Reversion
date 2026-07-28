@@ -6,7 +6,7 @@
 
 Reversion, Chinese name `反文`, is a macOS WYSIWYG Markdown editor for Chinese-language writing. It is based on [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` and its TypeScript editor engine, `@muyajs/core`, with inline live rendering, a native Finder Quick Look extension, two typographic themes, an importer for Typora themes, and an app icon built around the calligraphic Chinese radical `攵`.
 
-Current release: **1.3.2** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
+Current release: **1.3.3** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
 
 ## Core features
 
@@ -26,15 +26,15 @@ The app checks this repository for a newer stable release 15 seconds after the f
 
 The app is ad-hoc signed with a stable application requirement and is **not Apple notarized**. The stable requirement is what lets one release validate the next; downloads are additionally covered by GitHub HTTPS and the SHA-512 digest in `latest-mac.yml`. On first launch macOS Gatekeeper may require Control-click → Open in Finder.
 
-## What's new in 1.3.2
+## What's new in 1.3.3
 
-- **Import a Typora theme from inside the app.** Theme ▸ Import Theme (Typora compatible) converts a Typora `.css` into a Reversion editor theme plus a matching HTML/PDF export theme, lists it under Imported Themes and switches to it, and reports how much carried over with a link to the full compatibility report. Previously this existed only as a CLI script.
-- The inline format toolbar uses Material Symbols icons and shows each button's action and shortcut on hover.
-- The sidebar rail uses the same icon set, marks the open panel with an accent pill, and has hover feedback and tooltips.
-- The word counter shows a named total and reports CJK characters and Latin words separately instead of one mixed number behind a one-letter label.
-- Fixed: transpiled themes lost all their heading styling, because the transpiler still emitted heading selectors for the retired editor engine's DOM.
+- A document now reports its word count as soon as it opens. The counter was only written when content *changed*, so an opened file sat at zero until the first keystroke.
+- The Preferences heading no longer sits under the macOS window buttons: the sidebar started 24px from the top, inside the 32px strip the window reserves for its title bar, which is exactly where the system paints the traffic lights.
+- The seven Preferences category icons use the same Material Symbols set as the sidebar rail and the editor toolbar.
 
-Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.3.2).
+1.3.2 added in-app Typora theme import (Theme ▸ Import Theme) along with the Material Symbols icon pass across the editor chrome.
+
+Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.3.3).
 
 ## Roadmap
 
@@ -64,7 +64,7 @@ This writes `<name>-marktext.css` (editor), `export/<name>.css` (HTML/PDF), and 
 The build resolves the upstream source tree, applies Reversion's commits, and produces signed artifacts. It pins Node to the version upstream releases with (see `.nvmrc`) and pnpm to the version in upstream's `packageManager` field.
 
 ```bash
-./scripts/build-release-from-source.sh 1.3.2
+./scripts/build-release-from-source.sh 1.3.3
 ```
 
 Artifacts land in `releases/<version>/`: DMG, updater ZIP, `latest-mac.yml`, and SHA-256 sidecars.
