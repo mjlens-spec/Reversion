@@ -1,5 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@400;500;600;700&family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=JetBrains+Mono:wght@400;500;600&display=swap");
-@import url("https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css");
+/* Font note: install LXGW WenKai locally for the intended CJK reading style. */
 
 :root {
   --brand-blue: #1F566B;
@@ -250,9 +249,7 @@
     border-right: 1px solid var(--lens-line) !important;
   }
 
-  .ag-root,
-  .ag-editor,
-  .ag-container,
+  .mu-editor,
   .mu-container {
     max-width: var(--editor-area-width) !important;
     font-family: var(--editor-body-font-family, var(--reading-font-body)), var(--lens-font-sans) !important;
@@ -263,10 +260,6 @@
     letter-spacing: 0 !important;
   }
 
-  p.ag-paragraph,
-  .ag-list-item,
-  .ag-table td,
-  .ag-table th,
   .mu-container p,
   .mu-container li,
   .mu-container td,
@@ -277,12 +270,6 @@
     overflow-wrap: break-word;
   }
 
-  h1.ag-paragraph,
-  h2.ag-paragraph,
-  h3.ag-paragraph,
-  h4.ag-paragraph,
-  h5.ag-paragraph,
-  h6.ag-paragraph,
   .mu-container h1,
   .mu-container h2,
   .mu-container h3,
@@ -294,7 +281,6 @@
     letter-spacing: 0 !important;
   }
 
-  h1.ag-paragraph,
   .mu-container h1 {
     margin-top: 2.4em !important;
     margin-bottom: 0.8em !important;
@@ -307,7 +293,6 @@
     line-height: 1.2 !important;
   }
 
-  h2.ag-paragraph,
   .mu-container h2 {
     margin-top: 2.1em !important;
     margin-bottom: 0.7em !important;
@@ -318,7 +303,6 @@
     color: var(--lens-blue) !important;
   }
 
-  h3.ag-paragraph,
   .mu-container h3 {
     margin-top: 1.75em !important;
     font-family: var(--editor-heading-font-family, var(--reading-font-heading)), var(--lens-font-display) !important;
@@ -327,9 +311,6 @@
     color: var(--lens-wine) !important;
   }
 
-  h4.ag-paragraph,
-  h5.ag-paragraph,
-  h6.ag-paragraph,
   .mu-container h4,
   .mu-container h5,
   .mu-container h6 {
@@ -339,27 +320,23 @@
     color: var(--lens-blue-ink) !important;
   }
 
-  .ag-link,
   .mu-container a {
     color: var(--lens-blue) !important;
     text-decoration-color: rgba(31, 86, 107, 0.32);
     text-underline-offset: 3px;
   }
 
-  .ag-strong,
   .mu-container strong {
     color: var(--lens-text) !important;
     font-weight: 700;
   }
 
-  .ag-em,
   .mu-container em {
     color: var(--lens-wine) !important;
     /* CJK emphasis: WenKai (kai style) instead of faux-oblique hanzi; Latin gets true Spectral italic. */
     font-family: var(--lens-font-serif) !important;
   }
 
-  .ag-blockquote,
   .mu-container blockquote {
     margin: 1.35em 0 !important;
     padding: 18px 22px 18px 24px !important;
@@ -372,21 +349,16 @@
     line-height: 1.7 !important;
   }
 
-  .ag-blockquote::before,
   .mu-container blockquote::before {
     color: rgba(31, 86, 107, 0.2) !important;
   }
 
-  .ag-hr,
-  .mu-container hr,
   .mu-thematic-break:not(.mu-active)::before {
     border: 0 !important;
     border-top: 1px solid var(--lens-line) !important;
     background: transparent !important;
   }
 
-  .ag-inline-code,
-  .ag-code,
   .mu-container code,
   .mu-container .mu-code {
     border-radius: var(--lens-radius-sm);
@@ -396,8 +368,6 @@
     font-size: 0.92em !important;
   }
 
-  .ag-code-block,
-  .ag-code-container,
   .mu-container pre,
   .mu-container .mu-code-block,
   .mu-code-block {
@@ -407,8 +377,6 @@
     box-shadow: var(--lens-shadow-1);
   }
 
-  .ag-code-content,
-  .ag-code-block pre,
   .mu-container pre code,
   .mu-code-block code,
   .mu-code-block .CodeMirror {
@@ -418,8 +386,6 @@
     line-height: 1.62 !important;
   }
 
-  .ag-table,
-  #ag-editor-id table,
   .mu-container table {
     display: table;
     width: 100% !important;
@@ -435,8 +401,6 @@
     box-shadow: var(--lens-shadow-1);
   }
 
-  .ag-table th,
-  #ag-editor-id table th,
   .mu-container table th {
     background: var(--lens-sunken) !important;
     color: var(--lens-blue-ink) !important;
@@ -446,10 +410,6 @@
     white-space: normal;
   }
 
-  .ag-table td,
-  .ag-table th,
-  #ag-editor-id table td,
-  #ag-editor-id table th,
   .mu-container table td,
   .mu-container table th {
     box-sizing: border-box;
@@ -461,56 +421,40 @@
     word-break: normal;
   }
 
-  .ag-table td *,
-  .ag-table th *,
-  #ag-editor-id table td *,
-  #ag-editor-id table th *,
   .mu-container table td *,
   .mu-container table th * {
     font-size: inherit !important;
     line-height: inherit !important;
   }
 
-  .ag-table td:first-child,
-  .ag-table th:first-child,
-  #ag-editor-id table td:first-child,
-  #ag-editor-id table th:first-child,
   .mu-container table td:first-child,
   .mu-container table th:first-child {
     min-width: 3.25em;
   }
 
-  .ag-table td:last-child,
-  .ag-table th:last-child,
-  #ag-editor-id table td:last-child,
-  #ag-editor-id table th:last-child,
   .mu-container table td:last-child,
   .mu-container table th:last-child {
     min-width: 8.5em;
   }
 
-  .ag-mark,
   .mu-container mark {
     background: linear-gradient(transparent 58%, rgba(176, 136, 62, 0.26) 58%);
     color: inherit;
   }
 
-  ul.mu-bullet-list > li.mu-list-item::before,
-  .ag-bullet-list-item::before {
+  ul.mu-bullet-list > li.mu-list-item::before {
     background: var(--lens-blue) !important;
   }
 
   li.mu-task-list-item > input[type="checkbox"]::before,
-  li.mu-task-list-item > span.mu-task-list-checkbox::before,
-  .ag-task-list-item input[type="checkbox"]::before {
+  li.mu-task-list-item > span.mu-task-list-checkbox::before {
     border: 1.5px solid var(--lens-blue) !important;
     border-radius: var(--lens-radius-sm) !important;
     background: var(--lens-surface) !important;
   }
 
   li.mu-task-list-item > input.mu-checkbox-checked::before,
-  li.mu-task-list-item > span.mu-checkbox-checked::before,
-  .ag-task-list-item input[type="checkbox"]:checked::before {
+  li.mu-task-list-item > span.mu-checkbox-checked::before {
     background: var(--lens-blue) !important;
   }
 

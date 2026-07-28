@@ -64,7 +64,7 @@ export async function placeCaretAtMarker(
   await window.waitForTimeout(100)
 
   const handle = await window.evaluateHandle(
-    ({ marker, edge, editorSelector, leafSelector }) => {
+    ({ marker, edge, editorSelector, leafSelector, engineId }) => {
       const container = document.querySelector(editorSelector)
       if (!container) throw new Error(`IME helper: editor root not found (${editorSelector})`)
       const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT)
@@ -85,11 +85,27 @@ export async function placeCaretAtMarker(
         if (!content) {
           throw new Error(`IME helper: marker "${marker}" has no leaf content ancestor matching ${leafSelector}`)
         }
+        if (engineId === 'muya2') {
+          const block = (content as unknown as {
+            __MUYA_BLOCK__?: { text: string; setCursor(start: number, end: number, update: boolean): void }
+          }).__MUYA_BLOCK__
+          if (!block) throw new Error(`IME helper: marker "${marker}" has no Muya 2 block binding`)
+          const modelIndex = block.text.indexOf(marker)
+          if (modelIndex === -1) throw new Error(`IME helper: marker "${marker}" missing from Muya 2 model`)
+          const modelOffset = edge === 'after' ? modelIndex + marker.length : modelIndex
+          block.setCursor(modelOffset, modelOffset, true)
+        }
         return content
       }
       throw new Error(`IME helper: marker not found in document: ${marker}`)
     },
-    { marker, edge, editorSelector: EDITOR_SELECTOR, leafSelector: LEAF_CONTENT_SELECTOR }
+    {
+      marker,
+      edge,
+      editorSelector: EDITOR_SELECTOR,
+      leafSelector: LEAF_CONTENT_SELECTOR,
+      engineId: ACTIVE_ENGINE.id
+    }
   )
   return handle.asElement() as ElementHandle<Element>
 }
@@ -120,7 +136,7 @@ export async function placeCaretAtMarkerNoClick(
   scopeSelector?: string | null
 ): Promise<ElementHandle<Element>> {
   const handle = await window.evaluateHandle(
-    ({ marker, edge, editorSelector, leafSelector, scopeSelector }) => {
+    ({ marker, edge, editorSelector, leafSelector, scopeSelector, engineId }) => {
       const root = document.querySelector(editorSelector)
       if (!root) throw new Error(`IME helper: editor root not found (${editorSelector})`)
       const container = scopeSelector ? root.querySelector(scopeSelector) : root
@@ -145,6 +161,16 @@ export async function placeCaretAtMarkerNoClick(
         if (!content) {
           throw new Error(`IME helper: marker "${marker}" has no leaf content ancestor matching ${leafSelector}`)
         }
+        if (engineId === 'muya2') {
+          const block = (content as unknown as {
+            __MUYA_BLOCK__?: { text: string; setCursor(start: number, end: number, update: boolean): void }
+          }).__MUYA_BLOCK__
+          if (!block) throw new Error(`IME helper: marker "${marker}" has no Muya 2 block binding`)
+          const modelIndex = block.text.indexOf(marker)
+          if (modelIndex === -1) throw new Error(`IME helper: marker "${marker}" missing from Muya 2 model`)
+          const modelOffset = edge === 'after' ? modelIndex + marker.length : modelIndex
+          block.setCursor(modelOffset, modelOffset, true)
+        }
         return content
       }
       throw new Error(`IME helper: marker not found in document: ${marker}`)
@@ -154,7 +180,8 @@ export async function placeCaretAtMarkerNoClick(
       edge,
       editorSelector: EDITOR_SELECTOR,
       leafSelector: LEAF_CONTENT_SELECTOR,
-      scopeSelector: scopeSelector ?? null
+      scopeSelector: scopeSelector ?? null,
+      engineId: ACTIVE_ENGINE.id
     }
   )
   return handle.asElement() as ElementHandle<Element>
@@ -178,7 +205,30 @@ export async function getContentHandleAtSelection(window: Page): Promise<Element
 }
 
 export async function readContentText(handle: ElementHandle<Element>): Promise<string> {
-  return handle.evaluate((el) => el.textContent ?? '')
+  return handle.evaluate((el, engineId) => {
+    if (engineId === 'muya2') {
+      const block = (el as unknown as { __MUYA_BLOCK__?: { text: string } }).__MUYA_BLOCK__
+      if (block) return block.text
+    }
+    return el.textContent ?? ''
+  }, ACTIVE_ENGINE.id)
+}
+
+/** Read the browser's live contenteditable text while an IME composition is
+ * still open. Muya 2 deliberately keeps intermediate composition text out of
+ * its persisted block model, so mid-composition polling must inspect the DOM.
+ * Render-only math/ruby previews are removed to keep offsets in the same
+ * logical Markdown coordinate system as the block model. */
+export async function readLiveContentText(handle: ElementHandle<Element>): Promise<string> {
+  return handle.evaluate((el, engineId) => {
+    const clone = el.cloneNode(true) as Element
+    const ignored =
+      engineId === 'muya2'
+        ? '.mu-math-render, .mu-ruby-render'
+        : '.ag-math-render, .ag-ruby-render'
+    clone.querySelectorAll(ignored).forEach((node) => node.remove())
+    return clone.textContent ?? ''
+  }, ACTIVE_ENGINE.id)
 }
 
 /** Character offset of the live caret within `handle`'s full text content
@@ -189,7 +239,13 @@ export async function getCaretOffsetInContent(
   window: Page,
   handle: ElementHandle<Element>
 ): Promise<number | null> {
-  return window.evaluate((content) => {
+  return window.evaluate(({ content, engineId }) => {
+    if (engineId === 'muya2') {
+      const block = (content as unknown as {
+        __MUYA_BLOCK__?: { getCursor(): { start: { offset: number } } | null }
+      }).__MUYA_BLOCK__
+      return block?.getCursor()?.start.offset ?? null
+    }
     const sel = window.getSelection()
     if (!sel || sel.rangeCount === 0) return null
     const range = sel.getRangeAt(0)
@@ -203,7 +259,7 @@ export async function getCaretOffsetInContent(
       total += node.data.length
     }
     return null
-  }, handle)
+  }, { content: handle, engineId: ACTIVE_ENGINE.id })
 }
 
 // ---------------------------------------------------------------------------

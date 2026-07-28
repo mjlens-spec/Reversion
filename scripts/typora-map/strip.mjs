@@ -72,7 +72,7 @@ export const STRIP_RULES = Object.freeze([
     id: 'typora-table-edit-ui',
     pattern: /\.ty-table-edit\b|\.ty-table-[\w-]+\b|\.md-table-edit\b/,
     disposition: 'drop',
-    reason: 'Typora 表格编辑浮层，反文有自己的 .ag-table-picker / .ag-table-bar-tools'
+    reason: 'Typora 表格编辑浮层，反文有自己的 .mu-table-picker / .mu-table-bar-tools'
   },
   {
     id: 'typora-print-block',
@@ -84,7 +84,7 @@ export const STRIP_RULES = Object.freeze([
     id: 'typora-focus-mode',
     pattern: /\.on-focus-mode\b/,
     disposition: 'manual',
-    reason: '需要人工确认反文专注模式（CLASS_OR_ID.AG_FOCUS_MODE，即 .ag-focus-mode，确认真实存在）的完整选择器组合'
+    reason: '需要人工确认反文专注模式（.mu-focus-mode）的完整选择器组合'
   }
 ])
 

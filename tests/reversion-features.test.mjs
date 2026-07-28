@@ -12,9 +12,10 @@ test('inline live rendering preserves Muya hidden markers and active syntax feed
   const installer = read('scripts/install-theme.mjs')
   const patcher = read('scripts/patch-asar-themes.mjs')
 
-  assert.match(css, /#ag-editor-id \.ag-hide[\s\S]*width: 0 !important/s)
-  assert.match(css, /#ag-editor-id \.ag-active \.ag-gray/)
-  assert.match(css, /#ag-editor-id \.ag-active \.ag-inline-rule/)
+  assert.match(css, /\.mu-editor \.mu-hide[\s\S]*opacity: 0 !important/s)
+  assert.match(css, /\.mu-editor \.mu-active \.mu-gray/)
+  assert.match(css, /\.mu-editor \.mu-active \.mu-inline-rule/)
+  assert.doesNotMatch(css, /#ag-editor-id|\.ag-/)
   assert.match(installer, /sourceCodeModeEnabled: false/)
   assert.match(installer, /autoPairMarkdownSyntax: true/)
   assert.match(patcher, /const reversionRuntimeCss = fs\.readFileSync/)
@@ -37,12 +38,13 @@ test('semantic minimap and its background Git work are removed', () => {
 test('editor and export themes balance narrow and wide tables', () => {
   for (const themePath of ['themes/lens-design-marktext.css', 'themes/claude-like-marktext.css']) {
     const css = read(themePath)
-    assert.match(css, /#ag-editor-id table,[\s\S]*width: 100% !important;[\s\S]*table-layout: auto;[\s\S]*font-size: 13px !important;/)
-    assert.match(css, /#ag-editor-id table th,[\s\S]*line-height: 1\.45 !important;[\s\S]*white-space: normal;/)
-    assert.match(css, /#ag-editor-id table th,[\s\S]*min-width: 4\.5em;/)
-    assert.match(css, /#ag-editor-id table th:first-child,[\s\S]*min-width: 3\.25em;/)
-    assert.match(css, /#ag-editor-id table th:last-child,[\s\S]*min-width: 8\.5em;/)
-    assert.match(css, /#ag-editor-id table td \*,[\s\S]*font-size: inherit !important;[\s\S]*line-height: inherit !important;/)
+    assert.match(css, /\.mu-container table \{[\s\S]*width: 100% !important;[\s\S]*table-layout: auto;[\s\S]*font-size: 13px !important;/)
+    assert.match(css, /\.mu-container table th \{[\s\S]*line-height: 1\.45 !important;[\s\S]*white-space: normal;/)
+    assert.match(css, /\.mu-container table td,[\s\S]*\.mu-container table th \{[\s\S]*min-width: 4\.5em;/)
+    assert.match(css, /\.mu-container table td:first-child,[\s\S]*\.mu-container table th:first-child \{[\s\S]*min-width: 3\.25em;/)
+    assert.match(css, /\.mu-container table td:last-child,[\s\S]*\.mu-container table th:last-child \{[\s\S]*min-width: 8\.5em;/)
+    assert.match(css, /\.mu-container table td \*,[\s\S]*\.mu-container table th \* \{[\s\S]*font-size: inherit !important;[\s\S]*line-height: inherit !important;/)
+    assert.doesNotMatch(css, /#ag-editor-id|\.ag-/)
   }
 
   for (const themePath of ['themes/export/lens-design.css', 'themes/export/claude-like.css']) {

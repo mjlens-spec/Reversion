@@ -142,9 +142,11 @@ test('both themes are wired into addThemeStyle(), the Preferences grid, and the 
   assert.match(menuTemplate, /label: 'Claude-like'/)
   assert.match(menuTemplate, /label: 'Lens Design'/)
 
+  const commonTheme = read('src/common/theme.ts')
+  assert.match(commonTheme, /\['lens-design', '#f4f6f8'\]/)
+  assert.match(commonTheme, /\['claude-like', '#f7f6f3'\]/)
   const windowBase = read('src/main/windows/base.ts')
-  assert.match(windowBase, /case 'lens-design':\s*\n\s*return '#f4f6f8'/)
-  assert.match(windowBase, /case 'claude-like':\s*\n\s*return '#f7f6f3'/)
+  assert.match(windowBase, /getThemeBackgroundColor\(theme\)/)
 })
 
 test('Lens Design is the schema default theme (was scripts/install-theme.mjs)', (t) => {
@@ -196,7 +198,8 @@ test('independent title/heading/body font-role preferences exist end to end', (t
   const editorVue = read('src/renderer/src/components/editorWithTabs/editor.vue')
   assert.match(editorVue, /'--editor-title-font-family': editorTitleFontFamily \|\| 'var\(--reading-font-title\)'/)
   assert.match(editorVue, /'--editor-body-font-family': editorBodyFontFamily \|\| 'var\(--reading-font-body\)'/)
-  assert.match(editorVue, /'font-family': editorBodyFontFamily/)
+  assert.match(editorVue, /watch\(editorBodyFontFamily/)
+  assert.match(editorVue, /editorFontFamily: resolveEditorFont\(editorBodyFontFamily\.value\)/)
 
   const prefEditor = read('src/renderer/src/prefComponents/editor/index.vue')
   assert.match(prefEditor, /onSelectChange\('editorTitleFontFamily', value\)/)
@@ -227,7 +230,7 @@ test('opening a project and bootstrapping a window both land on the table of con
 test('inline live-rendering CSS lives in the desktop global stylesheet', (t) => {
   if (!upstreamAvailable) return t.skip('upstream/marktext not available')
   const css = read('src/renderer/src/assets/styles/index.css')
-  assert.match(css, /#ag-editor-id \.ag-hide,\s*\n#ag-editor-id \.ag-hide \.ag-highlight,\s*\n#ag-editor-id \.ag-hide \.ag-selection \{/)
+  assert.match(css, /\.mu-editor \.mu-hide,\s*\n\.mu-editor \.mu-hide \.mu-highlight,\s*\n\.mu-editor \.mu-hide \.mu-selection \{/)
   assert.match(css, /opacity: 0 !important;/)
 })
 
@@ -302,7 +305,7 @@ test('build:unpack output contains the migrated theme, font-role, and TOC marker
   const cssFile = fs
     .readdirSync(rendererAssets)
     .map((file) => path.join(rendererAssets, file))
-    .find((file) => file.endsWith('.css') && fs.readFileSync(file, 'utf8').includes('ag-editor-id .ag-hide'))
+    .find((file) => file.endsWith('.css') && fs.readFileSync(file, 'utf8').includes('.mu-editor .mu-hide'))
   assert.ok(cssFile, 'expected a CSS chunk with the Reversion inline live-rendering rules')
 
   const mainFile = path.join(out, 'main', 'index.js')

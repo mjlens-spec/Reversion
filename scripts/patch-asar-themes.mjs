@@ -348,7 +348,10 @@ if (rendererLogoName) {
 const rendererCssPath = fs.readdirSync(rendererAssets)
   .filter((file) => file.endsWith('.css'))
   .map((file) => path.join(rendererAssets, file))
-  .find((file) => fs.readFileSync(file, 'utf8').includes('.ag-hide'))
+  .find((file) => {
+    const css = fs.readFileSync(file, 'utf8')
+    return css.includes('.mu-hide') || css.includes('.ag-hide')
+  })
 
 if (rendererCssPath) {
   let rendererCss = fs.readFileSync(rendererCssPath, 'utf8')

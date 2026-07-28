@@ -118,9 +118,9 @@ test.describe.serial('Reversion e2e smoke', () => {
     expect(pageErrors, `uncaught renderer exceptions on launch: ${pageErrors.join('\n')}`).toEqual([])
   })
 
-  test('3. fixture renders: #ag-editor-id shows heading/list/table/code/formula', async () => {
-    const editor = window.locator('#ag-editor-id')
-    await expect(editor, '#ag-editor-id should exist and mount muya').toBeVisible({ timeout: 15_000 })
+  test('3. fixture renders: .mu-editor shows heading/list/table/code/formula', async () => {
+    const editor = window.locator('.mu-editor')
+    await expect(editor, '.mu-editor should exist and mount Muya 2').toBeVisible({ timeout: 15_000 })
 
     // Give the editor a moment to finish its initial paragraph parse pass
     // (muya renders incrementally); wait for the heading text from the
@@ -189,11 +189,11 @@ test.describe.serial('Reversion e2e smoke', () => {
         }
         for (const cssRule of Array.from(rules)) {
           const rule = cssRule as CSSStyleRule
-          if (rule.selectorText?.includes('#ag-editor-id .ag-hide') && rule.style?.width) {
+          if (rule.selectorText?.includes('.mu-editor .mu-hide') && rule.style?.opacity) {
             return {
               selectorText: rule.selectorText,
-              width: rule.style.getPropertyValue('width'),
-              widthPriority: rule.style.getPropertyPriority('width')
+              opacity: rule.style.getPropertyValue('opacity'),
+              opacityPriority: rule.style.getPropertyPriority('opacity')
             }
           }
         }
@@ -201,9 +201,9 @@ test.describe.serial('Reversion e2e smoke', () => {
       return null
     })
 
-    expect(rule, '#ag-editor-id .ag-hide width-collapse rule should be findable in document.styleSheets').not.toBeNull()
-    expect(rule?.width.trim()).toBe('0px')
-    expect(rule?.widthPriority).toBe('important')
+    expect(rule, '.mu-editor .mu-hide fade rule should be findable in document.styleSheets').not.toBeNull()
+    expect(rule?.opacity.trim()).toBe('0')
+    expect(rule?.opacityPriority).toBe('important')
   })
 
   test('7. branding: app.getName() and the macOS application menu say Reversion', async () => {

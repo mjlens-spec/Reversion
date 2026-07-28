@@ -6,7 +6,7 @@
  *   node scripts/import-typora-theme.mjs <typora-theme.css> --name <themeName> --out-dir <dir>
  *
  * 产物（三件）：
- *   <out-dir>/<name>-marktext.css   编辑器主题（根作用域 #ag-editor-id）
+ *   <out-dir>/<name>-marktext.css   编辑器主题（根作用域 .mu-editor）
  *   <out-dir>/export/<name>.css     导出主题（根作用域 .markdown-body）
  *   <out-dir>/<name>-report.md      兼容报告（丢弃/未映射/覆盖率）
  *

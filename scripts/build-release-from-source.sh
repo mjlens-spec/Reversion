@@ -203,6 +203,7 @@ node -e '
 const fs = require("fs");
 const [file, version] = process.argv.slice(1);
 const text = fs.readFileSync(file, "utf8");
+if (JSON.parse(text).version === version) process.exit(0);
 const next = text.replace(/("version"\s*:\s*")[^"]*(")/, `$1${version}$2`);
 if (next === text) { throw new Error("version field not found in " + file); }
 if (JSON.parse(next).version !== version) { throw new Error("version rewrite did not take effect"); }

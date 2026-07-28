@@ -28,6 +28,7 @@ import {
   getCaretOffsetInContent,
   getContentHandleAtSelection,
   readContentText,
+  readLiveContentText,
   startInterruptionProbe,
   stopInterruptionProbe
 } from '../helpers/ime'
@@ -82,6 +83,18 @@ test.describe.serial('IME matrix B — composition interruption operations', () 
     await handle.window.screenshot({ path: path.join(screenshotDir, `${cell}-failure.png`) }).catch(() => {})
   }
 
+  async function sendEditorAction(action: 'undo' | 'redo'): Promise<void> {
+    await handle.app.evaluate(({ BrowserWindow }, actionName) => {
+      BrowserWindow.getAllWindows()[0]?.webContents.send('mt::editor-edit-action', actionName)
+    }, action)
+  }
+
+  async function requestFileSave(): Promise<void> {
+    await handle.app.evaluate(({ BrowserWindow }) => {
+      BrowserWindow.getAllWindows()[0]?.webContents.send('mt::editor-ask-file-save')
+    })
+  }
+
   // -- B1: Enter submits the candidate ---------------------------------
   for (const posKey of MATRIX_B_POSITIONS) {
     test(`B1@${posKey}: Enter submits candidate normally`, async () => {
@@ -89,9 +102,20 @@ test.describe.serial('IME matrix B — composition interruption operations', () 
       const { window, cdp } = handle
       const position = POSITIONS[posKey]
       const { handle: h, textBefore, caretOffsetBefore } = await beginComposition(window, cdp, position, 'ceshi')
-      await window.keyboard.press('Enter')
-      await window.waitForTimeout(150)
+      // CDP has no candidate window for a real Enter key to confirm. Sending
+      // Playwright's native Enter ends the synthetic composition before the
+      // page sees the IME-keydown semantics. Dispatch the keydown to verify the
+      // editor leaves it to the active composition, then use CDP's documented
+      // composition commit primitive for the candidate confirmation itself.
+      await window.evaluate(() => {
+        document.activeElement?.dispatchEvent(
+          new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })
+        )
+      })
+      await window.waitForTimeout(50)
       const midEvidence = await drainInterruptionEvidence(window)
+      await composeCommit(window, cdp, 'ceshi')
+      await window.waitForTimeout(100)
       await stopInterruptionProbe(window)
       const { handle: fresh } = await resolveLiveHandle(window, h)
       const textAfter = await readContentText(fresh)
@@ -148,10 +172,15 @@ test.describe.serial('IME matrix B — composition interruption operations', () 
       const { window, cdp } = handle
       const position = POSITIONS[posKey]
       const { handle: h, textBefore, caretOffsetBefore } = await beginComposition(window, cdp, position, 'ceshi')
-      await window.keyboard.press('ArrowDown')
-      await window.keyboard.press('ArrowUp')
+      await window.evaluate(() => {
+        for (const key of ['ArrowDown', 'ArrowUp']) {
+          document.activeElement?.dispatchEvent(
+            new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true })
+          )
+        }
+      })
       await window.waitForTimeout(100)
-      const midText = await readContentText(h)
+      const midText = await readLiveContentText(h)
       const stillComposing = midText === textBefore.slice(0, caretOffsetBefore) + 'ceshi' + textBefore.slice(caretOffsetBefore)
 
       await composeCommit(window, cdp, '测试')
@@ -284,7 +313,7 @@ test.describe.serial('IME matrix B — composition interruption operations', () 
       const { handle: afterCommitHandle } = await resolveLiveHandle(window, h)
       const textAfterCommit = await readContentText(afterCommitHandle)
 
-      await window.keyboard.press('Meta+z')
+      await sendEditorAction('undo')
       await window.waitForTimeout(150)
       const { handle: afterUndoHandle } = await resolveLiveHandle(window, afterCommitHandle)
       const textAfterUndo = await readContentText(afterUndoHandle)
@@ -310,7 +339,7 @@ test.describe.serial('IME matrix B — composition interruption operations', () 
       const { window, cdp } = handle
       const position = POSITIONS[posKey]
       const { handle: h, textBefore } = await beginComposition(window, cdp, position, 'ceshi')
-      await window.keyboard.press('Meta+z')
+      await sendEditorAction('undo')
       await window.waitForTimeout(150)
       const midEvidence = await drainInterruptionEvidence(window)
       await composeCancel(window, cdp)
@@ -369,7 +398,7 @@ test.describe.serial('IME matrix B — composition interruption operations', () 
         const caret = await getCaretOffsetInContent(window, currentHandle)
         if (caret === null) { perRoundOk.push(false); break }
         await composeSteps(window, cdp, [step])
-        await pollUntil(() => readContentText(currentHandle), (t) => t === before.slice(0, caret) + step + before.slice(caret), 600)
+        await pollUntil(() => readLiveContentText(currentHandle), (t) => t === before.slice(0, caret) + step + before.slice(caret), 600)
         await drainInterruptionEvidence(window)
         await composeCommit(window, cdp, final)
         await stopInterruptionProbe(window)
@@ -426,7 +455,7 @@ test.describe.serial('IME matrix B — composition interruption operations', () 
       const position = POSITIONS[posKey]
       const { handle: h, textBefore, caretOffsetBefore } = await beginComposition(window, cdp, position, 'ceshi')
 
-      await window.keyboard.press('Meta+s')
+      await requestFileSave()
       await window.waitForTimeout(300)
       const midEvidence = await drainInterruptionEvidence(window)
 
@@ -467,7 +496,7 @@ test.describe.serial('IME matrix B — composition interruption operations', () 
 
     await startInterruptionProbe(window, h0)
     await composeSteps(window, cdp, ['ceshi'])
-    await pollUntil(() => readContentText(h0), (t) => t === textBefore.slice(0, caretOffsetBefore) + 'ceshi' + textBefore.slice(caretOffsetBefore), 600)
+    await pollUntil(() => readLiveContentText(h0), (t) => t === textBefore.slice(0, caretOffsetBefore) + 'ceshi' + textBefore.slice(caretOffsetBefore), 600)
     await drainInterruptionEvidence(window)
     await composeCommit(window, cdp, '测试')
     await window.waitForTimeout(150)
@@ -627,11 +656,19 @@ test.describe.serial('IME matrix B — composition interruption operations', () 
       const { window, cdp } = handle
       const position = POSITIONS[posKey]
       const { handle: h, textBefore, caretOffsetBefore } = await beginComposition(window, cdp, position, 'ceshi')
-      await window.keyboard.press('Tab')
-      await window.waitForTimeout(150)
+      // Tab is normally consumed by the OS IME candidate UI. Playwright's
+      // native Tab has no candidate window to consume it and prematurely
+      // finalizes the synthetic CDP composition, so dispatch only the
+      // editor-facing keydown, then commit through CDP.
+      await window.evaluate(() => {
+        document.activeElement?.dispatchEvent(
+          new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true })
+        )
+      })
+      await window.waitForTimeout(50)
+      const midEvidence = await drainInterruptionEvidence(window)
       await composeCommit(window, cdp, '测试')
       await window.waitForTimeout(120)
-      const midEvidence = await drainInterruptionEvidence(window)
       await stopInterruptionProbe(window)
       const { handle: fresh } = await resolveLiveHandle(window, h)
       const textAfter = await readContentText(fresh)

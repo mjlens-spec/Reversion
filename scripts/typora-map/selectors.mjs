@@ -4,16 +4,15 @@
  * Source of truth: outputs/E2任务1_Typora主题映射规格_Claude_260726.md §2 (选择器映射表)
  * and §5 (已核实的三个特例：行内代码 / mark / hr)。
  *
- * ARCHITECTURE CONTRACT (规格 §6「前瞻风险」)：这个文件是**可整表替换**的数据层。
- * 一旦上游把桌面端从 `packages/muyajs`（`ag-` 前缀，CLASS_OR_ID 词表）切到
- * `packages/muya`（TS 重写版，`mu-` 前缀），只需要替换本文件，转译逻辑不动。
+ * 1.3.0 已切换到 `packages/muya`（TS 重写版，`mu-` 前缀）；本表只描述
+ * @muyajs/core 的现行 DOM，转译逻辑保持不变。
  *
  * ─── 条目字段 ────────────────────────────────────────────────────────────────
  *  editor / export : string | string[] | null
  *      目标选择器。数组表示一对多（重写时做笛卡尔展开）。null 表示该目标不支持，
  *      整条选择器在该目标里被丢弃并计入报告的「目标不支持」清单。
  *  scope : 'content' (默认) | 'root' | 'app'
- *      'content' 前置根作用域（编辑器 #ag-editor-id / 导出 .markdown-body）；
+ *      'content' 前置根作用域（编辑器 .mu-editor / 导出 .markdown-body）；
  *      'root'    自身即根（只有 #write）；
  *      'app'     不加根作用域（body/#app、CodeMirror、::selection 等应用层选择器）。
  *  absorbAncestors : boolean
@@ -32,7 +31,7 @@
  */
 
 export const ROOT_TARGETS = Object.freeze({
-  editor: '#ag-editor-id',
+  editor: '.mu-editor',
   export: '.markdown-body'
 })
 
@@ -46,14 +45,14 @@ const PASS = (name) => ({ editor: name, export: name })
  * 用于逐 compound 映射无法正确表达上下文语义的场合。
  */
 export const SEQUENCE_MAP = Object.freeze({
-  // 代码块内容：块内的 code/tt/pre 不是行内代码，走 .ag-code-content（规格 §2）。
-  '.md-fences code': { editor: '.ag-code-content', export: 'pre code', fontRole: 'mono' },
-  '.md-fences tt': { editor: '.ag-code-content', export: 'pre code', fontRole: 'mono' },
-  '.md-fences pre': { editor: '.ag-code-content', export: 'pre', fontRole: 'mono' },
-  '.md-fences > code': { editor: '.ag-code-content', export: 'pre > code', fontRole: 'mono' },
-  '.md-fences > pre': { editor: '.ag-code-content', export: 'pre', fontRole: 'mono' },
-  'pre code': { editor: '.ag-code-content', export: 'pre code', fontRole: 'mono' },
-  'pre tt': { editor: '.ag-code-content', export: 'pre code', fontRole: 'mono' }
+  // 代码块内容：块内的 code/tt/pre 不是行内代码，走 .mu-codeblock-content。
+  '.md-fences code': { editor: '.mu-codeblock-content', export: 'pre code', fontRole: 'mono' },
+  '.md-fences tt': { editor: '.mu-codeblock-content', export: 'pre code', fontRole: 'mono' },
+  '.md-fences pre': { editor: '.mu-codeblock-content', export: 'pre', fontRole: 'mono' },
+  '.md-fences > code': { editor: '.mu-codeblock-content', export: 'pre > code', fontRole: 'mono' },
+  '.md-fences > pre': { editor: '.mu-codeblock-content', export: 'pre', fontRole: 'mono' },
+  'pre code': { editor: '.mu-codeblock-content', export: 'pre code', fontRole: 'mono' },
+  'pre tt': { editor: '.mu-codeblock-content', export: 'pre code', fontRole: 'mono' }
 })
 
 /**
@@ -68,7 +67,7 @@ export const TOKEN_MAP = Object.freeze({
     export: ROOT_TARGETS.export,
     captureVars: { 'max-width': { marktext: 'editorAreaWidth' } },
     companion: { target: 'export', selector: '.hf-container', props: ['max-width'] },
-    note: '规格 §1.1 定案：#write → #ag-editor-id（编辑器）/ .markdown-body（导出）'
+    note: '1.3.0：#write → .mu-editor（编辑器）/ .markdown-body（导出）'
   },
   html: {
     scope: 'app',
@@ -86,52 +85,52 @@ export const TOKEN_MAP = Object.freeze({
   },
 
   // ── 标题 ────────────────────────────────────────────────────────────────
-  h1: { editor: 'h1.ag-paragraph', export: 'h1', fontRole: 'title' },
-  h2: { editor: 'h2.ag-paragraph', export: 'h2', fontRole: 'heading' },
-  h3: { editor: 'h3.ag-paragraph', export: 'h3', fontRole: 'heading' },
-  h4: { editor: 'h4.ag-paragraph', export: 'h4', fontRole: 'heading' },
-  h5: { editor: 'h5.ag-paragraph', export: 'h5', fontRole: 'heading' },
-  h6: { editor: 'h6.ag-paragraph', export: 'h6', fontRole: 'heading' },
+  h1: { editor: 'h1.mu-paragraph', export: 'h1', fontRole: 'title' },
+  h2: { editor: 'h2.mu-paragraph', export: 'h2', fontRole: 'heading' },
+  h3: { editor: 'h3.mu-paragraph', export: 'h3', fontRole: 'heading' },
+  h4: { editor: 'h4.mu-paragraph', export: 'h4', fontRole: 'heading' },
+  h5: { editor: 'h5.mu-paragraph', export: 'h5', fontRole: 'heading' },
+  h6: { editor: 'h6.mu-paragraph', export: 'h6', fontRole: 'heading' },
 
   // ── 块级内容 ────────────────────────────────────────────────────────────
-  p: { editor: 'p.ag-paragraph', export: 'p', fontRole: 'body' },
-  blockquote: { editor: 'blockquote.ag-paragraph', export: 'blockquote', fontRole: 'quote' },
-  figure: { editor: 'figure.ag-container-block', export: 'figure' },
+  p: { editor: 'p.mu-paragraph', export: 'p', fontRole: 'body' },
+  blockquote: { editor: '.mu-container blockquote', export: 'blockquote', fontRole: 'quote' },
+  figure: { editor: '.mu-container figure', export: 'figure' },
   figcaption: { editor: null, export: 'figcaption', note: '反文 figure 里没有 figcaption 渲染路径' },
   dl: { editor: null, export: 'dl', note: 'muyajs 无定义列表语法' },
   dt: { editor: null, export: 'dt', note: 'muyajs 无定义列表语法' },
   dd: { editor: null, export: 'dd', note: 'muyajs 无定义列表语法' },
 
   // ── 列表 ────────────────────────────────────────────────────────────────
-  ul: { editor: 'ul.ag-bullet-list', export: 'ul' },
-  ol: { editor: 'ol.ag-order-list', export: 'ol' },
-  li: { editor: 'li.ag-list-item', export: 'li', fontRole: 'body' },
-  '.task-list': { editor: 'ul.ag-task-list', export: 'ul' },
-  '.md-task-list-item': { editor: 'li.ag-task-list-item', export: 'li' },
-  '.task-list-item': { editor: 'li.ag-task-list-item', export: 'li' },
-  input: { editor: 'input.ag-task-list-item-checkbox', export: null, note: '编辑器里唯一的 input 是任务列表勾选框' },
+  ul: { editor: 'ul.mu-bullet-list', export: 'ul' },
+  ol: { editor: 'ol.mu-order-list', export: 'ol' },
+  li: { editor: 'li.mu-list-item', export: 'li', fontRole: 'body' },
+  '.task-list': { editor: 'ul.mu-task-list', export: 'ul' },
+  '.md-task-list-item': { editor: 'li.mu-task-list-item', export: 'li' },
+  '.task-list-item': { editor: 'li.mu-task-list-item', export: 'li' },
+  input: { editor: '.mu-task-list-checkbox', export: null, note: '任务列表勾选框在 Chromium 为 input，在 Firefox 为 span，共用类名' },
 
   // ── 表格 ────────────────────────────────────────────────────────────────
-  table: { editor: 'table.ag-paragraph', export: 'table' },
-  thead: { editor: 'thead.ag-paragraph', export: 'thead' },
-  tbody: { editor: 'tbody.ag-paragraph', export: 'tbody' },
+  table: { editor: 'table.mu-table-inner', export: 'table' },
+  thead: { editor: 'table.mu-table-inner > thead', export: 'thead' },
+  tbody: { editor: 'table.mu-table-inner > tbody', export: 'tbody' },
   tfoot: { editor: null, export: 'tfoot', note: 'muyajs 表格无 tfoot' },
-  tr: { editor: 'tr.ag-paragraph', export: 'tr' },
-  th: { editor: 'th.ag-paragraph', export: 'th', fontRole: 'body' },
-  td: { editor: 'td.ag-paragraph', export: 'td', fontRole: 'body' },
+  tr: { editor: 'table.mu-table-inner tr', export: 'tr' },
+  th: { editor: 'th.mu-table-cell', export: 'th', fontRole: 'body' },
+  td: { editor: 'td.mu-table-cell', export: 'td', fontRole: 'body' },
   caption: { editor: null, export: 'caption', note: 'muyajs 表格无 caption' },
   colgroup: { editor: null, export: 'colgroup' },
   col: { editor: null, export: 'col' },
 
   // ── 行内 ────────────────────────────────────────────────────────────────
-  a: { editor: 'a.ag-inline-rule', export: 'a', note: '.ag-link 为「声明未消费」，真实类是 .ag-inline-rule' },
-  '.md-link': { editor: 'a.ag-inline-rule', export: 'a' },
-  strong: { editor: 'strong.ag-inline-rule', export: 'strong' },
-  b: { editor: 'strong.ag-inline-rule', export: 'b' },
-  em: { editor: 'em.ag-inline-rule', export: 'em' },
-  i: { editor: 'em.ag-inline-rule', export: 'i' },
-  del: { editor: 'del.ag-inline-rule', export: 'del' },
-  s: { editor: 'del.ag-inline-rule', export: 's' },
+  a: { editor: 'a.mu-inline-rule', export: 'a' },
+  '.md-link': { editor: 'a.mu-inline-rule', export: 'a' },
+  strong: { editor: 'strong.mu-inline-rule', export: 'strong' },
+  b: { editor: 'strong.mu-inline-rule', export: 'b' },
+  em: { editor: 'em.mu-inline-rule', export: 'em' },
+  i: { editor: 'em.mu-inline-rule', export: 'i' },
+  del: { editor: 'del.mu-inline-rule', export: 'del' },
+  s: { editor: 'del.mu-inline-rule', export: 's' },
   mark: {
     editor: 'mark',
     export: 'mark',
@@ -152,8 +151,8 @@ export const TOKEN_MAP = Object.freeze({
   address: { editor: null, export: 'address', note: 'muyajs 无 address 渲染路径，仅导出侧保留' },
   '*': PASS('*'),
   img: { editor: 'img', export: 'img' },
-  code: { editor: 'code.ag-inline-rule', export: 'code', fontRole: 'mono', note: '【已核实】renderInlines/inlineCode.js:14 → code.ag-inline-rule' },
-  tt: { editor: 'code.ag-inline-rule', export: 'tt', fontRole: 'mono' },
+  code: { editor: 'code.mu-inline-rule', export: 'code', fontRole: 'mono' },
+  tt: { editor: 'code.mu-inline-rule', export: 'tt', fontRole: 'mono' },
 
   // ── 水平线（属性级改道，规格 §5 已核实） ────────────────────────────────
   hr: {
@@ -162,47 +161,47 @@ export const TOKEN_MAP = Object.freeze({
     propRoutes: [
       {
         props: ['margin', 'margin-top', 'margin-bottom', 'margin-left', 'margin-right'],
-        target: "p[data-role='hr']"
+        target: '.mu-thematic-break'
       },
       {
         props: ['background-color', 'background'],
-        target: "p[data-role='hr']::before",
+        target: '.mu-thematic-break:not(.mu-active)::before',
         renameTo: 'border-top-color',
         variable: 'hrColor',
         appendDecls: [['border-top-style', 'solid']]
       },
       {
         props: ['border-top-color', 'border-color'],
-        target: "p[data-role='hr']::before",
+        target: '.mu-thematic-break:not(.mu-active)::before',
         renameTo: 'border-top-color',
         variable: 'hrColor'
       },
       {
         props: ['height'],
-        target: "p[data-role='hr']::before",
+        target: '.mu-thematic-break:not(.mu-active)::before',
         renameTo: 'border-top-width'
       },
       {
         props: ['border-top', 'border-top-width', 'border-top-style', 'opacity'],
-        target: "p[data-role='hr']::before"
+        target: '.mu-thematic-break:not(.mu-active)::before'
       }
     ],
     dropProps: ['padding', 'border', 'border-bottom', 'border-left', 'border-right', 'overflow', 'box-sizing', 'width', 'display'],
-    note: '【已核实】muyajs 用 p:not(.ag-active)[data-role=\'hr\']::before 的 border-top 画线，颜色走 --hrColor'
+    note: '【已核实】@muyajs/core 用 .mu-thematic-break:not(.mu-active)::before 画线，颜色走 --hr-color'
   },
 
   // ── 代码块 ──────────────────────────────────────────────────────────────
   '.md-fences': {
-    editor: ['pre.ag-fence-code', 'pre.ag-indent-code'],
+    editor: ['.mu-code-block', '.mu-indented-code'],
     export: ['pre', '.highlight pre'],
     fontRole: 'mono'
   },
   pre: {
-    editor: ['pre.ag-fence-code', 'pre.ag-indent-code'],
+    editor: ['.mu-code-block', '.mu-indented-code'],
     export: 'pre',
     fontRole: 'mono'
   },
-  '.ag-code-content': { editor: '.ag-code-content', export: 'pre code', fontRole: 'mono' },
+  '.mu-codeblock-content': { editor: '.mu-codeblock-content', export: 'pre code', fontRole: 'mono' },
 
   // ── CodeMirror / 语法高亮：应用层，吸收祖先 ────────────────────────────
   '.CodeMirror': { scope: 'app', absorbAncestors: true, editor: '.CodeMirror', export: null, fontRole: 'mono' },
@@ -231,7 +230,7 @@ export const TOKEN_MAP = Object.freeze({
   '.md-toc-inner': { scope: { editor: 'content', export: 'app' }, editor: null, export: '.toc-container ul li span a' },
 
   // ── 脚注 ────────────────────────────────────────────────────────────────
-  '.footnotes': { scope: { editor: 'content', export: 'app' }, editor: 'figure[data-role="FOOTNOTE"]', export: '.footnotes' },
+  '.footnotes': { scope: { editor: 'content', export: 'app' }, editor: 'figure.mu-footnote', export: '.footnotes' },
 
   // ── 应用 chrome：规格 §2 最后一行明确映射的侧边栏容器 ───────────────────
   '#typora-sidebar': {
