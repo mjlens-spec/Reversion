@@ -6,7 +6,7 @@
 
 Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 所见即所得 Markdown 编辑器。它基于 [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` 与 TypeScript 编辑器引擎 `@muyajs/core`，加入行内实时渲染、原生 Finder Quick Look 扩展、两套排印主题、Typora 主题导入工具，以及书法「攵」应用图标。
 
-当前版本：**1.3.3**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
+当前版本：**1.3.4**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
 
 ## 核心功能
 
@@ -26,15 +26,13 @@ Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 
 
 应用采用带稳定应用标识的 ad-hoc 签名，**未经 Apple 公证**。该稳定标识用于让相邻版本互相校验；下载另有 GitHub HTTPS 与 `latest-mac.yml` 中的 SHA-512 校验保护。首次启动时，macOS Gatekeeper 可能要求在访达中按住 Control 点击 →「打开」。
 
-## 1.3.3 更新内容
+## 1.3.4 更新内容
 
-- 打开文件后立即显示字数。此前字数只在内容变化时写入，因此打开一份文档后一直显示 0，直到敲下第一个字。
-- 偏好设置窗口标题不再被 macOS 窗口按钮遮挡：左栏内容此前从距顶 24 像素处开始，落在窗口为标题栏预留的 32 像素区域内，而系统正是在那里绘制红黄绿按钮。
-- 偏好设置窗口的七个分类图标统一为 Material Symbols，与主窗口侧栏、编辑器工具条一致。
+- **Quick Look 表格排版。** 预览此前把表格每一行原样打印在等宽字体里靠字符宽度对齐——等宽字体只对拉丁字母等宽，含中文的单元格必然错列，长行会折到下一行，`| --- | --- |` 分隔行也被当作正文显示。现按 GFM 规则解析并交由系统文本表格排版：自动计算列宽、单元格内折行、绘制边框、表头浅底加粗，分隔行中的 `:---` / `---:` / `:---:` 对齐方式生效。
 
-1.3.2 已加入应用内导入 Typora 主题（主题 ▸ 导入主题），以及编辑器界面的 Material Symbols 图标统一。
+1.3.3 已修复打开文件不显示字数、偏好设置标题被 macOS 窗口按钮遮挡，并统一了偏好设置分类图标。
 
-完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.3.3)。
+完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.3.4)。
 
 ## 开发计划
 
@@ -64,7 +62,7 @@ node scripts/import-typora-theme.mjs <typora主题.css> --name <名称> --out-di
 构建流程会取得上游源码树、应用反文的 commit，并产出已签名的发布产物。Node 版本钉在上游发布所用的版本（见 `.nvmrc`），pnpm 钉在上游 `packageManager` 字段声明的版本。
 
 ```bash
-./scripts/build-release-from-source.sh 1.3.3
+./scripts/build-release-from-source.sh 1.3.4
 ```
 
 产物落在 `releases/<版本>/`：DMG、更新用 ZIP、`latest-mac.yml` 与 SHA-256 校验文件。

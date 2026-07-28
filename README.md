@@ -6,7 +6,7 @@
 
 Reversion, Chinese name `反文`, is a macOS WYSIWYG Markdown editor for Chinese-language writing. It is based on [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` and its TypeScript editor engine, `@muyajs/core`, with inline live rendering, a native Finder Quick Look extension, two typographic themes, an importer for Typora themes, and an app icon built around the calligraphic Chinese radical `攵`.
 
-Current release: **1.3.3** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
+Current release: **1.3.4** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
 
 ## Core features
 
@@ -26,15 +26,13 @@ The app checks this repository for a newer stable release 15 seconds after the f
 
 The app is ad-hoc signed with a stable application requirement and is **not Apple notarized**. The stable requirement is what lets one release validate the next; downloads are additionally covered by GitHub HTTPS and the SHA-512 digest in `latest-mac.yml`. On first launch macOS Gatekeeper may require Control-click → Open in Finder.
 
-## What's new in 1.3.3
+## What's new in 1.3.4
 
-- A document now reports its word count as soon as it opens. The counter was only written when content *changed*, so an opened file sat at zero until the first keystroke.
-- The Preferences heading no longer sits under the macOS window buttons: the sidebar started 24px from the top, inside the 32px strip the window reserves for its title bar, which is exactly where the system paints the traffic lights.
-- The seven Preferences category icons use the same Material Symbols set as the sidebar rail and the editor toolbar.
+- **Quick Look tables.** The preview printed each table row verbatim in a monospaced font and left it to line up on its own — which cannot work, because a monospaced font is only monospaced for Latin: any CJK cell threw the columns off, long rows wrapped into the next line, and the `| --- | --- |` delimiter row was shown as content. Tables are now parsed per GFM and laid out as real tables, with column sizing, wrapping inside a cell, borders, a shaded header row, and per-column alignment from the delimiter row.
 
-1.3.2 added in-app Typora theme import (Theme ▸ Import Theme) along with the Material Symbols icon pass across the editor chrome.
+1.3.3 fixed the word count on open, the Preferences heading sitting under the macOS window buttons, and unified the Preferences category icons.
 
-Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.3.3).
+Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.3.4).
 
 ## Roadmap
 
@@ -64,7 +62,7 @@ This writes `<name>-marktext.css` (editor), `export/<name>.css` (HTML/PDF), and 
 The build resolves the upstream source tree, applies Reversion's commits, and produces signed artifacts. It pins Node to the version upstream releases with (see `.nvmrc`) and pnpm to the version in upstream's `packageManager` field.
 
 ```bash
-./scripts/build-release-from-source.sh 1.3.3
+./scripts/build-release-from-source.sh 1.3.4
 ```
 
 Artifacts land in `releases/<version>/`: DMG, updater ZIP, `latest-mac.yml`, and SHA-256 sidecars.
