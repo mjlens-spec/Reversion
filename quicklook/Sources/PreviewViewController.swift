@@ -15,6 +15,11 @@ final class PreviewViewController: NSViewController, QLPreviewingController {
         scrollView.drawsBackground = true
         scrollView.backgroundColor = ReversionMarkdownRenderer.paperColor
 
+        // Tables are laid out with NSTextTable, which only TextKit 1 renders —
+        // under TextKit 2 the cells collapse into plain paragraphs. Touching
+        // the TextKit 1 layout manager is what pins the view to that stack.
+        _ = textView.layoutManager
+
         textView.isEditable = false
         textView.isSelectable = true
         textView.drawsBackground = true

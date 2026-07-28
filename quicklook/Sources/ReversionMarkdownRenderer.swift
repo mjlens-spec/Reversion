@@ -9,6 +9,8 @@ enum ReversionMarkdownRenderer {
     private static let codeColor = NSColor(calibratedRed: 0.34, green: 0.17, blue: 0.25, alpha: 1)
     private static let codeBackground = NSColor(calibratedRed: 0.91, green: 0.93, blue: 0.95, alpha: 1)
     private static let quoteBackground = NSColor(calibratedRed: 0.93, green: 0.95, blue: 0.96, alpha: 1)
+    private static let tableBorderColor = NSColor(calibratedWhite: 0.80, alpha: 1)
+    private static let tableHeaderBackground = NSColor(calibratedRed: 0.91, green: 0.93, blue: 0.95, alpha: 1)
 
     static func render(_ markdown: String, fileName: String) -> NSAttributedString {
         let output = NSMutableAttributedString()
@@ -17,6 +19,7 @@ enum ReversionMarkdownRenderer {
         let normalized = markdown.replacingOccurrences(of: "\r\n", with: "\n")
             .replacingOccurrences(of: "\r", with: "\n")
         let lines = normalized.components(separatedBy: "\n")
+        var index = 0
         var paragraph: [String] = []
         var codeLines: [String] = []
         var inFence = false
@@ -35,7 +38,9 @@ enum ReversionMarkdownRenderer {
             codeLanguage = ""
         }
 
-        for line in lines {
+        while index < lines.count {
+            let line = lines[index]
+            index += 1
             let trimmed = line.trimmingCharacters(in: .whitespaces)
 
             if inFence {
@@ -74,7 +79,13 @@ enum ReversionMarkdownRenderer {
             } else if isHorizontalRule(trimmed) {
                 flushParagraph()
                 appendRule(to: output)
+            } else if let table = table(startingAt: index - 1, in: lines) {
+                flushParagraph()
+                appendTable(table, to: output)
+                index = table.endIndex
             } else if looksLikeTable(line) {
+                // A pipe row without a valid delimiter row underneath is not a
+                // table in GFM; show it verbatim rather than inventing columns.
                 flushParagraph()
                 appendInline(line, style: .table, to: output)
             } else {
@@ -316,6 +327,175 @@ enum ReversionMarkdownRenderer {
     private static func looksLikeTable(_ line: String) -> Bool {
         let trimmed = line.trimmingCharacters(in: .whitespaces)
         return trimmed.hasPrefix("|") && trimmed.hasSuffix("|") && trimmed.filter { $0 == "|" }.count >= 2
+    }
+
+    struct Table {
+        let header: [String]
+        let rows: [[String]]
+        let alignments: [NSTextAlignment]
+        /// Index of the first line after the table, for the caller's cursor.
+        let endIndex: Int
+    }
+
+    /// A GFM table is a header row, a delimiter row that fixes the column count
+    /// and alignment, then body rows. Without a matching delimiter row the lines
+    /// are just text that happens to contain pipes, so this returns nil and the
+    /// caller falls back to verbatim output.
+    static func table(startingAt start: Int, in lines: [String]) -> Table? {
+        guard start + 1 < lines.count, looksLikeTable(lines[start]) else { return nil }
+        let header = tableCells(in: lines[start])
+        guard !header.isEmpty else { return nil }
+        guard let alignments = delimiterAlignments(in: lines[start + 1]),
+              alignments.count == header.count else { return nil }
+
+        var rows: [[String]] = []
+        var cursor = start + 2
+        while cursor < lines.count, looksLikeTable(lines[cursor]) {
+            var cells = tableCells(in: lines[cursor])
+            // GFM: short rows are padded, long rows truncated, so every row
+            // matches the header's column count.
+            if cells.count < header.count {
+                cells.append(contentsOf: Array(repeating: "", count: header.count - cells.count))
+            } else if cells.count > header.count {
+                cells = Array(cells.prefix(header.count))
+            }
+            rows.append(cells)
+            cursor += 1
+        }
+
+        return Table(header: header, rows: rows, alignments: alignments, endIndex: cursor)
+    }
+
+    /// Splits one row on unescaped pipes, dropping the optional outer pair.
+    static func tableCells(in line: String) -> [String] {
+        var cells: [String] = []
+        var current = ""
+        var escaped = false
+        for character in line.trimmingCharacters(in: .whitespaces) {
+            if escaped {
+                // Only `\|` is a pipe escape; every other pair keeps its
+                // backslash so inline markdown still sees what the author wrote.
+                if character != "|" { current.append("\\") }
+                current.append(character)
+                escaped = false
+            } else if character == "\\" {
+                escaped = true
+            } else if character == "|" {
+                cells.append(current)
+                current = ""
+            } else {
+                current.append(character)
+            }
+        }
+        if escaped { current.append("\\") }
+        cells.append(current)
+
+        if let first = cells.first, first.trimmingCharacters(in: .whitespaces).isEmpty {
+            cells.removeFirst()
+        }
+        if let last = cells.last, last.trimmingCharacters(in: .whitespaces).isEmpty {
+            cells.removeLast()
+        }
+        return cells.map { $0.trimmingCharacters(in: .whitespaces) }
+    }
+
+    /// `---` / `:---` / `---:` / `:---:` per column, or nil if this is not a
+    /// delimiter row.
+    static func delimiterAlignments(in line: String) -> [NSTextAlignment]? {
+        let cells = tableCells(in: line)
+        guard !cells.isEmpty else { return nil }
+
+        var alignments: [NSTextAlignment] = []
+        for cell in cells {
+            let leadsWithColon = cell.hasPrefix(":")
+            let trailsWithColon = cell.hasSuffix(":")
+            var dashes = cell
+            if leadsWithColon { dashes.removeFirst() }
+            if trailsWithColon, !dashes.isEmpty { dashes.removeLast() }
+            guard !dashes.isEmpty, dashes.allSatisfy({ $0 == "-" }) else { return nil }
+
+            switch (leadsWithColon, trailsWithColon) {
+            case (true, true): alignments.append(.center)
+            case (false, true): alignments.append(.right)
+            default: alignments.append(.left)
+            }
+        }
+        return alignments
+    }
+
+    private static func appendTable(_ table: Table, to output: NSMutableAttributedString) {
+        // NSTextTable does the column sizing and in-cell wrapping that the old
+        // monospaced-line rendering could not: a monospaced font is only
+        // monospaced for Latin, so CJK cells never lined up, and a long row
+        // wrapped into the next visual line instead of staying in its column.
+        let layout = NSTextTable()
+        layout.numberOfColumns = table.header.count
+        layout.layoutAlgorithm = .automaticLayoutAlgorithm
+        layout.collapsesBorders = true
+        layout.hidesEmptyCells = false
+
+        appendTableRow(table.header, alignments: table.alignments, row: 0, isHeader: true, layout: layout, to: output)
+        for (offset, cells) in table.rows.enumerated() {
+            appendTableRow(cells, alignments: table.alignments, row: offset + 1, isHeader: false, layout: layout, to: output)
+        }
+
+        // Close the table so the next block is not absorbed into its last cell.
+        output.append(NSAttributedString(string: "\n", attributes: [
+            .font: bodyFont(size: 6),
+            .paragraphStyle: paragraphStyle(spacingAfter: 12, lineHeight: 6)
+        ]))
+    }
+
+    private static func appendTableRow(
+        _ cells: [String],
+        alignments: [NSTextAlignment],
+        row: Int,
+        isHeader: Bool,
+        layout: NSTextTable,
+        to output: NSMutableAttributedString
+    ) {
+        let font = bodyFont(size: 14)
+        for (column, cell) in cells.enumerated() {
+            let block = NSTextTableBlock(
+                table: layout,
+                startingRow: row,
+                rowSpan: 1,
+                startingColumn: column,
+                columnSpan: 1
+            )
+            block.setBorderColor(tableBorderColor)
+            block.setWidth(1, type: .absoluteValueType, for: .border)
+            block.setWidth(7, type: .absoluteValueType, for: .padding)
+            if isHeader {
+                block.backgroundColor = tableHeaderBackground
+            }
+
+            let paragraph = paragraphStyle(spacingAfter: 0, lineHeight: 22)
+            paragraph.textBlocks = [block]
+            paragraph.alignment = alignments.indices.contains(column) ? alignments[column] : .left
+
+            let configuration = AttributedString.MarkdownParsingOptions(
+                interpretedSyntax: .inlineOnlyPreservingWhitespace,
+                failurePolicy: .returnPartiallyParsedIfPossible
+            )
+            let parsed = (try? AttributedString(markdown: cell, options: configuration)) ?? AttributedString(cell)
+            let rendered = NSMutableAttributedString(attributedString: NSAttributedString(parsed))
+            let cellFont = isHeader ? NSFontManager.shared.convert(font, toHaveTrait: .boldFontMask) : font
+            rendered.addAttributes([
+                .font: cellFont,
+                .foregroundColor: textColor,
+                .paragraphStyle: paragraph
+            ], range: NSRange(location: 0, length: rendered.length))
+            styleInlineIntents(in: rendered, baseFont: cellFont)
+
+            // Each cell is its own paragraph; TextKit assembles the grid from
+            // the row/column carried by every paragraph's text block.
+            rendered.append(NSAttributedString(string: "\n", attributes: [
+                .font: cellFont,
+                .paragraphStyle: paragraph
+            ]))
+            output.append(rendered)
+        }
     }
 
     private static func paragraphStyle(
