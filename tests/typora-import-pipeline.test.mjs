@@ -188,7 +188,7 @@ test('layer 2 variable-mapper: 未收录变量按「被引用→直通 / 无引�
 
 // ── layer 3: selector-rewriter ────────────────────────────────────────────
 test('layer 3 selector-rewriter: 基础映射与两路根作用域', () => {
-  assert.deepEqual(resolveSelector('h1', 'editor').selectors, ['.mu-editor h1.mu-paragraph'])
+  assert.deepEqual(resolveSelector('h1', 'editor').selectors, ['.mu-editor .mu-container h1'])
   assert.deepEqual(resolveSelector('h1', 'export').selectors, ['.markdown-body h1'])
   assert.deepEqual(resolveSelector('blockquote', 'editor').selectors, ['.mu-editor .mu-container blockquote'])
   assert.deepEqual(resolveSelector('table th', 'editor').selectors, ['.mu-editor table.mu-table-inner th.mu-table-cell'])
@@ -328,7 +328,7 @@ test('layer 5 font-slot-injector: 四槽位 + 运行时覆盖 fallback（规格 
   // 槽位锚点从映射表解析出来，不是写死的选择器
   const anchors = fontAnchorRules('editor', fonts.stacks)
   const anchorSelectors = anchors.flatMap((r) => r.selectors)
-  assert.ok(anchorSelectors.includes('.mu-editor h1.mu-paragraph'))
+  assert.ok(anchorSelectors.includes('.mu-editor .mu-container h1'))
   assert.ok(anchorSelectors.includes('.mu-editor .mu-container blockquote'))
   assert.ok(anchors.every((r) => r.decls.length === 1 && r.decls[0].prop === 'font-family'))
 })

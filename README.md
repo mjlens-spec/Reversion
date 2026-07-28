@@ -6,13 +6,13 @@
 
 Reversion, Chinese name `反文`, is a macOS WYSIWYG Markdown editor for Chinese-language writing. It is based on [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` and its TypeScript editor engine, `@muyajs/core`, with inline live rendering, a native Finder Quick Look extension, two typographic themes, an importer for Typora themes, and an app icon built around the calligraphic Chinese radical `攵`.
 
-Current release: **1.3.1** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
+Current release: **1.3.2** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
 
 ## Core features
 
 - **Inline live rendering** — Muya stays in WYSIWYG mode by default. Bold, italic, links, inline code, and math render as you type; Markdown markers appear inside the active syntax range and collapse once the caret leaves it.
 - **Typography-first themes** — two built-in themes, each with three independent reading font slots so large titles, smaller headings, and body copy can use different faces, with a CJK fallback chain that does not break Latin metrics.
-- **Typora theme import** — `scripts/import-typora-theme.mjs` transpiles a Typora theme's CSS into a Reversion editor theme plus a matching HTML/PDF export theme, and writes a compatibility report listing anything it could not map. Verified against six of Typora's built-in themes.
+- **Typora theme import** — Theme ▸ Import Theme (Typora compatible) converts a Typora theme's CSS, in the app, into a Reversion editor theme plus a matching HTML/PDF export theme, and writes a compatibility report listing anything it could not map. The same pipeline is available as `scripts/import-typora-theme.mjs`. Verified against six of Typora's built-in themes.
 - **Finder Quick Look** — the app bundles a native macOS Quick Look Preview Extension. Select a Markdown file in Finder and press Space to preview headings, lists, block quotes, code blocks, tables, and inline formatting.
 - **Diagrams and math** — Mermaid 11, Vega-Lite, PlantUML, flowchart.js, and KaTeX.
 - **Full-text search** — ripgrep-backed project search with exclusion rules and symlink handling.
@@ -26,15 +26,15 @@ The app checks this repository for a newer stable release 15 seconds after the f
 
 The app is ad-hoc signed with a stable application requirement and is **not Apple notarized**. The stable requirement is what lets one release validate the next; downloads are additionally covered by GitHub HTTPS and the SHA-512 digest in `latest-mac.yml`. On first launch macOS Gatekeeper may require Control-click → Open in Finder.
 
-## What's new in 1.3.1
+## What's new in 1.3.2
 
-- The editor pane fills the window again on wide displays. Both built-in themes were clamping the scroll viewport to the line width, which left dead space on the right and stranded the scrollbar mid-window; the clamp now applies only to the centered content column.
-- The inline format toolbar was restyled: softer corners and hairline border, roomier hit targets, and an accent-tinted pill on formats already applied. Colors come from the active theme.
-- A fresh install no longer shows the "update completed" dialog on first launch, and no longer starts in the `dark` theme when macOS is in dark appearance — the Lens Design default now holds. Follow-system theme switching remains available in Preferences → General.
+- **Import a Typora theme from inside the app.** Theme ▸ Import Theme (Typora compatible) converts a Typora `.css` into a Reversion editor theme plus a matching HTML/PDF export theme, lists it under Imported Themes and switches to it, and reports how much carried over with a link to the full compatibility report. Previously this existed only as a CLI script.
+- The inline format toolbar uses Material Symbols icons and shows each button's action and shortcut on hover.
+- The sidebar rail uses the same icon set, marks the open panel with an accent pill, and has hover feedback and tooltips.
+- The word counter shows a named total and reports CJK characters and Latin words separately instead of one mixed number behind a one-letter label.
+- Fixed: transpiled themes lost all their heading styling, because the transpiler still emitted heading selectors for the retired editor engine's DOM.
 
-1.3.0 moved Reversion from the frozen legacy Muya editor to `@muyajs/core`, the TypeScript rewrite used by current MarkText development, together with the theme migration, IME fixes, in-app update experience, and the 10,000-line performance benchmark.
-
-Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.3.1).
+Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.3.2).
 
 ## Roadmap
 
@@ -64,7 +64,7 @@ This writes `<name>-marktext.css` (editor), `export/<name>.css` (HTML/PDF), and 
 The build resolves the upstream source tree, applies Reversion's commits, and produces signed artifacts. It pins Node to the version upstream releases with (see `.nvmrc`) and pnpm to the version in upstream's `packageManager` field.
 
 ```bash
-./scripts/build-release-from-source.sh 1.3.1
+./scripts/build-release-from-source.sh 1.3.2
 ```
 
 Artifacts land in `releases/<version>/`: DMG, updater ZIP, `latest-mac.yml`, and SHA-256 sidecars.

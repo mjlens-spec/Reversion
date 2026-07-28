@@ -85,12 +85,16 @@ export const TOKEN_MAP = Object.freeze({
   },
 
   // ── 标题 ────────────────────────────────────────────────────────────────
-  h1: { editor: 'h1.mu-paragraph', export: 'h1', fontRole: 'title' },
-  h2: { editor: 'h2.mu-paragraph', export: 'h2', fontRole: 'heading' },
-  h3: { editor: 'h3.mu-paragraph', export: 'h3', fontRole: 'heading' },
-  h4: { editor: 'h4.mu-paragraph', export: 'h4', fontRole: 'heading' },
-  h5: { editor: 'h5.mu-paragraph', export: 'h5', fontRole: 'heading' },
-  h6: { editor: 'h6.mu-paragraph', export: 'h6', fontRole: 'heading' },
+  // 标题在 muya2 里是 `hN.mu-atx-heading`（`#` 语法）或 setext 变体，都不带
+  // `.mu-paragraph`——沿用 legacy 词表的 `hN.mu-paragraph` 会一条都匹配不上，
+  // 转译主题的标题样式全部静默失效。按 blockquote 的写法退回元素选择器，
+  // 两种标题语法都覆盖，也与手写内置主题（`.mu-container h1`）一致。
+  h1: { editor: '.mu-container h1', export: 'h1', fontRole: 'title' },
+  h2: { editor: '.mu-container h2', export: 'h2', fontRole: 'heading' },
+  h3: { editor: '.mu-container h3', export: 'h3', fontRole: 'heading' },
+  h4: { editor: '.mu-container h4', export: 'h4', fontRole: 'heading' },
+  h5: { editor: '.mu-container h5', export: 'h5', fontRole: 'heading' },
+  h6: { editor: '.mu-container h6', export: 'h6', fontRole: 'heading' },
 
   // ── 块级内容 ────────────────────────────────────────────────────────────
   p: { editor: 'p.mu-paragraph', export: 'p', fontRole: 'body' },

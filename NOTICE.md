@@ -25,6 +25,16 @@ The Claude-like theme CSS in this repository is adapted from the MIT-licensed Ty
 - License: https://github.com/Muyiiiii/Typora_Claude-Like_Theme/blob/master/LICENSE
 - Copyright (c) 2026 Muyiiiii
 
+The editor's inline format toolbar and the sidebar rail draw Material Symbols
+(Outlined, weight 400) icons, inlined as SVG path data:
+
+- Repository: https://github.com/google/material-design-icons
+- License: Apache License 2.0
+- Copyright (c) Google LLC
+
+The Apache 2.0 license text is included in
+`UPSTREAM_LICENSES/MaterialSymbols-APACHE-2.0-LICENSE.txt`.
+
 ## Fonts
 
 The themes reference externally hosted fonts and local system fallbacks. Font files are not redistributed in this repository.
