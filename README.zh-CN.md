@@ -6,13 +6,13 @@
 
 Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 所见即所得 Markdown 编辑器。它基于 [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` 与 TypeScript 编辑器引擎 `@muyajs/core`，加入行内实时渲染、原生 Finder Quick Look 扩展、两套排印主题、Typora 主题导入工具，以及书法「攵」应用图标。
 
-当前版本：**1.3.1**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
+当前版本：**1.3.2**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
 
 ## 核心功能
 
 - **行内实时渲染** — 默认进入 Muya 所见即所得模式。粗体、斜体、链接、行内代码、数学公式随输入实时排版；光标进入语法范围时显示 Markdown 标记，移开后自动隐藏。
 - **排印优先的主题** — 内置两套主题，各有三个独立的阅读字体槽位，可分别设定大标题、小标题与正文字体，并带一条不破坏西文字形度量的中文回退链。
-- **Typora 主题导入** — `scripts/import-typora-theme.mjs` 把 Typora 主题的 CSS 转译为反文的编辑器主题与配套 HTML/PDF 导出主题，并输出兼容报告列出无法映射的规则。已在 Typora 六套内置主题上验证。
+- **Typora 主题导入** — 「主题 ▸ 导入主题（Typora 兼容）」在应用内把 Typora 主题的 CSS 转译为反文的编辑器主题与配套 HTML/PDF 导出主题，并输出兼容报告列出无法映射的规则。同一条流水线也以 `scripts/import-typora-theme.mjs` 形式提供。已在 Typora 六套内置主题上验证。
 - **Finder Quick Look** — 应用内置原生 macOS Quick Look 预览扩展。在访达中选中 Markdown 文件按空格，即可预览标题、列表、引用、代码块、表格与行内格式。
 - **图表与公式** — Mermaid 11、Vega-Lite、PlantUML、flowchart.js 与 KaTeX。
 - **全文搜索** — 基于 ripgrep 的项目内搜索，支持排除规则与符号链接处理。
@@ -26,15 +26,15 @@ Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 
 
 应用采用带稳定应用标识的 ad-hoc 签名，**未经 Apple 公证**。该稳定标识用于让相邻版本互相校验；下载另有 GitHub HTTPS 与 `latest-mac.yml` 中的 SHA-512 校验保护。首次启动时，macOS Gatekeeper 可能要求在访达中按住 Control 点击 →「打开」。
 
-## 1.3.1 更新内容
+## 1.3.2 更新内容
 
-- 修复宽窗口下编辑区右侧出现大片空白、滚动条停在窗口中间的问题。两套内置主题此前把正文栏宽度限制加在了滚动视口上，现改为只约束居中的正文栏。
-- 重做选中文字后弹出的行内格式工具条：圆角与描边收敛、按钮间距重排、已应用的格式以主题色淡底标示。配色取自当前主题。
-- 全新安装不再误弹「更新说明」窗口；系统为深色外观时也不再被自动切换为 dark 主题，默认恢复 Lens Design。跟随系统外观切换主题仍可在「偏好设置 → 通用」中开启。
+- **应用内导入 Typora 主题。**「主题 ▸ 导入主题（Typora 兼容）」把 Typora 的 `.css` 转译为反文编辑器主题与配套的 HTML/PDF 导出主题，列入「已导入主题」并立即启用，同时给出转换覆盖情况与兼容报告入口。此前该能力只存在于命令行脚本中。
+- 行内格式工具条改用 Material Symbols 图标，鼠标悬停显示按钮功能与快捷键。
+- 左侧竖栏改用同一套图标，当前面板以圆角底色块标示，新增悬停反馈与文字提示。
+- 字数统计改为固定显示「总字数」，并将中文字数与英文单词数分开呈现，不再是单字母标识下的单个混合数字。
+- 修复：转译主题的标题样式全部失效——转译器仍按已退役编辑器内核的 DOM 生成标题选择器。
 
-1.3.0 已将反文从已冻结的旧 Muya 编辑器迁移到 TypeScript 重写的 `@muyajs/core`，并完成主题迁移、输入法修复、在线更新体验与 10,000 行性能基准。
-
-完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.3.1)。
+完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.3.2)。
 
 ## 开发计划
 
@@ -64,7 +64,7 @@ node scripts/import-typora-theme.mjs <typora主题.css> --name <名称> --out-di
 构建流程会取得上游源码树、应用反文的 commit，并产出已签名的发布产物。Node 版本钉在上游发布所用的版本（见 `.nvmrc`），pnpm 钉在上游 `packageManager` 字段声明的版本。
 
 ```bash
-./scripts/build-release-from-source.sh 1.3.1
+./scripts/build-release-from-source.sh 1.3.2
 ```
 
 产物落在 `releases/<版本>/`：DMG、更新用 ZIP、`latest-mac.yml` 与 SHA-256 校验文件。
