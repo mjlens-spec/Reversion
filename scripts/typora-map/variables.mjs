@@ -164,7 +164,7 @@ export const VARIABLE_MAP = Object.freeze({
   '--md-char-color': {
     strategy: 'theme-var',
     themeVar: 'md-char',
-    manualReview: '反文的 markdown 语法字符色由 .ag-gray / patches/reversion-runtime.css 控制，本变量未接线，需人工确认'
+    manualReview: '反文的 markdown 语法字符色由 .mu-gray / patches/reversion-runtime.css 控制，本变量未接线，需人工确认'
   },
 
   // ── 语法高亮 / 行内代码（规格 §7 问题 4：固定变量化策略） ────────────────

@@ -4,9 +4,9 @@
 
 <img src="icon/lens-marktext-icon.png" alt="反文图标" width="128" align="right" />
 
-Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 所见即所得 Markdown 编辑器。它基于 [MarkText](https://github.com/marktext/marktext) `0.19.1`，加入行内实时渲染、原生 Finder Quick Look 扩展、两套排印主题、Typora 主题导入工具，以及书法「攵」应用图标。
+Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 所见即所得 Markdown 编辑器。它基于 [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` 与 TypeScript 编辑器引擎 `@muyajs/core`，加入行内实时渲染、原生 Finder Quick Look 扩展、两套排印主题、Typora 主题导入工具，以及书法「攵」应用图标。
 
-当前版本：**1.2.0**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
+当前版本：**1.3.0**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
 
 ## 核心功能
 
@@ -22,25 +22,23 @@ Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 
 
 预构建的 `arm64` DMG 发布在 [Releases 页面](https://github.com/mjlens-spec/Reversion/releases)。每个版本同时提供 `Reversion-<版本>-arm64.dmg`、更新用 ZIP、`latest-mac.yml` 与 SHA-256 校验文件。
 
-应用会在首个窗口打开 15 秒后检查本仓库是否有更新的稳定版，发现新版时询问是否下载，没有新版则不打扰。也可随时使用「Reversion → 检查更新」。
+应用会在首个窗口打开 15 秒后检查本仓库是否有更新的稳定版，没有新版时不打扰。发现新版后，右下方常驻进度卡会显示百分比、已下载容量、速率与预计剩余时间，不阻塞编辑。重启安装前会先处理未保存文档；新版本启动后，更新说明只显示一次。也可随时使用「Reversion → 检查更新」。
 
 应用采用带稳定应用标识的 ad-hoc 签名，**未经 Apple 公证**。该稳定标识用于让相邻版本互相校验；下载另有 GitHub HTTPS 与 `latest-mac.yml` 中的 SHA-512 校验保护。首次启动时，macOS Gatekeeper 可能要求在访达中按住 Control 点击 →「打开」。
 
-## 1.2.0 更新内容
+## 1.3.0 更新内容
 
-1.2.0 是第一个完全从源码构建的版本。此前各版本是对预构建的 MarkText `app.asar` 打补丁得到的；现在全部定制都以源码 commit 的形式维护在上游 fork 上，一条命令即可产出发布产物。
+1.3.0 将反文从已冻结的旧 Muya 编辑器迁移到 TypeScript 重写的 `@muyajs/core`，与 MarkText 当前开发线重新对齐。
 
-- macOS 菜单栏、Dock、强制退出对话框现在显示 **Reversion**——应用包本体与四个 Helper 进程均已原生重命名。
-- 写入非法偏好值不再弹出主进程错误对话框；越界的 `preferences.json` 不再导致应用无法启动。
-- 拼音组合输入过程中按 Backspace / Delete，不再删掉已提交的字符或使光标错位。
-- 自定义的大标题 / 小标题 / 正文字体不再被重启还原；全新安装现在正确进入 Lens Design 主题。
-- 安装包体积减小约 6 MB——原生模块不再被错误内联进 `app.asar`。
+- 新编辑器内核带来当前上游的编辑与输入法修复，包括代码块组合输入，以及组合态 Backspace / Delete 的光标保持。
+- Lens Design、Claude-like、行内实时渲染与 Typora 主题转译器已统一迁到新的 `.mu-*` DOM 词表，并移除 Google Fonts 与 jsDelivr 远程字体依赖。
+- 在线更新新增窗口与 Dock 连续进度、取消 / 重试、重启前未保存文档保护，以及安装后仅显示一次的版本说明。
+- 新增 10,000 行混合文档生产构建基准。本机 renderer 就绪时间为 1.019 秒，输入延迟 P95 为 34.9 ms。
+- 既有偏好、历史记录、主题、Finder Quick Look 与稳定更新身份保持兼容。
 
-完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.2.0)。
+完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.3.0)。
 
 ## 开发计划
-
-**1.3.0 — 编辑器引擎迁移。** 上游 MarkText 已用 TypeScript 重写编辑器引擎（`@muyajs/core`）并把自己的桌面端切换过去，而反文当前所用的引擎已被上游冻结。1.3.0 将反文迁移到新引擎，使上游的编辑修复——其中包含多个输入法缺陷——能直接受益，而不必两边各修一遍。范围包括：把行内实时渲染层移植到新的 DOM 词表、通过主题转译器的映射表重新生成两套主题、合入上游的输入法修复，以及以一万行文档为基准的长文档性能优化。
 
 **后续。** 行内实时渲染的行为对齐 Typora（光标锚定、点击落点、链接编辑）、表格编辑（行列拖拽手柄、Excel/CSV 粘贴成表、宽表格滚动）、PDF 导出的大纲书签与分页控制，以及中文排印细化（中西文间距、标点挤压、智能引号）。
 
@@ -68,7 +66,7 @@ node scripts/import-typora-theme.mjs <typora主题.css> --name <名称> --out-di
 构建流程会取得上游源码树、应用反文的 commit，并产出已签名的发布产物。Node 版本钉在上游发布所用的版本（见 `.nvmrc`），pnpm 钉在上游 `packageManager` 字段声明的版本。
 
 ```bash
-./scripts/build-release-from-source.sh 1.2.0
+./scripts/build-release-from-source.sh 1.3.0
 ```
 
 产物落在 `releases/<版本>/`：DMG、更新用 ZIP、`latest-mac.yml` 与 SHA-256 校验文件。

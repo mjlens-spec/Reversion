@@ -2,8 +2,7 @@
  * Adapted from https://github.com/Muyiiiii/Typora_Claude-Like_Theme
  * Upstream license: MIT, Copyright (c) 2026 Muyiiiii.
  */
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap");
-@import url("https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css");
+/* Font note: install LXGW WenKai locally for the intended CJK reading style. */
 
 :root {
   --claude-bg: #f7f6f3;

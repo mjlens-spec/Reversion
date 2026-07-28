@@ -4,9 +4,9 @@
 
 <img src="icon/lens-marktext-icon.png" alt="Reversion icon" width="128" align="right" />
 
-Reversion, Chinese name `反文`, is a macOS WYSIWYG Markdown editor for Chinese-language writing. It is a fork of [MarkText](https://github.com/marktext/marktext) `0.19.1` with inline live rendering, a native Finder Quick Look extension, two typographic themes, an importer for Typora themes, and an app icon built around the calligraphic Chinese radical `攵`.
+Reversion, Chinese name `反文`, is a macOS WYSIWYG Markdown editor for Chinese-language writing. It is based on [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` and its TypeScript editor engine, `@muyajs/core`, with inline live rendering, a native Finder Quick Look extension, two typographic themes, an importer for Typora themes, and an app icon built around the calligraphic Chinese radical `攵`.
 
-Current release: **1.2.0** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
+Current release: **1.3.0** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
 
 ## Core features
 
@@ -22,25 +22,23 @@ Current release: **1.2.0** (Apple Silicon). Reversion keeps MarkText's applicati
 
 Prebuilt `arm64` DMGs are on the [Releases page](https://github.com/mjlens-spec/Reversion/releases). Each release ships `Reversion-<version>-arm64.dmg` together with the updater ZIP, `latest-mac.yml`, and SHA-256 sidecars.
 
-The app checks this repository for a newer stable release 15 seconds after the first window opens, asks before downloading, and stays quiet when already current. **Reversion → Check for Updates** works at any time.
+The app checks this repository for a newer stable release 15 seconds after the first window opens and stays quiet when already current. When an update is found, a compact progress card shows percentage, transfer size, speed and remaining time without blocking the editor. Reversion asks before restarting, protects unsaved documents, and shows the release notes once after the new version opens. **Reversion → Check for Updates** works at any time.
 
 The app is ad-hoc signed with a stable application requirement and is **not Apple notarized**. The stable requirement is what lets one release validate the next; downloads are additionally covered by GitHub HTTPS and the SHA-512 digest in `latest-mac.yml`. On first launch macOS Gatekeeper may require Control-click → Open in Finder.
 
-## What's new in 1.2.0
+## What's new in 1.3.0
 
-1.2.0 is the first release built from source. Earlier versions were produced by patching a prebuilt MarkText `app.asar`; every customization is now a source commit on a fork of upstream, and one command produces the release artifacts.
+1.3.0 moves Reversion from the frozen legacy Muya editor to `@muyajs/core`, the TypeScript rewrite now used by current MarkText development.
 
-- macOS menu bar, Dock, and Force Quit now say **Reversion** — the bundle and its four helper processes are natively renamed.
-- Writing invalid preference values no longer raises a main-process error dialog, and an out-of-range `preferences.json` no longer prevents the app from starting.
-- Pressing Backspace or Delete mid-composition in an IME no longer deletes committed characters or misplaces the caret.
-- Custom title / heading / body fonts survive a restart; a fresh install now opens in Lens Design as intended.
-- Installer is about 6 MB smaller — native modules are no longer inlined into `app.asar`.
+- The new editor engine brings current upstream editing and IME fixes, including composition handling in code blocks and cursor preservation during Backspace/Delete.
+- Lens Design, Claude-like, inline live rendering, and the Typora theme importer now use the new `.mu-*` DOM vocabulary. Remote Google Fonts and jsDelivr dependencies were removed.
+- In-app updates now show continuous download progress in the window and Dock, support cancel/retry, protect unsaved documents before restart, and display the version notes once after installation.
+- A production Electron benchmark now guards a 10,000-line mixed document. On the release machine, renderer ready time was 1.019 s and input latency P95 was 34.9 ms.
+- Existing Reversion preferences, history, themes, Finder Quick Look, and the stable updater identity remain compatible.
 
-Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.2.0).
+Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.3.0).
 
 ## Roadmap
-
-**1.3.0 — editor engine migration.** Upstream MarkText has rewritten its editor engine (`@muyajs/core`) in TypeScript and moved its own desktop app onto it, while the engine Reversion currently ships is frozen. 1.3.0 rebases Reversion onto the new engine so that upstream's editing fixes — several IME defects among them — land in Reversion instead of being maintained twice. In scope: porting the inline live-rendering layer to the new DOM vocabulary, regenerating both themes through the theme transpiler's mapping tables, adopting upstream's IME fixes, and a long-document performance pass with a 10,000-line benchmark.
 
 **Later.** Inline live rendering behavior parity with Typora (caret anchoring, click targeting, link editing), table editing (row/column handles, Excel/CSV paste, wide-table scrolling), PDF export outline and page-break control, and Chinese typography refinements (CJK/Latin spacing, punctuation compression, smart quotes).
 
@@ -68,7 +66,7 @@ This writes `<name>-marktext.css` (editor), `export/<name>.css` (HTML/PDF), and 
 The build resolves the upstream source tree, applies Reversion's commits, and produces signed artifacts. It pins Node to the version upstream releases with (see `.nvmrc`) and pnpm to the version in upstream's `packageManager` field.
 
 ```bash
-./scripts/build-release-from-source.sh 1.2.0
+./scripts/build-release-from-source.sh 1.3.0
 ```
 
 Artifacts land in `releases/<version>/`: DMG, updater ZIP, `latest-mac.yml`, and SHA-256 sidecars.

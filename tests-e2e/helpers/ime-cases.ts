@@ -13,6 +13,7 @@ import {
   getCaretOffsetInContent,
   getContentHandleAtSelection,
   readContentText,
+  readLiveContentText,
   startInterruptionProbe,
   stopInterruptionProbe,
   type InterruptionEvidence
@@ -96,7 +97,7 @@ export async function runBasicComposition(
   const expectedMidText =
     textBefore.slice(0, caretOffsetBefore) + steps[steps.length - 1] + textBefore.slice(caretOffsetBefore)
   const lastStepLanded = await pollUntil(
-    () => readContentText(handle),
+    () => readLiveContentText(handle),
     (text) => text === expectedMidText,
     600
   )
@@ -197,7 +198,7 @@ export async function beginComposition(
   await startInterruptionProbe(window, handle)
   await composeSteps(window, cdp, [text])
   const landed = await pollUntil(
-    () => readContentText(handle),
+    () => readLiveContentText(handle),
     (t) => t === textBefore.slice(0, caretOffsetBefore) + text + textBefore.slice(caretOffsetBefore),
     600
   )

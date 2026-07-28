@@ -2,7 +2,7 @@
  * Pipeline layer 3 — selector-rewriter (规格 §6，拆两路并行).
  *
  * 输入：剥离后的 IR 规则 + scripts/typora-map/selectors.mjs 映射表
- * 输出 A：编辑器规则（根作用域 #ag-editor-id）
+ * 输出 A：编辑器规则（根作用域 .mu-editor）
  * 输出 B：导出规则（根作用域 .markdown-body）
  *
  * 硬性约束（规格 §6）：严禁「看起来像」的启发式重写。命中不了白名单的一律进
@@ -64,7 +64,7 @@ export function resolveSelector (selector, target) {
 
     if (inAppContext) {
       // Inside a CodeMirror subtree the DOM is CodeMirror's own, not muya's:
-      // pass the compound through verbatim instead of guessing an ag-* class.
+      // pass the compound through verbatim instead of guessing a mu-* class.
       if (alternatives.length) usedCombinators.push(combinators[i - 1] || '')
       alternatives.push([compound])
       continue

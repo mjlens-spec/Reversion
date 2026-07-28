@@ -163,13 +163,13 @@ test('ASAR patch adds independent title, heading, and body font preferences to M
 test('Lens Design reads runtime font roles instead of relying on one inherited editor font', () => {
   const css = fs.readFileSync(path.join(root, 'themes', 'lens-design-marktext.css'), 'utf8')
 
-  assert.match(css, /h1\.ag-paragraph[^{}]*\{[^{}]*font-family:\s*var\(--editor-title-font-family,\s*var\(--reading-font-title\)\)/s)
-  assert.match(css, /h2\.ag-paragraph[^{}]*\{[^{}]*font-family:\s*var\(--editor-heading-font-family,\s*var\(--reading-font-heading\)\)/s)
-  assert.match(css, /p\.ag-paragraph[^{}]*\{[^{}]*font-family:\s*var\(--editor-body-font-family,\s*var\(--reading-font-body\)\)/s)
+  assert.match(css, /\.mu-container h1[^{}]*\{[^{}]*font-family:\s*var\(--editor-title-font-family,\s*var\(--reading-font-title\)\)/s)
+  assert.match(css, /\.mu-container h2[^{}]*\{[^{}]*font-family:\s*var\(--editor-heading-font-family,\s*var\(--reading-font-heading\)\)/s)
+  assert.match(css, /\.mu-container p[^{}]*\{[^{}]*font-family:\s*var\(--editor-body-font-family,\s*var\(--reading-font-body\)\)/s)
   assert.doesNotMatch(
     css,
-    /(?:^|\n)\s*\.ag-paragraph\s*,[^{}]*\{[^{}]*font-family:\s*var\(--editor-body-font-family/s,
-    'the body rule must not flatten Muya heading elements, which also carry ag-paragraph'
+    /(?:^|\n)\s*\.mu-paragraph\s*,[^{}]*\{[^{}]*font-family:\s*var\(--editor-body-font-family/s,
+    'the body rule must not flatten Muya heading elements, which also carry mu-paragraph'
   )
 })
 

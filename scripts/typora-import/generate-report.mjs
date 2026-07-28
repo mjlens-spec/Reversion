@@ -32,7 +32,7 @@ export const KNOWN_GAPS = Object.freeze([
   ['任务列表勾选框（导出侧）', 'Typora 导出 HTML 与反文导出主题都没有勾选框样式钩子，转译器不生成导出侧规则。'],
   ['表格斑马纹 / 行悬停', '仅当源主题确有对应规则时才产出；转译器不为悬空变量凭空补规则（规格 §5）。'],
   ['CodeMirror token 覆盖广度', '只搬运源主题写到的 token 类，未覆盖的 token 见下表「编辑器专有」条目，MVP 不补齐。'],
-  ['列表标记 `::marker`', 'muyajs 的列表符号由 `.ag-bullet-list-item::before` 绘制，源主题里的 `li::marker` 规则可能不生效，需要人工在真机核实。']
+  ['列表标记 `::marker`', 'muyajs 的列表符号由 `.mu-bullet-list-item::before` 绘制，源主题里的 `li::marker` 规则可能不生效，需要人工在真机核实。']
 ])
 
 const table = (headers, rows) => {
@@ -73,7 +73,7 @@ export function generateReport (ctx) {
       ['源选择器', stats.sourceSelectors, '逗号分隔后逐条计'],
       ['剥离选择器', stats.strippedSelectors, 'Typora 专有 UI / 打印块（规格 §4）'],
       ['可转译选择器', stats.translatable, '源选择器 − 剥离'],
-      ['编辑器命中', `${stats.editorMapped}（${pct(stats.editorMapped, stats.translatable)}）`, '成功重写到 #ag-editor-id 体系'],
+      ['编辑器命中', `${stats.editorMapped}（${pct(stats.editorMapped, stats.translatable)}）`, '成功重写到 .mu-editor 体系'],
       ['导出命中', `${stats.exportMapped}（${pct(stats.exportMapped, stats.translatable)}）`, '成功重写到 .markdown-body 体系'],
       ['双目标命中', `${stats.bothMapped}（${pct(stats.bothMapped, stats.translatable)}）`, '两份产物都拿到规则'],
       ['任一目标命中', `${stats.eitherMapped}（${pct(stats.eitherMapped, stats.translatable)}）`, '总体覆盖率'],

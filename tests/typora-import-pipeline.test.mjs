@@ -57,9 +57,9 @@ test('selector syntax: 顶层逗号切分与复合选择器拆解', () => {
   assert.deepEqual(compounds, ['#write', 'ul:first-child', 'li'])
   assert.deepEqual(combinators, ['>', ''])
 
-  const compound = parseCompound('li.ag-list-item[data-x]:nth-child(2n)::before')
+  const compound = parseCompound('li.mu-list-item[data-x]:nth-child(2n)::before')
   assert.equal(compound.element, 'li')
-  assert.deepEqual(compound.classes, ['.ag-list-item'])
+  assert.deepEqual(compound.classes, ['.mu-list-item'])
   assert.deepEqual(compound.attrs, ['[data-x]'])
   assert.deepEqual(compound.pseudos, [':nth-child(2n)', '::before'])
 
@@ -188,12 +188,12 @@ test('layer 2 variable-mapper: 未收录变量按「被引用→直通 / 无引�
 
 // ── layer 3: selector-rewriter ────────────────────────────────────────────
 test('layer 3 selector-rewriter: 基础映射与两路根作用域', () => {
-  assert.deepEqual(resolveSelector('h1', 'editor').selectors, ['#ag-editor-id h1.ag-paragraph'])
+  assert.deepEqual(resolveSelector('h1', 'editor').selectors, ['.mu-editor h1.mu-paragraph'])
   assert.deepEqual(resolveSelector('h1', 'export').selectors, ['.markdown-body h1'])
-  assert.deepEqual(resolveSelector('blockquote', 'editor').selectors, ['#ag-editor-id blockquote.ag-paragraph'])
-  assert.deepEqual(resolveSelector('table th', 'editor').selectors, ['#ag-editor-id table.ag-paragraph th.ag-paragraph'])
-  assert.deepEqual(resolveSelector('a:hover', 'editor').selectors, ['#ag-editor-id a.ag-inline-rule:hover'])
-  assert.deepEqual(resolveSelector('strong', 'editor').selectors, ['#ag-editor-id strong.ag-inline-rule'])
+  assert.deepEqual(resolveSelector('blockquote', 'editor').selectors, ['.mu-editor .mu-container blockquote'])
+  assert.deepEqual(resolveSelector('table th', 'editor').selectors, ['.mu-editor table.mu-table-inner th.mu-table-cell'])
+  assert.deepEqual(resolveSelector('a:hover', 'editor').selectors, ['.mu-editor a.mu-inline-rule:hover'])
+  assert.deepEqual(resolveSelector('strong', 'editor').selectors, ['.mu-editor strong.mu-inline-rule'])
 
   // #write 是根，不再额外加作用域
   assert.deepEqual(resolveSelector('#write', 'editor').selectors, [ROOT_TARGETS.editor])
@@ -204,27 +204,27 @@ test('layer 3 selector-rewriter: 基础映射与两路根作用域', () => {
 
   // 一对多展开
   assert.deepEqual(resolveSelector('.md-fences', 'editor').selectors, [
-    '#ag-editor-id pre.ag-fence-code',
-    '#ag-editor-id pre.ag-indent-code'
+    '.mu-editor .mu-code-block',
+    '.mu-editor .mu-indented-code'
   ])
 })
 
 test('layer 3 selector-rewriter: 规格 §5 已核实的三个特例', () => {
-  // ① 行内代码 → code.ag-inline-rule（与代码块内的 code 区分）
-  assert.deepEqual(resolveSelector('code', 'editor').selectors, ['#ag-editor-id code.ag-inline-rule'])
-  assert.deepEqual(resolveSelector('tt', 'editor').selectors, ['#ag-editor-id code.ag-inline-rule'])
-  assert.deepEqual(resolveSelector('.md-fences code', 'editor').selectors, ['#ag-editor-id .ag-code-content'])
+  // ① 行内代码 → code.mu-inline-rule（与代码块内的 code 区分）
+  assert.deepEqual(resolveSelector('code', 'editor').selectors, ['.mu-editor code.mu-inline-rule'])
+  assert.deepEqual(resolveSelector('tt', 'editor').selectors, ['.mu-editor code.mu-inline-rule'])
+  assert.deepEqual(resolveSelector('.md-fences code', 'editor').selectors, ['.mu-editor .mu-codeblock-content'])
 
   // ② <mark> 仅行内 HTML：两个目标都保留 mark 选择器，映射条目里带说明
   const mark = resolveSelector('mark', 'editor')
-  assert.deepEqual(mark.selectors, ['#ag-editor-id mark'])
+  assert.deepEqual(mark.selectors, ['.mu-editor mark'])
   assert.deepEqual(resolveSelector('mark', 'export').selectors, ['.markdown-body mark'])
   assert.match(TOKEN_MAP.mark.note, /行内 HTML/)
 
   // ③ hr：编辑器走属性改道 + --hrColor；导出仍是真实 <hr>
   const hrEditor = resolveSelector('hr', 'editor')
   assert.ok(hrEditor.propRoutes, 'hr 在编辑器侧应触发属性改道')
-  assert.deepEqual(hrEditor.prefixes, ['#ag-editor-id'])
+  assert.deepEqual(hrEditor.prefixes, ['.mu-editor'])
   assert.deepEqual(resolveSelector('hr', 'export').selectors, ['.markdown-body hr'])
 
   const hrRule = {
@@ -240,8 +240,8 @@ test('layer 3 selector-rewriter: 规格 §5 已核实的三个特例', () => {
   }
   const routed = rewriteRules([hrRule], 'editor')
   const selectors = routed.rules.flatMap((r) => r.selectors)
-  assert.ok(selectors.includes("#ag-editor-id p[data-role='hr']"))
-  assert.ok(selectors.includes("#ag-editor-id p[data-role='hr']::before"))
+  assert.ok(selectors.includes('.mu-editor .mu-thematic-break'))
+  assert.ok(selectors.includes('.mu-editor .mu-thematic-break:not(.mu-active)::before'))
 
   const beforeRule = routed.rules.find((r) => r.selectors[0].endsWith('::before'))
   const props = beforeRule.decls.map((d) => d.prop)
@@ -328,8 +328,8 @@ test('layer 5 font-slot-injector: 四槽位 + 运行时覆盖 fallback（规格 
   // 槽位锚点从映射表解析出来，不是写死的选择器
   const anchors = fontAnchorRules('editor', fonts.stacks)
   const anchorSelectors = anchors.flatMap((r) => r.selectors)
-  assert.ok(anchorSelectors.includes('#ag-editor-id h1.ag-paragraph'))
-  assert.ok(anchorSelectors.includes('#ag-editor-id blockquote.ag-paragraph'))
+  assert.ok(anchorSelectors.includes('.mu-editor h1.mu-paragraph'))
+  assert.ok(anchorSelectors.includes('.mu-editor .mu-container blockquote'))
   assert.ok(anchors.every((r) => r.decls.length === 1 && r.decls[0].prop === 'font-family'))
 })
 
@@ -409,8 +409,8 @@ test('架构契约：映射项只能出现在 scripts/typora-map/，转译逻辑
   ]
   for (const relative of logicModules) {
     const code = fs.readFileSync(path.join(root, relative), 'utf8').replace(/\/\*[\s\S]*?\*\/|(^|\s)\/\/.*$/gm, '')
-    assert.doesNotMatch(code, /['"`][^'"`]*\.ag-[\w-]/, `${relative} 不应硬编码 ag- 选择器`)
-    assert.doesNotMatch(code, /['"`]#ag-editor-id/, `${relative} 不应硬编码根选择器`)
+    assert.doesNotMatch(code, /['"`][^'"`]*\.ag-[\w-]/, `${relative} 不应残留旧 ag- 选择器`)
+    assert.doesNotMatch(code, /['"`]#ag-editor-id/, `${relative} 不应残留旧根选择器`)
     assert.doesNotMatch(code, /['"`]\.markdown-body/, `${relative} 不应硬编码根选择器`)
   }
 

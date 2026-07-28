@@ -40,16 +40,17 @@ test('端到端：两份产物都是合法 CSS，且作用域正确', () => {
   const exportSelectors = []
   exported.walkRules((rule) => exportSelectors.push(rule.selector))
 
-  assert.ok(editorSelectors.some((s) => s.includes('#ag-editor-id h1.ag-paragraph')))
-  assert.ok(editorSelectors.some((s) => s.includes('#ag-editor-id code.ag-inline-rule')))
-  assert.ok(editorSelectors.some((s) => s.includes("p[data-role='hr']::before")))
+  assert.ok(editorSelectors.some((s) => s.includes('.mu-editor h1.mu-paragraph')))
+  assert.ok(editorSelectors.some((s) => s.includes('.mu-editor code.mu-inline-rule')))
+  assert.ok(editorSelectors.some((s) => s.includes('.mu-thematic-break:not(.mu-active)::before')))
+  assert.ok(!editorSelectors.some((s) => /#ag-editor-id|\.ag-/.test(s)), '编辑器主题不得残留旧 Muya 选择器')
   assert.ok(editorSelectors.some((s) => s.trim() === '.cm-keyword'))
   assert.ok(!editorSelectors.some((s) => s.includes('.markdown-body')), '编辑器主题不得混入导出作用域')
 
   assert.ok(exportSelectors.some((s) => s.includes('.markdown-body h1')))
   assert.ok(exportSelectors.some((s) => s.includes('.markdown-body hr')))
   assert.ok(exportSelectors.some((s) => s.trim() === '.toc-container'))
-  assert.ok(!exportSelectors.some((s) => s.includes('ag-paragraph')), '导出主题不得混入编辑器选择器')
+  assert.ok(!exportSelectors.some((s) => s.includes('mu-paragraph')), '导出主题不得混入编辑器选择器')
   assert.ok(!exportSelectors.some((s) => s.includes('cm-keyword')), '导出 HTML 没有 CodeMirror')
 })
 
@@ -87,10 +88,10 @@ test('端到端：变量双层转发与阅读字体槽位齐备', () => {
   assert.doesNotMatch(translated.exportCss, /--editor-heading-font-family/)
 })
 
-test('端到端：hr 走 --hrColor 与 p[data-role=hr]::before（规格 §5 已核实）', () => {
+test('端到端：hr 走 --hrColor 与 Muya thematic-break（规格 §5 已核实）', () => {
   assert.match(translated.editorCss, /--hrColor: var\(--sample-line\);/)
-  assert.match(translated.editorCss, /p\[data-role='hr'\]::before \{[\s\S]*border-top-color/)
-  assert.match(translated.editorCss, /p\[data-role='hr'\] \{[\s\S]*margin: 20px 0/)
+  assert.match(translated.editorCss, /\.mu-thematic-break:not\(\.mu-active\)::before \{[\s\S]*border-top-color/)
+  assert.match(translated.editorCss, /\.mu-thematic-break \{[\s\S]*margin: 20px 0/)
   assert.match(translated.exportCss, /\.markdown-body hr \{/)
 })
 
