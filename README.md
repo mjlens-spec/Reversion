@@ -6,7 +6,7 @@
 
 Reversion, Chinese name `反文`, is a macOS WYSIWYG Markdown editor for Chinese-language writing. It is based on [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` and its TypeScript editor engine, `@muyajs/core`, with inline live rendering, a native Finder Quick Look extension, two typographic themes, an importer for Typora themes, and an app icon built around the calligraphic Chinese radical `攵`.
 
-Current release: **1.3.0** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
+Current release: **1.3.1** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
 
 ## Core features
 
@@ -26,17 +26,15 @@ The app checks this repository for a newer stable release 15 seconds after the f
 
 The app is ad-hoc signed with a stable application requirement and is **not Apple notarized**. The stable requirement is what lets one release validate the next; downloads are additionally covered by GitHub HTTPS and the SHA-512 digest in `latest-mac.yml`. On first launch macOS Gatekeeper may require Control-click → Open in Finder.
 
-## What's new in 1.3.0
+## What's new in 1.3.1
 
-1.3.0 moves Reversion from the frozen legacy Muya editor to `@muyajs/core`, the TypeScript rewrite now used by current MarkText development.
+- The editor pane fills the window again on wide displays. Both built-in themes were clamping the scroll viewport to the line width, which left dead space on the right and stranded the scrollbar mid-window; the clamp now applies only to the centered content column.
+- The inline format toolbar was restyled: softer corners and hairline border, roomier hit targets, and an accent-tinted pill on formats already applied. Colors come from the active theme.
+- A fresh install no longer shows the "update completed" dialog on first launch, and no longer starts in the `dark` theme when macOS is in dark appearance — the Lens Design default now holds. Follow-system theme switching remains available in Preferences → General.
 
-- The new editor engine brings current upstream editing and IME fixes, including composition handling in code blocks and cursor preservation during Backspace/Delete.
-- Lens Design, Claude-like, inline live rendering, and the Typora theme importer now use the new `.mu-*` DOM vocabulary. Remote Google Fonts and jsDelivr dependencies were removed.
-- In-app updates now show continuous download progress in the window and Dock, support cancel/retry, protect unsaved documents before restart, and display the version notes once after installation.
-- A production Electron benchmark now guards a 10,000-line mixed document. On the release machine, renderer ready time was 1.019 s and input latency P95 was 34.9 ms.
-- Existing Reversion preferences, history, themes, Finder Quick Look, and the stable updater identity remain compatible.
+1.3.0 moved Reversion from the frozen legacy Muya editor to `@muyajs/core`, the TypeScript rewrite used by current MarkText development, together with the theme migration, IME fixes, in-app update experience, and the 10,000-line performance benchmark.
 
-Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.3.0).
+Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.3.1).
 
 ## Roadmap
 
@@ -66,7 +64,7 @@ This writes `<name>-marktext.css` (editor), `export/<name>.css` (HTML/PDF), and 
 The build resolves the upstream source tree, applies Reversion's commits, and produces signed artifacts. It pins Node to the version upstream releases with (see `.nvmrc`) and pnpm to the version in upstream's `packageManager` field.
 
 ```bash
-./scripts/build-release-from-source.sh 1.3.0
+./scripts/build-release-from-source.sh 1.3.1
 ```
 
 Artifacts land in `releases/<version>/`: DMG, updater ZIP, `latest-mac.yml`, and SHA-256 sidecars.

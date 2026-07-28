@@ -6,7 +6,7 @@
 
 Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 所见即所得 Markdown 编辑器。它基于 [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` 与 TypeScript 编辑器引擎 `@muyajs/core`，加入行内实时渲染、原生 Finder Quick Look 扩展、两套排印主题、Typora 主题导入工具，以及书法「攵」应用图标。
 
-当前版本：**1.3.0**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
+当前版本：**1.3.1**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
 
 ## 核心功能
 
@@ -26,17 +26,15 @@ Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 
 
 应用采用带稳定应用标识的 ad-hoc 签名，**未经 Apple 公证**。该稳定标识用于让相邻版本互相校验；下载另有 GitHub HTTPS 与 `latest-mac.yml` 中的 SHA-512 校验保护。首次启动时，macOS Gatekeeper 可能要求在访达中按住 Control 点击 →「打开」。
 
-## 1.3.0 更新内容
+## 1.3.1 更新内容
 
-1.3.0 将反文从已冻结的旧 Muya 编辑器迁移到 TypeScript 重写的 `@muyajs/core`，与 MarkText 当前开发线重新对齐。
+- 修复宽窗口下编辑区右侧出现大片空白、滚动条停在窗口中间的问题。两套内置主题此前把正文栏宽度限制加在了滚动视口上，现改为只约束居中的正文栏。
+- 重做选中文字后弹出的行内格式工具条：圆角与描边收敛、按钮间距重排、已应用的格式以主题色淡底标示。配色取自当前主题。
+- 全新安装不再误弹「更新说明」窗口；系统为深色外观时也不再被自动切换为 dark 主题，默认恢复 Lens Design。跟随系统外观切换主题仍可在「偏好设置 → 通用」中开启。
 
-- 新编辑器内核带来当前上游的编辑与输入法修复，包括代码块组合输入，以及组合态 Backspace / Delete 的光标保持。
-- Lens Design、Claude-like、行内实时渲染与 Typora 主题转译器已统一迁到新的 `.mu-*` DOM 词表，并移除 Google Fonts 与 jsDelivr 远程字体依赖。
-- 在线更新新增窗口与 Dock 连续进度、取消 / 重试、重启前未保存文档保护，以及安装后仅显示一次的版本说明。
-- 新增 10,000 行混合文档生产构建基准。本机 renderer 就绪时间为 1.019 秒，输入延迟 P95 为 34.9 ms。
-- 既有偏好、历史记录、主题、Finder Quick Look 与稳定更新身份保持兼容。
+1.3.0 已将反文从已冻结的旧 Muya 编辑器迁移到 TypeScript 重写的 `@muyajs/core`，并完成主题迁移、输入法修复、在线更新体验与 10,000 行性能基准。
 
-完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.3.0)。
+完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.3.1)。
 
 ## 开发计划
 
@@ -66,7 +64,7 @@ node scripts/import-typora-theme.mjs <typora主题.css> --name <名称> --out-di
 构建流程会取得上游源码树、应用反文的 commit，并产出已签名的发布产物。Node 版本钉在上游发布所用的版本（见 `.nvmrc`），pnpm 钉在上游 `packageManager` 字段声明的版本。
 
 ```bash
-./scripts/build-release-from-source.sh 1.3.0
+./scripts/build-release-from-source.sh 1.3.1
 ```
 
 产物落在 `releases/<版本>/`：DMG、更新用 ZIP、`latest-mac.yml` 与 SHA-256 校验文件。
