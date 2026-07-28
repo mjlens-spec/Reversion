@@ -40,7 +40,7 @@ test('端到端：两份产物都是合法 CSS，且作用域正确', () => {
   const exportSelectors = []
   exported.walkRules((rule) => exportSelectors.push(rule.selector))
 
-  assert.ok(editorSelectors.some((s) => s.includes('.mu-editor h1.mu-paragraph')))
+  assert.ok(editorSelectors.some((s) => s.includes('.mu-editor .mu-container h1')))
   assert.ok(editorSelectors.some((s) => s.includes('.mu-editor code.mu-inline-rule')))
   assert.ok(editorSelectors.some((s) => s.includes('.mu-thematic-break:not(.mu-active)::before')))
   assert.ok(!editorSelectors.some((s) => /#ag-editor-id|\.ag-/.test(s)), '编辑器主题不得残留旧 Muya 选择器')
