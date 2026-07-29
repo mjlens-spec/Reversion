@@ -6,7 +6,7 @@
 
 Reversion, Chinese name `反文`, is a macOS WYSIWYG Markdown editor for Chinese-language writing. It is based on [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` and its TypeScript editor engine, `@muyajs/core`, with inline live rendering, a native Finder Quick Look extension, two typographic themes, an importer for Typora themes, and an app icon built around the calligraphic Chinese radical `攵`.
 
-Current release: **1.3.4** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
+Current release: **1.5.0** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
 
 ## Core features
 
@@ -26,13 +26,15 @@ The app checks this repository for a newer stable release 15 seconds after the f
 
 The app is ad-hoc signed with a stable application requirement and is **not Apple notarized**. The stable requirement is what lets one release validate the next; downloads are additionally covered by GitHub HTTPS and the SHA-512 digest in `latest-mac.yml`. On first launch macOS Gatekeeper may require Control-click → Open in Finder.
 
-## What's new in 1.3.4
+## What's new in 1.5.0
 
-- **Quick Look tables.** The preview printed each table row verbatim in a monospaced font and left it to line up on its own — which cannot work, because a monospaced font is only monospaced for Latin: any CJK cell threw the columns off, long rows wrapped into the next line, and the `| --- | --- |` delimiter row was shown as content. Tables are now parsed per GFM and laid out as real tables, with column sizing, wrapping inside a cell, borders, a shaded header row, and per-column alignment from the delimiter row.
+- **Table context menu.** Right-clicking a table now offers insert row above/below, insert column left/right, delete row, delete column, per-column alignment, copy the table as Markdown or HTML, and delete the table. These operations existed only behind the floating table tools, which appear when the pointer lands in the right few pixels above a column or beside a row.
+- **Tab at the last cell adds a row**, matching Typora. **⌥↑ / ⌥↓ moves the row** holding the caret; the header row neither moves nor is displaced.
+- **Wide tables scroll inside the table** instead of pushing the document into a horizontal scroll. The built-in themes no longer shrink table text to 13px to fit.
+- **Pasting TSV/CSV builds a table.** Excel, Numbers and Sheets already pasted as tables (they ship HTML alongside); text copied from a `.csv`/`.tsv` file, a terminal or an editor landed verbatim. Quoted fields are honoured per RFC 4180, and comma-separated prose is left alone.
+- **Inline links are editable in place.** The hover popover gained an edit form for the link text and address; it stays pinned while the form is open.
 
-1.3.3 fixed the word count on open, the Preferences heading sitting under the macOS window buttons, and unified the Preferences category icons.
-
-Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.3.4).
+Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.5.0).
 
 ## Roadmap
 
@@ -62,7 +64,7 @@ This writes `<name>-marktext.css` (editor), `export/<name>.css` (HTML/PDF), and 
 The build resolves the upstream source tree, applies Reversion's commits, and produces signed artifacts. It pins Node to the version upstream releases with (see `.nvmrc`) and pnpm to the version in upstream's `packageManager` field.
 
 ```bash
-./scripts/build-release-from-source.sh 1.3.4
+./scripts/build-release-from-source.sh 1.5.0
 ```
 
 Artifacts land in `releases/<version>/`: DMG, updater ZIP, `latest-mac.yml`, and SHA-256 sidecars.
@@ -70,8 +72,9 @@ Artifacts land in `releases/<version>/`: DMG, updater ZIP, `latest-mac.yml`, and
 Tests:
 
 ```bash
-npm test          # contract tests: source migration, branding, release pipeline, theme transpiler
-npm run test:e2e  # Playwright: launch smoke + branding checks against a packaged .app
+npm test               # contract tests: source migration, branding, release pipeline, theme transpiler
+npm run test:e2e       # Playwright: launch smoke + branding checks against a packaged .app
+npm run test:muya-e2e  # Playwright: the editor engine's own suite, in Chromium
 ```
 
 The e2e suites drive a real packaged application and assert that the user's actual `~/Library/Application Support/marktext` directory is left byte-for-byte unchanged.
