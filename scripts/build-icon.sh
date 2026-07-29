@@ -2,7 +2,10 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-DEFAULT_SRC="$ROOT/icon/lens-marktext-pu-v1-alpha.png"
+# The app icon shipped since 1.6.0: handwritten W on newsprint, already masked
+# to the 824-in-1024 squircle. Earlier releases used
+# icon/lens-marktext-pu-v1-alpha.png (ink-brush 反), still on disk for reference.
+DEFAULT_SRC="$ROOT/icon/reversion-w-paper-alpha_AC_260730.png"
 SRC="${1:-"$DEFAULT_SRC"}"
 OUT="$ROOT/icon/build"
 ICONSET="$OUT/LensMarkText.iconset"
