@@ -153,8 +153,9 @@
   --floatHoverColor: rgba(31, 86, 107, 0.06);
   --floatBorderColor: rgba(21, 24, 28, 0.08);
   --maskColor: rgba(236, 239, 242, 0.82);
-  /* ~44 CJK chars per line at 17px, inside the 35-45 char comfort range. */
-  --editorAreaWidth: 760px;
+  /* ~49 CJK chars per line at 17px — Lens reads wider than the classic
+     35-45 char band. */
+  --editorAreaWidth: 836px;
 
   --theme-color: var(--themeColor);
   --highlight-color: var(--highlightColor);
@@ -294,7 +295,8 @@
     padding-bottom: 0.32em;
     border-bottom: 1px solid var(--lens-line);
     font-family: var(--editor-title-font-family, var(--reading-font-title)), var(--lens-font-wordmark) !important;
-    font-size: 2.4em !important;
+    /* Only a notch above h2 (1.78em): an oversized h1 dominated the page. */
+    font-size: 1.9em !important;
     /* Lens title uses the loaded bold display face and a heavier CJK fallback. */
     font-weight: 700 !important;
     line-height: 1.2 !important;

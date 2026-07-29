@@ -68,7 +68,7 @@
   --floatBgColor: rgba(255, 253, 248, 0.98);
   --floatHoverColor: rgba(188, 106, 58, 0.08);
   --floatBorderColor: rgba(43, 38, 33, 0.1);
-  --editorAreaWidth: 820px;
+  --editorAreaWidth: 900px;
 
   --theme-color: var(--themeColor);
   --highlight-color: var(--highlightColor);
@@ -196,7 +196,8 @@
     padding-bottom: 0.35em !important;
     border-bottom: 1px solid var(--claude-line) !important;
     font-family: var(--editor-title-font-family, var(--reading-font-title)), var(--claude-font-title) !important;
-    font-size: 2.1em !important;
+    /* Only a notch above h2 (1.58em): an oversized h1 dominated the page. */
+    font-size: 1.7em !important;
     font-weight: 700 !important;
     line-height: 1.18 !important;
   }

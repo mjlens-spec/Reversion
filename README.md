@@ -6,7 +6,7 @@
 
 Reversion, Chinese name `反文`, is a macOS WYSIWYG Markdown editor for Chinese-language writing. It is based on [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` and its TypeScript editor engine, `@muyajs/core`, with inline live rendering, a native Finder Quick Look extension, two typographic themes, an importer for Typora themes, and an app icon built around the calligraphic Chinese radical `攵`.
 
-Current release: **1.5.0** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
+Current release: **1.5.1** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
 
 ## Core features
 
@@ -26,15 +26,15 @@ The app checks this repository for a newer stable release 15 seconds after the f
 
 The app is ad-hoc signed with a stable application requirement and is **not Apple notarized**. The stable requirement is what lets one release validate the next; downloads are additionally covered by GitHub HTTPS and the SHA-512 digest in `latest-mac.yml`. On first launch macOS Gatekeeper may require Control-click → Open in Finder.
 
-## What's new in 1.5.0
+## What's new in 1.5.1
 
-- **Table context menu.** Right-clicking a table now offers insert row above/below, insert column left/right, delete row, delete column, per-column alignment, copy the table as Markdown or HTML, and delete the table. These operations existed only behind the floating table tools, which appear when the pointer lands in the right few pixels above a column or beside a row.
-- **Tab at the last cell adds a row**, matching Typora. **⌥↑ / ⌥↓ moves the row** holding the caret; the header row neither moves nor is displaced.
-- **Wide tables scroll inside the table** instead of pushing the document into a horizontal scroll. The built-in themes no longer shrink table text to 13px to fit.
-- **Pasting TSV/CSV builds a table.** Excel, Numbers and Sheets already pasted as tables (they ship HTML alongside); text copied from a `.csv`/`.tsv` file, a terminal or an editor landed verbatim. Quoted fields are honoured per RFC 4180, and comma-separated prose is left alone.
-- **Inline links are editable in place.** The hover popover gained an edit form for the link text and address; it stays pinned while the form is open.
+- **Double-click the sidebar divider to auto-fit.** The sidebar sizes itself to the active panel's natural content width — no entry is truncated — capped so the editor always keeps its full content column. Dragging still works as before.
+- **Wider reading columns in the built-in themes.** Lens Design grows from 760px to 836px, Claude from 820px to 900px (~10%). A custom editor-area width set in Preferences still takes precedence.
+- **Calmer H1.** Both themes drop H1 to a notch above H2 (1.9em and 1.7em) — the old sizes dominated the page in long documents.
 
-Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.5.0).
+1.5.0 brought the table editing line: context menu, Tab at the last cell, ⌥↑/⌥↓ row moves, in-table horizontal scrolling, TSV/CSV paste, and in-place link editing.
+
+Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.5.1).
 
 ## Roadmap
 
@@ -64,7 +64,7 @@ This writes `<name>-marktext.css` (editor), `export/<name>.css` (HTML/PDF), and 
 The build resolves the upstream source tree, applies Reversion's commits, and produces signed artifacts. It pins Node to the version upstream releases with (see `.nvmrc`) and pnpm to the version in upstream's `packageManager` field.
 
 ```bash
-./scripts/build-release-from-source.sh 1.5.0
+./scripts/build-release-from-source.sh 1.5.1
 ```
 
 Artifacts land in `releases/<version>/`: DMG, updater ZIP, `latest-mac.yml`, and SHA-256 sidecars.
