@@ -6,7 +6,7 @@
 
 Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 所见即所得 Markdown 编辑器。它基于 [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` 与 TypeScript 编辑器引擎 `@muyajs/core`，加入行内实时渲染、原生 Finder Quick Look 扩展、两套排印主题、Typora 主题导入工具，以及书法「攵」应用图标。
 
-当前版本：**1.3.4**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
+当前版本：**1.5.0**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
 
 ## 核心功能
 
@@ -26,13 +26,15 @@ Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 
 
 应用采用带稳定应用标识的 ad-hoc 签名，**未经 Apple 公证**。该稳定标识用于让相邻版本互相校验；下载另有 GitHub HTTPS 与 `latest-mac.yml` 中的 SHA-512 校验保护。首次启动时，macOS Gatekeeper 可能要求在访达中按住 Control 点击 →「打开」。
 
-## 1.3.4 更新内容
+## 1.5.0 更新内容
 
-- **Quick Look 表格排版。** 预览此前把表格每一行原样打印在等宽字体里靠字符宽度对齐——等宽字体只对拉丁字母等宽，含中文的单元格必然错列，长行会折到下一行，`| --- | --- |` 分隔行也被当作正文显示。现按 GFM 规则解析并交由系统文本表格排版：自动计算列宽、单元格内折行、绘制边框、表头浅底加粗，分隔行中的 `:---` / `---:` / `:---:` 对齐方式生效。
+- **表格右键菜单。** 在表格里点右键，新增上方/下方插入行、左侧/右侧插入列、删除行、删除列、本列左/中/右对齐、复制表格为 Markdown / HTML、删除表格。这些能力此前只在悬浮工具条里，需要把指针停在列头上方或行首左侧的几像素内才会出现。
+- **末格按 Tab 新建一行**（对齐 Typora）；**⌥↑ / ⌥↓ 移动光标所在的表格行**，表头行不参与移动也不会被顶替。
+- **宽表格在表格内横向滚动**，不再把整个文档撑出横向滚动条；两套内置主题也不再为了塞下宽表把表格字号压到 13px。
+- **粘贴 TSV / CSV 自动成表。** 从 Excel、Numbers、Sheets 复制本来就会成表（它们同时提供 HTML 剪贴板内容）；从 `.csv` / `.tsv` 文件、终端或编辑器复制的纯文本此前原样落地。按 RFC 4180 处理引号字段，逗号分隔的正文不会被误判成表格。
+- **行内链接可直接编辑。** 悬停弹出的工具条新增编辑表单，可改链接文字与地址；表单打开期间弹层钉住不消失。
 
-1.3.3 已修复打开文件不显示字数、偏好设置标题被 macOS 窗口按钮遮挡，并统一了偏好设置分类图标。
-
-完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.3.4)。
+完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.5.0)。
 
 ## 开发计划
 
@@ -62,7 +64,7 @@ node scripts/import-typora-theme.mjs <typora主题.css> --name <名称> --out-di
 构建流程会取得上游源码树、应用反文的 commit，并产出已签名的发布产物。Node 版本钉在上游发布所用的版本（见 `.nvmrc`），pnpm 钉在上游 `packageManager` 字段声明的版本。
 
 ```bash
-./scripts/build-release-from-source.sh 1.3.4
+./scripts/build-release-from-source.sh 1.5.0
 ```
 
 产物落在 `releases/<版本>/`：DMG、更新用 ZIP、`latest-mac.yml` 与 SHA-256 校验文件。
@@ -70,8 +72,9 @@ node scripts/import-typora-theme.mjs <typora主题.css> --name <名称> --out-di
 测试：
 
 ```bash
-npm test          # 契约测试：源码化迁移、品牌、发布管线、主题转译器
-npm run test:e2e  # Playwright：对打包后的 .app 跑启动冒烟与品牌断言
+npm test               # 契约测试：源码化迁移、品牌、发布管线、主题转译器
+npm run test:e2e       # Playwright：对打包后的 .app 跑启动冒烟与品牌断言
+npm run test:muya-e2e  # Playwright：编辑器引擎自带的用例集（Chromium）
 ```
 
 e2e 套件驱动的是真实打包应用，并会断言用户实际的 `~/Library/Application Support/marktext` 目录逐字节未被改动。

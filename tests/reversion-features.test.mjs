@@ -36,9 +36,15 @@ test('semantic minimap and its background Git work are removed', () => {
 })
 
 test('editor and export themes balance narrow and wide tables', () => {
+  // In the editor a wide table now scrolls inside `.mu-table` (muya's
+  // blockSyntax.css sets `overflow-x: auto` on the figure), so the table sizes
+  // to its content and the 13px compression that used to be the only way to
+  // fit it is gone. `min-width: 100%` still makes a narrow table fill the
+  // column. Export keeps 100% + 13px: a printed page cannot scroll.
   for (const themePath of ['themes/lens-design-marktext.css', 'themes/claude-like-marktext.css']) {
     const css = read(themePath)
-    assert.match(css, /\.mu-container table \{[\s\S]*width: 100% !important;[\s\S]*table-layout: auto;[\s\S]*font-size: 13px !important;/)
+    assert.match(css, /\.mu-container table \{[\s\S]*width: max-content;[\s\S]*min-width: 100%;[\s\S]*table-layout: auto;/)
+    assert.doesNotMatch(css, /\.mu-container table \{[^}]*font-size: 13px/)
     assert.match(css, /\.mu-container table th \{[\s\S]*line-height: 1\.45 !important;[\s\S]*white-space: normal;/)
     assert.match(css, /\.mu-container table td,[\s\S]*\.mu-container table th \{[\s\S]*min-width: 4\.5em;/)
     assert.match(css, /\.mu-container table td:first-child,[\s\S]*\.mu-container table th:first-child \{[\s\S]*min-width: 3\.25em;/)

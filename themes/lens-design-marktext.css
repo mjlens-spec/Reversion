@@ -395,11 +395,13 @@
 
   .mu-container table {
     display: table;
-    width: 100% !important;
+    /* `min-width` keeps a narrow table filling the column, `max-content` lets
+       a wide one exceed it and scroll inside `.mu-table`. This replaces the
+       13px compression that used to be the only way to fit wide tables. */
+    width: max-content;
     min-width: 100%;
     max-width: none;
     table-layout: auto;
-    font-size: 13px !important;
     line-height: 1.55 !important;
     border-collapse: collapse !important;
     overflow: visible;
