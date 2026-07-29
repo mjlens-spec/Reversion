@@ -347,9 +347,11 @@
   }
 
   .mu-container blockquote {
-    margin: 1.35em 0 !important;
-    padding: 18px 22px 18px 24px !important;
-    border-left: 3px solid var(--lens-blue) !important;
+    margin: 1em 0 !important;
+    /* Single-line quote keeps roughly one line-height of air above and
+       below the text (margin + padding + inner paragraph margin). */
+    padding: 4px 22px 4px 24px !important;
+    border-left: 4px solid var(--lens-blue) !important;
     border-radius: 0 var(--lens-radius-md) var(--lens-radius-md) 0;
     background: rgba(255, 255, 255, 0.78) !important;
     box-shadow: inset 0 0 0 1px rgba(224, 228, 233, 0.72);
@@ -358,8 +360,10 @@
     line-height: 1.7 !important;
   }
 
+  /* The engine draws its own 2px quote bar via ::before; together with the
+     theme border-left it reads as two bars — keep only the border. */
   .mu-container blockquote::before {
-    color: rgba(31, 86, 107, 0.2) !important;
+    display: none !important;
   }
 
   .mu-thematic-break:not(.mu-active)::before {
