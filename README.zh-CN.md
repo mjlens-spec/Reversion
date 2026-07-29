@@ -4,15 +4,16 @@
 
 <img src="icon/lens-marktext-icon.png" alt="反文图标" width="128" align="right" />
 
-Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 所见即所得 Markdown 编辑器。它基于 [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` 与 TypeScript 编辑器引擎 `@muyajs/core`，加入行内实时渲染、原生 Finder Quick Look 扩展、两套排印主题、Typora 主题导入工具，以及书法「攵」应用图标。
+Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 所见即所得 Markdown 编辑器。它基于 [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` 与 TypeScript 编辑器引擎 `@muyajs/core`，加入行内实时渲染、原生 Finder Quick Look 扩展、两套排印主题、Typora 主题导入工具，以及 HTML / PDF / DOCX / PNG 长图四种导出格式。
 
-当前版本：**1.5.2**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
+当前版本：**1.6.0**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
 
 ## 核心功能
 
 - **行内实时渲染** — 默认进入 Muya 所见即所得模式。粗体、斜体、链接、行内代码、数学公式随输入实时排版；光标进入语法范围时显示 Markdown 标记，移开后自动隐藏。
 - **排印优先的主题** — 内置两套主题，各有三个独立的阅读字体槽位，可分别设定大标题、小标题与正文字体，并带一条不破坏西文字形度量的中文回退链。
 - **Typora 主题导入** — 「主题 ▸ 导入主题（Typora 兼容）」在应用内把 Typora 主题的 CSS 转译为反文的编辑器主题与配套 HTML/PDF 导出主题，并输出兼容报告列出无法映射的规则。同一条流水线也以 `scripts/import-typora-theme.mjs` 形式提供。已在 Typora 六套内置主题上验证。
+- **导出** — HTML、PDF、DOCX 与 PNG 长图四种格式。HTML 与 PDF 沿用导出主题、字体、目录与页眉页脚设置；DOCX 经 pandoc 转为 Word 原生结构；PNG 把整篇文档渲染成一张不分页长图。
 - **Finder Quick Look** — 应用内置原生 macOS Quick Look 预览扩展。在访达中选中 Markdown 文件按空格，即可预览标题、列表、引用、代码块、表格与行内格式。
 - **图表与公式** — Mermaid 11、Vega-Lite、PlantUML、flowchart.js 与 KaTeX。
 - **全文搜索** — 基于 ripgrep 的项目内搜索，支持排除规则与符号链接处理。
@@ -26,14 +27,15 @@ Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 
 
 应用采用带稳定应用标识的 ad-hoc 签名，**未经 Apple 公证**。该稳定标识用于让相邻版本互相校验；下载另有 GitHub HTTPS 与 `latest-mac.yml` 中的 SHA-512 校验保护。首次启动时，macOS Gatekeeper 可能要求在访达中按住 Control 点击 →「打开」。
 
-## 1.5.2 更新内容
+## 1.6.0 更新内容
 
-- **应用图标可切换。** 偏好设置 → 主题新增「应用图标」：内置四款——反 · 书法（默认）、手写线稿、W · 深色、W · 浅色。选择后立即生效，作用于程序坞（Dock）、Cmd+Tab 与调度中心；访达中的应用图标由安装包固定。
-- **引用块不再显示两根竖线。** 引擎默认竖线与主题左边框此前叠加显示，现在只保留一根 4px 粗线，并压缩了引用块高度：单行引用上下各留约一个行高。两套内置主题同步修正。
+- **导出为 DOCX。** 文件 → 导出 → 导出为 DOCX，从 Markdown 源直接转换：标题、列表、表格、引用、代码块转为 Word 原生结构，公式转为可继续编辑的 Word 原生公式（OMML），`[TOC]` 转为 Word 目录域，相对路径图片按文档所在目录解析。转换由 pandoc 完成，需自行安装（`brew install pandoc`），未安装时导出会提示。Word 文档的排版由 Word 自身决定，导出设置中的页面、主题、字体各项对其不生效。
+- **导出为 PNG 长图。** 文件 → 导出 → 导出为 PNG 长图，整篇文档渲染成一张不分页的完整长图。导出设置新增「图片」页：图片宽度（400–2000 px）、分辨率（标准 1 倍 / 高清 2 倍）、页边距、背景颜色。样式沿用导出主题与字体设置，与 HTML 导出一致；图片高度按正文实际内容裁切。
+- **应用图标更新。** 新图标为墨绿手写 W 配报纸纸纹，访达、程序坞与安装包统一使用。「应用图标」选择器增至五款；此前使用默认图标的用户一并更新，手动选过其他图标的保持原选择。
 
-1.5.1 带来了侧栏分隔条双击自适应与两套主题的阅读排版调整；1.5.0 带来了表格编辑主线：右键菜单、末格 Tab 新建行、⌥↑/⌥↓ 移动行、表格内横向滚动、TSV/CSV 粘贴成表，以及行内链接直接编辑。
+1.5.2 带来了应用图标选择器与引用块单竖线修正；1.5.1 带来了侧栏分隔条双击自适应与两套主题的阅读排版调整。
 
-完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.5.2)。
+完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.6.0)。
 
 ## 开发计划
 
@@ -63,7 +65,7 @@ node scripts/import-typora-theme.mjs <typora主题.css> --name <名称> --out-di
 构建流程会取得上游源码树、应用反文的 commit，并产出已签名的发布产物。Node 版本钉在上游发布所用的版本（见 `.nvmrc`），pnpm 钉在上游 `packageManager` 字段声明的版本。
 
 ```bash
-./scripts/build-release-from-source.sh 1.5.2
+./scripts/build-release-from-source.sh 1.6.0
 ```
 
 产物落在 `releases/<版本>/`：DMG、更新用 ZIP、`latest-mac.yml` 与 SHA-256 校验文件。

@@ -4,15 +4,16 @@
 
 <img src="icon/lens-marktext-icon.png" alt="Reversion icon" width="128" align="right" />
 
-Reversion, Chinese name `反文`, is a macOS WYSIWYG Markdown editor for Chinese-language writing. It is based on [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` and its TypeScript editor engine, `@muyajs/core`, with inline live rendering, a native Finder Quick Look extension, two typographic themes, an importer for Typora themes, and an app icon built around the calligraphic Chinese radical `攵`.
+Reversion, Chinese name `反文`, is a macOS WYSIWYG Markdown editor for Chinese-language writing. It is based on [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` and its TypeScript editor engine, `@muyajs/core`, with inline live rendering, a native Finder Quick Look extension, two typographic themes, an importer for Typora themes, and export to HTML, PDF, DOCX and a single long PNG.
 
-Current release: **1.5.2** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
+Current release: **1.6.0** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
 
 ## Core features
 
 - **Inline live rendering** — Muya stays in WYSIWYG mode by default. Bold, italic, links, inline code, and math render as you type; Markdown markers appear inside the active syntax range and collapse once the caret leaves it.
 - **Typography-first themes** — two built-in themes, each with three independent reading font slots so large titles, smaller headings, and body copy can use different faces, with a CJK fallback chain that does not break Latin metrics.
 - **Typora theme import** — Theme ▸ Import Theme (Typora compatible) converts a Typora theme's CSS, in the app, into a Reversion editor theme plus a matching HTML/PDF export theme, and writes a compatibility report listing anything it could not map. The same pipeline is available as `scripts/import-typora-theme.mjs`. Verified against six of Typora's built-in themes.
+- **Export** — HTML, PDF, DOCX and a single long PNG. HTML and PDF carry the export themes, fonts, TOC and header/footer settings; DOCX goes through pandoc into native Word structures; PNG renders the whole document as one unpaginated image.
 - **Finder Quick Look** — the app bundles a native macOS Quick Look Preview Extension. Select a Markdown file in Finder and press Space to preview headings, lists, block quotes, code blocks, tables, and inline formatting.
 - **Diagrams and math** — Mermaid 11, Vega-Lite, PlantUML, flowchart.js, and KaTeX.
 - **Full-text search** — ripgrep-backed project search with exclusion rules and symlink handling.
@@ -26,14 +27,15 @@ The app checks this repository for a newer stable release 15 seconds after the f
 
 The app is ad-hoc signed with a stable application requirement and is **not Apple notarized**. The stable requirement is what lets one release validate the next; downloads are additionally covered by GitHub HTTPS and the SHA-512 digest in `latest-mac.yml`. On first launch macOS Gatekeeper may require Control-click → Open in Finder.
 
-## What's new in 1.5.2
+## What's new in 1.6.0
 
-- **Pick your app icon.** Preferences → Theme gains an "App icon" picker with four built-ins — ink-brush 反 (the default), writing hand, W · dark and W · light. The choice applies immediately to the Dock, Cmd+Tab and Mission Control; the icon Finder shows is fixed by the installer.
-- **Quotes render a single bar.** The engine's built-in quote bar and the theme border used to stack into two lines; quotes now draw one 4px rule, and the block is much tighter — a single-line quote keeps about one line-height of air above and below. Both built-in themes are fixed.
+- **Export as DOCX.** File → Export → Export as DOCX converts from the markdown source: headings, lists, tables, quotes and code blocks become native Word structures, math becomes native Word equations (OMML) you can keep editing, `[TOC]` becomes a Word table-of-contents field, and relative image paths resolve against the document's own folder. The conversion is done by pandoc, which you install yourself (`brew install pandoc`); the export says so when it is missing. Word owns the styling, so the page, theme and font settings in the export dialog do not apply to it.
+- **Export as PNG (long image).** File → Export → Export as PNG renders the whole document into one tall, unpaginated image. The export dialog gains an "Image" tab: image width (400–2000 px), resolution (standard 1x or HiDPI 2x), margin and background colour. Styling follows the export theme and font settings, exactly as HTML export does, and the image is cropped to the article's real height.
+- **A new app icon.** Handwritten W on newsprint, used by Finder, the Dock and the installer alike. The "App icon" picker now offers five. Anyone still on the previous default is moved to the new icon; a deliberate pick is left alone.
 
-1.5.1 brought the double-click sidebar auto-fit and the wider reading columns; 1.5.0 brought the table editing line: context menu, Tab at the last cell, ⌥↑/⌥↓ row moves, in-table horizontal scrolling, TSV/CSV paste, and in-place link editing.
+1.5.2 brought the app-icon picker and the single-bar quotes; 1.5.1 brought the double-click sidebar auto-fit and the wider reading columns.
 
-Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.5.2).
+Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.6.0).
 
 ## Roadmap
 
@@ -63,7 +65,7 @@ This writes `<name>-marktext.css` (editor), `export/<name>.css` (HTML/PDF), and 
 The build resolves the upstream source tree, applies Reversion's commits, and produces signed artifacts. It pins Node to the version upstream releases with (see `.nvmrc`) and pnpm to the version in upstream's `packageManager` field.
 
 ```bash
-./scripts/build-release-from-source.sh 1.5.2
+./scripts/build-release-from-source.sh 1.6.0
 ```
 
 Artifacts land in `releases/<version>/`: DMG, updater ZIP, `latest-mac.yml`, and SHA-256 sidecars.
