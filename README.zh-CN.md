@@ -6,7 +6,7 @@
 
 Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 所见即所得 Markdown 编辑器。它基于 [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` 与 TypeScript 编辑器引擎 `@muyajs/core`，加入行内实时渲染、原生 Finder Quick Look 扩展、两套排印主题、Typora 主题导入工具，以及书法「攵」应用图标。
 
-当前版本：**1.5.1**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
+当前版本：**1.5.2**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
 
 ## 核心功能
 
@@ -26,15 +26,14 @@ Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 
 
 应用采用带稳定应用标识的 ad-hoc 签名，**未经 Apple 公证**。该稳定标识用于让相邻版本互相校验；下载另有 GitHub HTTPS 与 `latest-mac.yml` 中的 SHA-512 校验保护。首次启动时，macOS Gatekeeper 可能要求在访达中按住 Control 点击 →「打开」。
 
-## 1.5.1 更新内容
+## 1.5.2 更新内容
 
-- **双击分隔条，侧栏宽度自适应。** 侧栏自动调整到当前面板内容的自然宽度，条目完整显示、不再截断；宽度有上限保护，始终为正文预留完整的内容列宽。拖拽调宽的行为不变。
-- **两套内置主题的正文列加宽约 10%。** Lens Design 由 760px 调至 836px，Claude 由 820px 调至 900px。在偏好设置里自定义过编辑区宽度的用户不受影响。
-- **一级标题字号回落。** H1 现在只比 H2 略大一级（1.9em / 1.7em），长文中不再过于抢占版面。
+- **应用图标可切换。** 偏好设置 → 主题新增「应用图标」：内置四款——反 · 书法（默认）、手写线稿、W · 深色、W · 浅色。选择后立即生效，作用于程序坞（Dock）、Cmd+Tab 与调度中心；访达中的应用图标由安装包固定。
+- **引用块不再显示两根竖线。** 引擎默认竖线与主题左边框此前叠加显示，现在只保留一根 4px 粗线，并压缩了引用块高度：单行引用上下各留约一个行高。两套内置主题同步修正。
 
-1.5.0 带来了表格编辑主线：右键菜单、末格 Tab 新建行、⌥↑/⌥↓ 移动行、表格内横向滚动、TSV/CSV 粘贴成表，以及行内链接直接编辑。
+1.5.1 带来了侧栏分隔条双击自适应与两套主题的阅读排版调整；1.5.0 带来了表格编辑主线：右键菜单、末格 Tab 新建行、⌥↑/⌥↓ 移动行、表格内横向滚动、TSV/CSV 粘贴成表，以及行内链接直接编辑。
 
-完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.5.1)。
+完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.5.2)。
 
 ## 开发计划
 
@@ -64,7 +63,7 @@ node scripts/import-typora-theme.mjs <typora主题.css> --name <名称> --out-di
 构建流程会取得上游源码树、应用反文的 commit，并产出已签名的发布产物。Node 版本钉在上游发布所用的版本（见 `.nvmrc`），pnpm 钉在上游 `packageManager` 字段声明的版本。
 
 ```bash
-./scripts/build-release-from-source.sh 1.5.1
+./scripts/build-release-from-source.sh 1.5.2
 ```
 
 产物落在 `releases/<版本>/`：DMG、更新用 ZIP、`latest-mac.yml` 与 SHA-256 校验文件。
