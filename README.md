@@ -6,7 +6,7 @@
 
 Reversion, Chinese name `反文`, is a macOS WYSIWYG Markdown editor for Chinese-language writing. It is based on [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` and its TypeScript editor engine, `@muyajs/core`, with inline live rendering, a native Finder Quick Look extension, two typographic themes, an importer for Typora themes, and export to HTML, PDF, DOCX and a single long PNG.
 
-Current release: **1.6.0** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
+Current release: **1.6.1** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
 
 ## Core features
 
@@ -27,6 +27,11 @@ The app checks this repository for a newer stable release 15 seconds after the f
 
 The app is ad-hoc signed with a stable application requirement and is **not Apple notarized**. The stable requirement is what lets one release validate the next; downloads are additionally covered by GitHub HTTPS and the SHA-512 digest in `latest-mac.yml`. On first launch macOS Gatekeeper may require Control-click → Open in Finder.
 
+## What's new in 1.6.1
+
+- **The table toolbar no longer covers the export dialog.** With the dialog open, moving the pointer across it found the table painted behind and popped the engine's column toolbar on top, hiding the tabs and options. The editor is dropped from hit-testing while a dialog is up.
+- **The export dialog has a cancel button.** Escape or a click outside were the only ways out; a quiet Cancel now sits beside Export, and the settings you changed are kept either way.
+
 ## What's new in 1.6.0
 
 - **Export as DOCX.** File → Export → Export as DOCX converts from the markdown source: headings, lists, tables, quotes and code blocks become native Word structures, math becomes native Word equations (OMML) you can keep editing, `[TOC]` becomes a Word table-of-contents field, and relative image paths resolve against the document's own folder. The conversion is done by pandoc, which you install yourself (`brew install pandoc`); the export says so when it is missing. Word owns the styling, so the page, theme and font settings in the export dialog do not apply to it.
@@ -35,7 +40,7 @@ The app is ad-hoc signed with a stable application requirement and is **not Appl
 
 1.5.2 brought the app-icon picker and the single-bar quotes; 1.5.1 brought the double-click sidebar auto-fit and the wider reading columns.
 
-Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.6.0).
+Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.6.1).
 
 ## Roadmap
 
@@ -65,7 +70,7 @@ This writes `<name>-marktext.css` (editor), `export/<name>.css` (HTML/PDF), and 
 The build resolves the upstream source tree, applies Reversion's commits, and produces signed artifacts. It pins Node to the version upstream releases with (see `.nvmrc`) and pnpm to the version in upstream's `packageManager` field.
 
 ```bash
-./scripts/build-release-from-source.sh 1.6.0
+./scripts/build-release-from-source.sh 1.6.1
 ```
 
 Artifacts land in `releases/<version>/`: DMG, updater ZIP, `latest-mac.yml`, and SHA-256 sidecars.
