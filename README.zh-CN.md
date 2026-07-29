@@ -6,7 +6,7 @@
 
 Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 所见即所得 Markdown 编辑器。它基于 [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` 与 TypeScript 编辑器引擎 `@muyajs/core`，加入行内实时渲染、原生 Finder Quick Look 扩展、两套排印主题、Typora 主题导入工具，以及 HTML / PDF / DOCX / PNG 长图四种导出格式。
 
-当前版本：**1.6.0**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
+当前版本：**1.6.1**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
 
 ## 核心功能
 
@@ -27,6 +27,11 @@ Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 
 
 应用采用带稳定应用标识的 ad-hoc 签名，**未经 Apple 公证**。该稳定标识用于让相邻版本互相校验；下载另有 GitHub HTTPS 与 `latest-mac.yml` 中的 SHA-512 校验保护。首次启动时，macOS Gatekeeper 可能要求在访达中按住 Control 点击 →「打开」。
 
+## 1.6.1 更新内容
+
+- **表格工具条不再盖在导出弹窗上。** 打开导出设置后，鼠标划过弹窗时，若弹窗背后正好是表格，编辑器的表格列工具条会浮在最上层挡住标签页与选项。现在弹窗打开期间编辑器不再参与坐标命中判定。
+- **导出弹窗新增取消按钮。** 此前只能按 Esc 或点击弹窗外部退出；取消按钮采用弱化配色置于「导出」左侧，已调整的设置照常保留。
+
 ## 1.6.0 更新内容
 
 - **导出为 DOCX。** 文件 → 导出 → 导出为 DOCX，从 Markdown 源直接转换：标题、列表、表格、引用、代码块转为 Word 原生结构，公式转为可继续编辑的 Word 原生公式（OMML），`[TOC]` 转为 Word 目录域，相对路径图片按文档所在目录解析。转换由 pandoc 完成，需自行安装（`brew install pandoc`），未安装时导出会提示。Word 文档的排版由 Word 自身决定，导出设置中的页面、主题、字体各项对其不生效。
@@ -35,7 +40,7 @@ Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 
 
 1.5.2 带来了应用图标选择器与引用块单竖线修正；1.5.1 带来了侧栏分隔条双击自适应与两套主题的阅读排版调整。
 
-完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.6.0)。
+完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.6.1)。
 
 ## 开发计划
 
@@ -65,7 +70,7 @@ node scripts/import-typora-theme.mjs <typora主题.css> --name <名称> --out-di
 构建流程会取得上游源码树、应用反文的 commit，并产出已签名的发布产物。Node 版本钉在上游发布所用的版本（见 `.nvmrc`），pnpm 钉在上游 `packageManager` 字段声明的版本。
 
 ```bash
-./scripts/build-release-from-source.sh 1.6.0
+./scripts/build-release-from-source.sh 1.6.1
 ```
 
 产物落在 `releases/<版本>/`：DMG、更新用 ZIP、`latest-mac.yml` 与 SHA-256 校验文件。
