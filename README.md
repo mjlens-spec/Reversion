@@ -6,7 +6,7 @@
 
 Reversion, Chinese name `反文`, is a macOS WYSIWYG Markdown editor for Chinese-language writing. It is based on [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` and its TypeScript editor engine, `@muyajs/core`, with inline live rendering, a native Finder Quick Look extension, two typographic themes, an importer for Typora themes, and export to HTML, PDF, DOCX and a single long PNG.
 
-Current release: **1.6.1** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
+Current release: **1.6.2** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
 
 ## Core features
 
@@ -27,6 +27,11 @@ The app checks this repository for a newer stable release 15 seconds after the f
 
 The app is ad-hoc signed with a stable application requirement and is **not Apple notarized**. The stable requirement is what lets one release validate the next; downloads are additionally covered by GitHub HTTPS and the SHA-512 digest in `latest-mac.yml`. On first launch macOS Gatekeeper may require Control-click → Open in Finder.
 
+## What's new in 1.6.2
+
+- **Long table-of-contents entries wrap inside the sidebar.** Headings that exceed the available width now continue on the next line instead of ending in an ellipsis or creating horizontal overflow.
+- **The sidebar reopens at the silver ratio.** Every app launch resets the table-of-contents sidebar and editor to `1 : 2.414`. Dragging still adjusts the width for the current session, and narrow windows retain the 220 px safety minimum.
+
 ## What's new in 1.6.1
 
 - **The table toolbar no longer covers the export dialog.** With the dialog open, moving the pointer across it found the table painted behind and popped the engine's column toolbar on top, hiding the tabs and options. The editor is dropped from hit-testing while a dialog is up.
@@ -40,7 +45,7 @@ The app is ad-hoc signed with a stable application requirement and is **not Appl
 
 1.5.2 brought the app-icon picker and the single-bar quotes; 1.5.1 brought the double-click sidebar auto-fit and the wider reading columns.
 
-Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.6.1).
+Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.6.2).
 
 ## Roadmap
 
@@ -70,7 +75,7 @@ This writes `<name>-marktext.css` (editor), `export/<name>.css` (HTML/PDF), and 
 The build resolves the upstream source tree, applies Reversion's commits, and produces signed artifacts. It pins Node to the version upstream releases with (see `.nvmrc`) and pnpm to the version in upstream's `packageManager` field.
 
 ```bash
-./scripts/build-release-from-source.sh 1.6.1
+./scripts/build-release-from-source.sh 1.6.2
 ```
 
 Artifacts land in `releases/<version>/`: DMG, updater ZIP, `latest-mac.yml`, and SHA-256 sidecars.
