@@ -25,7 +25,7 @@
 ## 兼容性
 
 - Apple Silicon（arm64）
-- macOS 应用路径：\`/Applications/Reversion.app\`
-- 用户数据目录继续使用 \`~/Library/Application Support/marktext\`
-- Bundle ID 继续使用 \`com.github.marktext.marktext\`
+- macOS 应用路径：`/Applications/Reversion.app`
+- 用户数据目录继续使用 `~/Library/Application Support/marktext`
+- Bundle ID 继续使用 `com.github.marktext.marktext`
 - 反文采用稳定 ad-hoc 签名，未经 Apple 公证
