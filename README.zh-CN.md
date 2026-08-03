@@ -6,7 +6,7 @@
 
 Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 所见即所得 Markdown 编辑器。它基于 [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` 与 TypeScript 编辑器引擎 `@muyajs/core`，加入行内实时渲染、原生 Finder Quick Look 扩展、两套排印主题、Typora 主题导入工具，以及 HTML / PDF / DOCX / PNG 长图四种导出格式。
 
-当前版本：**1.7.2**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
+当前版本：**1.8.0**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
 
 ## 核心功能
 
@@ -26,6 +26,14 @@ Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 
 应用会在首个窗口打开 15 秒后检查本仓库是否有更新的稳定版，没有新版时不打扰。发现新版后，右下方常驻进度卡会显示百分比、已下载容量、速率与预计剩余时间，不阻塞编辑。重启安装前会先处理未保存文档；新版本启动后，更新说明只显示一次。也可随时使用「Reversion → 检查更新」。
 
 应用采用带稳定应用标识的 ad-hoc 签名，**未经 Apple 公证**。该稳定标识用于让相邻版本互相校验；下载另有 GitHub HTTPS 与 `latest-mac.yml` 中的 SHA-512 校验保护。首次启动时，macOS Gatekeeper 可能要求在访达中按住 Control 点击 →「打开」。
+
+## 1.8.0 更新内容
+
+- **「文件」改为目录树。** 打开单个文档后，侧栏会显示该文件所在的文件夹结构，不再只是平铺已打开的标签；可继续向上浏览，也可按需展开子文件夹。
+- **文件状态清楚区分。** 支持打开的文档保持正常颜色，不支持的格式以暗灰色显示并禁用，当前文档持续保留选中高亮。
+- **大型目录保持顺畅。** 目录条目采用批量读取，同一文件夹内切换文档会复用结果，子目录仅在展开时加载。
+- **文件系统边界更加稳健。** Windows 盘符根目录、UNC 共享路径、符号链接、无权读取的文件夹与重试状态均有明确处理。
+- **键盘操作与多语言补齐。** 文件树支持键盘导航，并提供当前项与禁用项的无障碍语义；新增提示与错误文案已覆盖 10 种界面语言。
 
 ## 1.7.2 更新内容
 
@@ -60,7 +68,7 @@ Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 
 
 1.5.2 带来了应用图标选择器与引用块单竖线修正；1.5.1 带来了侧栏分隔条双击自适应与两套主题的阅读排版调整。
 
-完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.7.2)。
+完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.8.0)。
 
 ## 开发计划
 
@@ -90,7 +98,7 @@ node scripts/import-typora-theme.mjs <typora主题.css> --name <名称> --out-di
 构建流程会取得上游源码树、应用反文的 commit，并产出已签名的发布产物。Node 版本钉在上游发布所用的版本（见 `.nvmrc`），pnpm 钉在上游 `packageManager` 字段声明的版本。
 
 ```bash
-./scripts/build-release-from-source.sh 1.7.2
+./scripts/build-release-from-source.sh 1.8.0
 ```
 
 产物落在 `releases/<版本>/`：DMG、更新用 ZIP、`latest-mac.yml` 与 SHA-256 校验文件。
