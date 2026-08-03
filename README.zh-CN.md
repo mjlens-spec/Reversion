@@ -6,7 +6,7 @@
 
 Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 所见即所得 Markdown 编辑器。它基于 [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` 与 TypeScript 编辑器引擎 `@muyajs/core`，加入行内实时渲染、原生 Finder Quick Look 扩展、两套排印主题、Typora 主题导入工具，以及 HTML / PDF / DOCX / PNG 长图四种导出格式。
 
-当前版本：**1.8.0**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
+当前版本：**1.8.1**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
 
 ## 核心功能
 
@@ -26,6 +26,12 @@ Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 
 应用会在首个窗口打开 15 秒后检查本仓库是否有更新的稳定版，没有新版时不打扰。发现新版后，右下方常驻进度卡会显示百分比、已下载容量、速率与预计剩余时间，不阻塞编辑。重启安装前会先处理未保存文档；新版本启动后，更新说明只显示一次。也可随时使用「Reversion → 检查更新」。
 
 应用采用带稳定应用标识的 ad-hoc 签名，**未经 Apple 公证**。该稳定标识用于让相邻版本互相校验；下载另有 GitHub HTTPS 与 `latest-mac.yml` 中的 SHA-512 校验保护。首次启动时，macOS Gatekeeper 可能要求在访达中按住 Control 点击 →「打开」。
+
+## 1.8.1 更新内容
+
+- **侧栏内容四周统一留白。** 文件、搜索与目录视图的内容区四边均增加 8 px 间距，与标注稿的边距基准一致，不改变侧栏外部宽度。
+- **侧栏整体字号缩小 1 px。** 入口文字、文件与文件夹、搜索框与搜索结果、目录条目、按钮及底部字数统计都按原有层级统一缩小。
+- **自适应宽度与滚动保持稳定。** 双击分隔条计算宽度时会计入新增边距，现有选中态、禁用态与溢出滚动行为保持不变。
 
 ## 1.8.0 更新内容
 
@@ -68,7 +74,7 @@ Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 
 
 1.5.2 带来了应用图标选择器与引用块单竖线修正；1.5.1 带来了侧栏分隔条双击自适应与两套主题的阅读排版调整。
 
-完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.8.0)。
+完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.8.1)。
 
 ## 开发计划
 
@@ -98,7 +104,7 @@ node scripts/import-typora-theme.mjs <typora主题.css> --name <名称> --out-di
 构建流程会取得上游源码树、应用反文的 commit，并产出已签名的发布产物。Node 版本钉在上游发布所用的版本（见 `.nvmrc`），pnpm 钉在上游 `packageManager` 字段声明的版本。
 
 ```bash
-./scripts/build-release-from-source.sh 1.8.0
+./scripts/build-release-from-source.sh 1.8.1
 ```
 
 产物落在 `releases/<版本>/`：DMG、更新用 ZIP、`latest-mac.yml` 与 SHA-256 校验文件。
