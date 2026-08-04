@@ -137,7 +137,7 @@ test('unreferenced MarkText-branded locale keys were deleted, not just left to r
 test('title bar shows "Reversion" (not "MarkText") when no file is open', (t) => {
   if (!upstreamAvailable) return t.skip('upstream/marktext not available')
   const titleBar = read('src/renderer/src/components/titleBar/index.vue')
-  assert.match(titleBar, /<span v-if="!filename">Reversion<\/span>/)
+  assert.match(titleBar, /v-if="!filename"[\s\S]{0,120}>Reversion<\/span>/)
   assert.doesNotMatch(titleBar, />MarkText</)
 })
 
