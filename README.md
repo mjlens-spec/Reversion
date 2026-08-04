@@ -6,7 +6,7 @@
 
 Reversion, Chinese name `反文`, is a macOS WYSIWYG Markdown editor for Chinese-language writing. It is based on [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` and its TypeScript editor engine, `@muyajs/core`, with inline live rendering, a native Finder Quick Look extension, two typographic themes, an importer for Typora themes, and export to HTML, PDF, DOCX and a single long PNG.
 
-Current release: **1.8.1** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
+Current release: **1.9.0** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
 
 ## Core features
 
@@ -26,6 +26,12 @@ Prebuilt `arm64` DMGs are on the [Releases page](https://github.com/mjlens-spec/
 The app checks this repository for a newer stable release 15 seconds after the first window opens and stays quiet when already current. When an update is found, a compact progress card shows percentage, transfer size, speed and remaining time without blocking the editor. Reversion asks before restarting, protects unsaved documents, and shows the release notes once after the new version opens. **Reversion → Check for Updates** works at any time.
 
 The app is ad-hoc signed with a stable application requirement and is **not Apple notarized**. The stable requirement is what lets one release validate the next; downloads are additionally covered by GitHub HTTPS and the SHA-512 digest in `latest-mac.yml`. On first launch macOS Gatekeeper may require Control-click → Open in Finder.
+
+## What's new in 1.9.0
+
+- **The title bar now leads with the document name.** The active filename is bold and shown without its final extension, so it remains the clearest piece of context at a glance.
+- **Folder context is compact and readable.** A muted capsule follows the filename and shows up to the three nearest folders in parent-to-child order, with restrained chevrons between levels.
+- **Long paths stay inside the window chrome.** Filenames and folder levels truncate independently when space is tight, while macOS rename behavior and the unsaved-document indicator remain intact.
 
 ## What's new in 1.8.1
 
@@ -74,7 +80,7 @@ The app is ad-hoc signed with a stable application requirement and is **not Appl
 
 1.5.2 brought the app-icon picker and the single-bar quotes; 1.5.1 brought the double-click sidebar auto-fit and the wider reading columns.
 
-Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.8.1).
+Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.9.0).
 
 ## Roadmap
 
@@ -104,7 +110,7 @@ This writes `<name>-marktext.css` (editor), `export/<name>.css` (HTML/PDF), and 
 The build resolves the upstream source tree, applies Reversion's commits, and produces signed artifacts. It pins Node to the version upstream releases with (see `.nvmrc`) and pnpm to the version in upstream's `packageManager` field.
 
 ```bash
-./scripts/build-release-from-source.sh 1.8.1
+./scripts/build-release-from-source.sh 1.9.0
 ```
 
 Artifacts land in `releases/<version>/`: DMG, updater ZIP, `latest-mac.yml`, and SHA-256 sidecars.
