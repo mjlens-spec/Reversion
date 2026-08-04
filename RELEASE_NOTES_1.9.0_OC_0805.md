@@ -15,8 +15,11 @@
 - Desktop 完整单元测试：846/846
 - 标题栏逻辑覆盖率：语句、分支、函数、行均为 100%
 - 标题栏真实 Electron 渲染验收：1/1
+- 正式打包应用 E2E：20/20
 - 工具仓契约测试：98/98
 - TypeScript、ESLint、production build：通过
+- DMG 与更新 ZIP 的 SHA-256、ZIP 完整性、DMG 校验、`latest-mac.yml` 的版本/大小/SHA-512：通过
+- 从正式更新 ZIP 解出的应用版本、arm64 架构、指定要求与深度签名：通过
 
 ## 兼容性
 
