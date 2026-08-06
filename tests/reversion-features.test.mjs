@@ -54,6 +54,32 @@ test('Reversion 2.0 themes render diagrams, flat highlights, and editorial quote
   }
 })
 
+test('theme stylesheets keep braces balanced', () => {
+  // A stray top-level `}` is silently discarded by Chromium's error recovery
+  // but breaks stricter CSS tooling; 2.0.0 shipped one in each export theme.
+  const themeFiles = [
+    'themes/lens-design-marktext.css',
+    'themes/claude-like-marktext.css',
+    'themes/export/lens-design.css',
+    'themes/export/claude-like.css',
+    'patches/reversion-runtime.css'
+  ]
+  for (const themePath of themeFiles) {
+    const css = read(themePath)
+    let depth = 0
+    let line = 1
+    for (const ch of css) {
+      if (ch === '\n') line += 1
+      else if (ch === '{') depth += 1
+      else if (ch === '}') {
+        depth -= 1
+        assert.ok(depth >= 0, `${themePath}: stray closing brace at line ${line}`)
+      }
+    }
+    assert.equal(depth, 0, `${themePath}: ${depth} unclosed brace(s) at end of file`)
+  }
+})
+
 test('editor and export themes balance narrow and wide tables', () => {
   // In the editor a wide table now scrolls inside `.mu-table` (muya's
   // blockSyntax.css sets `overflow-x: auto` on the figure), so the table sizes

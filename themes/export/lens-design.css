@@ -312,7 +312,6 @@ body {
 .markdown-body mark[data-color='blue'] { background: rgba(143, 206, 232, 0.42); }
 .markdown-body mark[data-color='orange'] { background: rgba(244, 190, 107, 0.42); }
 .markdown-body mark[data-color='pink'] { background: rgba(238, 164, 194, 0.4); }
-}
 
 .toc-container .toc-title {
   color: var(--lens-blue);
