@@ -189,6 +189,23 @@ body {
   color: inherit;
 }
 
+.markdown-body figure.mu-diagram-block .mu-diagram-preview {
+  box-sizing: border-box;
+  min-height: 180px;
+  padding: 24px;
+  overflow: auto;
+  border: 1px solid var(--claude-line);
+  border-radius: 16px;
+  background: var(--claude-surface);
+  box-shadow: var(--claude-shadow);
+}
+
+.markdown-body figure.mu-diagram-block .mu-diagram-preview svg {
+  display: block;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
 .markdown-body table {
   display: table;
   width: 100%;
@@ -245,8 +262,17 @@ body {
 }
 
 .markdown-body mark {
-  background: linear-gradient(transparent 58%, rgba(188, 106, 58, 0.24) 58%);
+  padding: 0.08em 0.2em;
+  border-radius: 4px;
+  background: rgba(184, 231, 119, 0.46);
   color: inherit;
+  box-decoration-break: clone;
+}
+
+.markdown-body mark[data-color='green'] { background: rgba(184, 231, 119, 0.46); }
+.markdown-body mark[data-color='blue'] { background: rgba(143, 206, 232, 0.4); }
+.markdown-body mark[data-color='orange'] { background: rgba(244, 190, 107, 0.4); }
+.markdown-body mark[data-color='pink'] { background: rgba(238, 164, 194, 0.38); }
 }
 
 .toc-container .toc-title {

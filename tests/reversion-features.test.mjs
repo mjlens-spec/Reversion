@@ -22,7 +22,7 @@ test('inline live rendering preserves Muya hidden markers and active syntax feed
   assert.match(patcher, /replaceMarkedAppend\([\s\S]*Reversion runtime styles patch start/)
 })
 
-test('semantic minimap and its background Git work are removed', () => {
+test('legacy injected minimap and background Git bridge stay removed', () => {
   const patcher = read('scripts/patch-asar-themes.mjs')
   const css = read('patches/reversion-runtime.css')
 
@@ -33,6 +33,25 @@ test('semantic minimap and its background Git work are removed', () => {
   assert.doesNotMatch(patcher, /setInterval\(|MutationObserver/)
   assert.match(patcher, /removeMarkedBlock\([\s\S]*Reversion semantic minimap runtime patch start/)
   assert.match(patcher, /removeMarkedBlock\([\s\S]*Reversion Git diff bridge patch start/)
+})
+
+test('Reversion 2.0 themes render diagrams, flat highlights, and editorial quotes', () => {
+  for (const themePath of ['themes/lens-design-marktext.css', 'themes/claude-like-marktext.css']) {
+    const css = read(themePath)
+    assert.match(css, /figure\.mu-diagram-block \.mu-diagram-preview \{[\s\S]*border-radius: 16px !important;[\s\S]*box-shadow:/)
+    assert.match(css, /\.mu-container blockquote \{[\s\S]*border-left: 4px solid/)
+    assert.match(css, /\.mu-container mark\[data-color='green'\] \{[\s\S]*background: rgba\(/)
+    assert.match(css, /\.mu-container mark\[data-color='blue'\] \{[\s\S]*background: rgba\(/)
+    assert.doesNotMatch(css, /\.mu-container mark[^}]*linear-gradient/s)
+  }
+
+  for (const themePath of ['themes/export/lens-design.css', 'themes/export/claude-like.css']) {
+    const css = read(themePath)
+    assert.match(css, /\.markdown-body figure\.mu-diagram-block \.mu-diagram-preview \{[\s\S]*border-radius: 16px;/)
+    assert.match(css, /\.markdown-body blockquote \{[\s\S]*border-left: 4px solid/)
+    assert.match(css, /\.markdown-body mark\[data-color='pink'\][^{]*\{ background: rgba\(/)
+    assert.doesNotMatch(css, /\.markdown-body mark[^}]*linear-gradient/s)
+  }
 })
 
 test('editor and export themes balance narrow and wide tables', () => {

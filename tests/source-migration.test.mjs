@@ -192,23 +192,31 @@ test('the first-run preference seed (not just the validation schema) defaults to
   }
 })
 
-test('independent title/heading/body font-role preferences exist end to end', (t) => {
+test('title, heading, Western body, and CJK reading fonts exist end to end', (t) => {
   if (!upstreamAvailable) return t.skip('upstream/marktext not available')
   const schema = JSON.parse(read('src/main/preferences/schema.json'))
   assert.equal(schema.editorTitleFontFamily.default, 'Cormorant Garamond')
   assert.equal(schema.editorHeadingFontFamily.default, 'Spectral')
   assert.equal(schema.editorBodyFontFamily.default, 'Noto Sans SC')
+  assert.equal(schema.readingWesternBodyFont.default, 'theme')
+  assert.equal(schema.readingCjkFont.default, 'theme')
 
   const editorVue = read('src/renderer/src/components/editorWithTabs/editor.vue')
-  assert.match(editorVue, /'--editor-title-font-family': editorTitleFontFamily \|\| 'var\(--reading-font-title\)'/)
-  assert.match(editorVue, /'--editor-body-font-family': editorBodyFontFamily \|\| 'var\(--reading-font-body\)'/)
-  assert.match(editorVue, /watch\(editorBodyFontFamily/)
-  assert.match(editorVue, /editorFontFamily: resolveEditorFont\(editorBodyFontFamily\.value\)/)
+  assert.match(editorVue, /'--editor-title-font-family': readingFontStacks\.title/)
+  assert.match(editorVue, /'--editor-body-font-family': readingFontStacks\.body/)
+  assert.match(editorVue, /composeReadingFontStacks\(/)
+  assert.match(editorVue, /createReadingFontOverrideCss\(\s*readingFontStacks\.value\s*\)/)
+  assert.match(editorVue, /watch\(\[editorBodyFontFamily, readingWesternBodyFont, readingCjkFont\]/)
 
   const prefEditor = read('src/renderer/src/prefComponents/editor/index.vue')
-  assert.match(prefEditor, /onSelectChange\('editorTitleFontFamily', value\)/)
-  assert.match(prefEditor, /onSelectChange\('editorHeadingFontFamily', value\)/)
-  assert.match(prefEditor, /onSelectChange\('editorBodyFontFamily', value\)/)
+  assert.match(prefEditor, /onSelectChange\('readingWesternBodyFont', value\)/)
+  assert.match(prefEditor, /onSelectChange\('readingCjkFont', value\)/)
+  assert.match(prefEditor, /<reading-font-picker/)
+
+  const fontPicker = read('src/renderer/src/prefComponents/editor/readingFontPicker.vue')
+  assert.match(fontPicker, /window\.fonts\.list\(\)/)
+  assert.match(fontPicker, /browserCjkFontCheck/)
+  assert.match(fontPicker, /resolveEffectiveCjkFont/)
 })
 
 // ---------------------------------------------------------------------------
@@ -260,28 +268,36 @@ test('checkUpdates supports a silent mode used for the startup auto-check', (t) 
 })
 
 // ---------------------------------------------------------------------------
-// Removed legacy blocks (asar patch used to strip these; confirm they never
-// existed in upstream source, i.e. there is nothing left to remove there).
+// Reversion 2.0 semantic minimap
 // ---------------------------------------------------------------------------
 
-test('semantic minimap and Git diff bridge have no footprint in upstream source', (t) => {
+test('semantic minimap is native, persisted, and independent from the removed Git bridge', (t) => {
   if (!upstreamAvailable) return t.skip('upstream/marktext not available')
-  const searchRoots = [path.join(desktop, 'src')]
-  const offenders = []
-  const walk = (dir) => {
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      const full = path.join(dir, entry.name)
-      if (entry.isDirectory()) walk(full)
-      else if (/\.(ts|vue|js)$/.test(entry.name)) {
-        const content = fs.readFileSync(full, 'utf8')
-        if (/semantic.?minimap|reversionSemanticMinimap|git-diff-summary/i.test(content)) {
-          offenders.push(full)
-        }
-      }
-    }
-  }
-  for (const dir of searchRoots) walk(dir)
-  assert.deepEqual(offenders, [])
+  const schema = JSON.parse(read('src/main/preferences/schema.json'))
+  assert.equal(schema.showMinimap.default, true)
+
+  const minimap = read('src/renderer/src/components/editorWithTabs/semanticMinimap.vue')
+  assert.match(minimap, /const visible = computed\(\(\) => showMinimap\.value && !props\.sourceCode\)/)
+  assert.match(minimap, /new ResizeObserver\(measureDocument\)/)
+  assert.match(minimap, /new MutationObserver\(/)
+  assert.match(minimap, /@pointerdown="handlePointerDown"/)
+
+  const editorShell = read('src/renderer/src/components/editorWithTabs/index.vue')
+  assert.match(editorShell, /<semantic-minimap :source-code="sourceCode" \/>/)
+  const commands = read('src/renderer/src/commands/index.ts')
+  assert.match(commands, /id: 'view\.toggle-minimap'/)
+  const viewMenu = read('src/main/menu/templates/view.ts')
+  assert.match(viewMenu, /id: 'semanticMinimapMenuItem'[\s\S]*checked: true/)
+  const viewActions = read('src/main/menu/actions/view.ts')
+  assert.match(viewActions, /toggleTypeMode\(win, 'showMinimap'\)/)
+  assert.match(viewActions, /changeMenuByName\('semanticMinimapMenuItem', value\)/)
+
+  const sourceTree = fs
+    .readdirSync(path.join(desktop, 'src', 'renderer', 'src'), { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile() && /\.(ts|vue|js)$/.test(entry.name))
+    .map((entry) => fs.readFileSync(path.join(entry.parentPath, entry.name), 'utf8'))
+    .join('\n')
+  assert.doesNotMatch(sourceTree, /git-diff-summary|reversion::git-diff-summary/i)
 })
 
 // ---------------------------------------------------------------------------

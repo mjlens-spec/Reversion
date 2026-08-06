@@ -246,7 +246,7 @@
     margin: 1em 0 !important;
     /* Single-line quote keeps roughly one line-height of air above and
        below the text (margin + padding + inner paragraph margin). */
-    padding: 4px 22px !important;
+    padding: 10px 22px !important;
     border-left: 4px solid var(--claude-line-strong) !important;
     border-radius: 0 6px 6px 0 !important;
     background: var(--claude-surface-muted) !important;
@@ -293,6 +293,23 @@
     color: var(--claude-code-text) !important;
     font-family: var(--claude-font-mono) !important;
     line-height: 1.62 !important;
+  }
+
+  figure.mu-diagram-block .mu-diagram-preview {
+    box-sizing: border-box;
+    min-height: 180px;
+    padding: 24px !important;
+    overflow: auto;
+    border: 1px solid var(--claude-line) !important;
+    border-radius: 16px !important;
+    background: var(--claude-surface) !important;
+    box-shadow: var(--claude-shadow);
+  }
+
+  figure.mu-diagram-block .mu-diagram-preview svg {
+    display: block;
+    max-width: 100%;
+    margin: 0 auto;
   }
 
   .mu-container table {
@@ -350,8 +367,27 @@
   }
 
   .mu-container mark {
-    background: linear-gradient(transparent 58%, rgba(188, 106, 58, 0.24) 58%);
+    padding: 0.08em 0.2em;
+    border-radius: 4px;
+    background: rgba(184, 231, 119, 0.46);
     color: inherit;
+    box-decoration-break: clone;
+  }
+
+  .mu-container mark[data-color='green'] {
+    background: rgba(184, 231, 119, 0.46);
+  }
+
+  .mu-container mark[data-color='blue'] {
+    background: rgba(143, 206, 232, 0.4);
+  }
+
+  .mu-container mark[data-color='orange'] {
+    background: rgba(244, 190, 107, 0.4);
+  }
+
+  .mu-container mark[data-color='pink'] {
+    background: rgba(238, 164, 194, 0.38);
   }
 
   ul.mu-bullet-list > li.mu-list-item::before {

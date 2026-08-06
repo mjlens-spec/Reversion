@@ -6,12 +6,14 @@
 
 Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 所见即所得 Markdown 编辑器。它基于 [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` 与 TypeScript 编辑器引擎 `@muyajs/core`，加入行内实时渲染、原生 Finder Quick Look 扩展、两套排印主题、Typora 主题导入工具，以及 HTML / PDF / DOCX / PNG 长图四种导出格式。
 
-当前版本：**1.9.0**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
+当前版本：**2.0.0**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
 
 ## 核心功能
 
 - **行内实时渲染** — 默认进入 Muya 所见即所得模式。粗体、斜体、链接、行内代码、数学公式随输入实时排版；光标进入语法范围时显示 Markdown 标记，移开后自动隐藏。
-- **排印优先的主题** — 内置两套主题，各有三个独立的阅读字体槽位，可分别设定大标题、小标题与正文字体，并带一条不破坏西文字形度量的中文回退链。
+- **双字体阅读系统** — 西文正文与中日韩字体可分别选择，也可继续跟随主题；编辑器与 HTML、PNG、PDF、打印共用同一字体栈。
+- **语义缩略图** — 编辑区右缘以标题、段落、代码、引用、表格和图示呈现文档结构，支持点击与拖动定位。
+- **双语命令面板** — `Command+Shift+P` 统一检索命令、最近文件和当前文件夹，中英文均可匹配；`Command+K` 仍保留给目录。
 - **Typora 主题导入** — 「主题 ▸ 导入主题（Typora 兼容）」在应用内把 Typora 主题的 CSS 转译为反文的编辑器主题与配套 HTML/PDF 导出主题，并输出兼容报告列出无法映射的规则。同一条流水线也以 `scripts/import-typora-theme.mjs` 形式提供。已在 Typora 六套内置主题上验证。
 - **导出** — HTML、PDF、DOCX 与 PNG 长图四种格式。HTML 与 PDF 沿用导出主题、字体、目录与页眉页脚设置；DOCX 经 pandoc 转为 Word 原生结构；PNG 把整篇文档渲染成一张不分页长图。
 - **Finder Quick Look** — 应用内置原生 macOS Quick Look 预览扩展。在访达中选中 Markdown 文件按空格，即可预览标题、列表、引用、代码块、表格与行内格式。
@@ -26,6 +28,14 @@ Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 
 应用会在首个窗口打开 15 秒后检查本仓库是否有更新的稳定版，没有新版时不打扰。发现新版后，右下方常驻进度卡会显示百分比、已下载容量、速率与预计剩余时间，不阻塞编辑。重启安装前会先处理未保存文档；新版本启动后，更新说明只显示一次。也可随时使用「Reversion → 检查更新」。
 
 应用采用带稳定应用标识的 ad-hoc 签名，**未经 Apple 公证**。该稳定标识用于让相邻版本互相校验；下载另有 GitHub HTTPS 与 `latest-mac.yml` 中的 SHA-512 校验保护。首次启动时，macOS Gatekeeper 可能要求在访达中按住 Control 点击 →「打开」。
+
+## 2.0.0 更新内容
+
+- **页面形态全面更新。** 侧栏改为带轻微透明、模糊与阴影的浅浮层；Mermaid 图示进入独立视觉容器，highlight 支持绿、蓝、橙、粉四种平面色块，引用块使用浅蓝表面与单边强调线。
+- **新增语义缩略图。** 默认显示，支持视口跟随、点击跳转和按住拖动；窄窗口、源码模式或模态弹窗期间自动退出布局与命中。
+- **新增双字体设置。** 字体选择器可搜索系统字体并实时预览，CJK 入口会显示当前实际命中的字体，设置可持久化。
+- **命令面板升级为双语工作入口。** 包含三个分区、最近命令排序、无文档禁用态、IME 组合输入保护与全局 Esc 关闭。
+- **10 种界面语言同步补齐。** 缩略图、字体设置与命令面板新文案已全部本地化。
 
 ## 1.9.0 更新内容
 
@@ -80,7 +90,7 @@ Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 
 
 1.5.2 带来了应用图标选择器与引用块单竖线修正；1.5.1 带来了侧栏分隔条双击自适应与两套主题的阅读排版调整。
 
-完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.9.0)。
+完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v2.0.0)。
 
 ## 开发计划
 
@@ -110,7 +120,7 @@ node scripts/import-typora-theme.mjs <typora主题.css> --name <名称> --out-di
 构建流程会取得上游源码树、应用反文的 commit，并产出已签名的发布产物。Node 版本钉在上游发布所用的版本（见 `.nvmrc`），pnpm 钉在上游 `packageManager` 字段声明的版本。
 
 ```bash
-./scripts/build-release-from-source.sh 1.9.0
+./scripts/build-release-from-source.sh 2.0.0
 ```
 
 产物落在 `releases/<版本>/`：DMG、更新用 ZIP、`latest-mac.yml` 与 SHA-256 校验文件。
