@@ -6,12 +6,14 @@
 
 Reversion, Chinese name `反文`, is a macOS WYSIWYG Markdown editor for Chinese-language writing. It is based on [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` and its TypeScript editor engine, `@muyajs/core`, with inline live rendering, a native Finder Quick Look extension, two typographic themes, an importer for Typora themes, and export to HTML, PDF, DOCX and a single long PNG.
 
-Current release: **1.9.0** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
+Current release: **2.0.0** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
 
 ## Core features
 
 - **Inline live rendering** — Muya stays in WYSIWYG mode by default. Bold, italic, links, inline code, and math render as you type; Markdown markers appear inside the active syntax range and collapse once the caret leaves it.
-- **Typography-first themes** — two built-in themes, each with three independent reading font slots so large titles, smaller headings, and body copy can use different faces, with a CJK fallback chain that does not break Latin metrics.
+- **Dual-font reading system** — choose Western body and CJK fonts independently or keep following the active theme. The editor and HTML, PNG, PDF and print exports share the same composed font stack.
+- **Semantic minimap** — a narrow right-edge overview maps headings, paragraphs, code, quotes, tables and diagrams, with click and drag navigation.
+- **Bilingual command palette** — `Command+Shift+P` searches commands, recent files and current-folder files in English or Chinese; `Command+K` remains assigned to the table of contents.
 - **Typora theme import** — Theme ▸ Import Theme (Typora compatible) converts a Typora theme's CSS, in the app, into a Reversion editor theme plus a matching HTML/PDF export theme, and writes a compatibility report listing anything it could not map. The same pipeline is available as `scripts/import-typora-theme.mjs`. Verified against six of Typora's built-in themes.
 - **Export** — HTML, PDF, DOCX and a single long PNG. HTML and PDF carry the export themes, fonts, TOC and header/footer settings; DOCX goes through pandoc into native Word structures; PNG renders the whole document as one unpaginated image.
 - **Finder Quick Look** — the app bundles a native macOS Quick Look Preview Extension. Select a Markdown file in Finder and press Space to preview headings, lists, block quotes, code blocks, tables, and inline formatting.
@@ -26,6 +28,14 @@ Prebuilt `arm64` DMGs are on the [Releases page](https://github.com/mjlens-spec/
 The app checks this repository for a newer stable release 15 seconds after the first window opens and stays quiet when already current. When an update is found, a compact progress card shows percentage, transfer size, speed and remaining time without blocking the editor. Reversion asks before restarting, protects unsaved documents, and shows the release notes once after the new version opens. **Reversion → Check for Updates** works at any time.
 
 The app is ad-hoc signed with a stable application requirement and is **not Apple notarized**. The stable requirement is what lets one release validate the next; downloads are additionally covered by GitHub HTTPS and the SHA-512 digest in `latest-mac.yml`. On first launch macOS Gatekeeper may require Control-click → Open in Finder.
+
+## What's new in 2.0.0
+
+- **A new document-first visual shell.** The sidebar becomes a shallow translucent floating panel; Mermaid diagrams sit in calm visual cards; highlights use flat green, blue, orange and pink color blocks; quotes use a pale tinted surface and a single accent rule.
+- **A semantic minimap for long documents.** It follows the viewport, supports click and drag navigation, and withdraws in narrow windows, source mode and modal states.
+- **Independent Western and CJK reading fonts.** Searchable system-font pickers include live previews, report the effective CJK face, persist across restarts and flow into every styled export.
+- **A bilingual command workspace.** The upgraded palette adds three sections, recent-command ranking, document-aware disabled states, IME composition protection and reliable global Escape handling.
+- **Complete localization.** New 2.0 labels are present in all ten interface languages.
 
 ## What's new in 1.9.0
 
@@ -80,7 +90,7 @@ The app is ad-hoc signed with a stable application requirement and is **not Appl
 
 1.5.2 brought the app-icon picker and the single-bar quotes; 1.5.1 brought the double-click sidebar auto-fit and the wider reading columns.
 
-Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v1.9.0).
+Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v2.0.0).
 
 ## Roadmap
 
@@ -110,7 +120,7 @@ This writes `<name>-marktext.css` (editor), `export/<name>.css` (HTML/PDF), and 
 The build resolves the upstream source tree, applies Reversion's commits, and produces signed artifacts. It pins Node to the version upstream releases with (see `.nvmrc`) and pnpm to the version in upstream's `packageManager` field.
 
 ```bash
-./scripts/build-release-from-source.sh 1.9.0
+./scripts/build-release-from-source.sh 2.0.0
 ```
 
 Artifacts land in `releases/<version>/`: DMG, updater ZIP, `latest-mac.yml`, and SHA-256 sidecars.
