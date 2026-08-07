@@ -149,11 +149,11 @@ test('both themes are wired into addThemeStyle(), the Preferences grid, and the 
   assert.match(windowBase, /getThemeBackgroundColor\(theme, effectiveAppearance\)/)
 })
 
-test('Lens Design is the schema default theme (was scripts/install-theme.mjs)', (t) => {
+test('Claude-like is the schema default theme', (t) => {
   if (!upstreamAvailable) return t.skip('upstream/marktext not available')
   const schema = JSON.parse(read('src/main/preferences/schema.json'))
-  assert.equal(schema.theme.default, 'lens-design')
-  assert.equal(schema.lightModeTheme.default, 'lens-design')
+  assert.equal(schema.theme.default, 'claude-like')
+  assert.equal(schema.lightModeTheme.default, 'claude-like')
   // These already matched upstream defaults pre-migration; asserted here so
   // a future upstream change doesn't silently drift from what
   // install-theme.mjs (and users relying on defaults) expect.
@@ -161,7 +161,7 @@ test('Lens Design is the schema default theme (was scripts/install-theme.mjs)', 
   assert.equal(schema.autoPairMarkdownSyntax.default, true)
 })
 
-test('the first-run preference seed (not just the validation schema) defaults to Lens Design', (t) => {
+test('the first-run preference seed (not just the validation schema) defaults to Claude-like', (t) => {
   if (!upstreamAvailable) return t.skip('upstream/marktext not available')
   // Found by the E1 task 5 e2e smoke suite (tests-e2e/smoke.spec.ts): on a
   // truly fresh userData directory, `Preference.init()`
@@ -172,13 +172,13 @@ test('the first-run preference seed (not just the validation schema) defaults to
   // start still landed on the upstream "light" theme. Guard both files so
   // this can't silently drift apart again.
   const staticSeed = JSON.parse(read('static/preference.json'))
-  assert.equal(staticSeed.theme, 'lens-design')
-  assert.equal(staticSeed.lightModeTheme, 'lens-design')
+  assert.equal(staticSeed.theme, 'claude-like')
+  assert.equal(staticSeed.lightModeTheme, 'claude-like')
   assert.equal(staticSeed.darkModeTheme, 'dark')
   // followSystemTheme was upstream's `true` through 1.3.0 (E1任务3 report
   // §2.4 left it out of scope). That silently defeated the two assertions
   // above on any dark-appearance Mac: startup ran selectTheme(darkModeTheme),
-  // so a fresh install never actually showed Lens Design. Seeding it off is
+  // so a fresh install never actually showed the branded default. Seeding it off is
   // what makes the seeded default real; following the system stays available
   // as an opt-in preference, with the light/dark mappings above intact.
   assert.equal(staticSeed.followSystemTheme, false)
