@@ -34,93 +34,28 @@ The app is ad-hoc signed with a stable application requirement and is **not Appl
 
 ## What's new in 2.1.2
 
-- **Long documents end cleanly.** Normal reading mode now leaves a compact 64 px tail instead of an extra viewport of blank space; typewriter mode keeps its intentional centering space.
-- **The reading measure uses more of the window.** On a wide window the column grows to 1300 px including editor padding, leaving about 1200 px for text, and still contracts without horizontal overflow on smaller windows.
-- **Table type is consistently compact.** Every table cell and its nested formatting render exactly 2 px below the active body size across both built-in themes and styled exports.
+- Long documents now end with a compact 64 px tail, while typewriter mode keeps its centering space.
+- The reading column uses more of wide windows and still contracts without horizontal overflow.
+- Table text stays 2 px below body text in the editor and styled exports.
 
-## What's new in 2.1.1
+## Major releases
 
-- **Documents stay visible when release notes appear.** The post-update notice no longer covers or blanks the editor, and its Escape, focus, and focus-restoration behavior is now explicit.
-- **The semantic minimap magnifier reads as a thumbnail.** The panel keeps its existing size, while preview text is 3 px smaller and follows the document's selected Western and CJK fonts.
-- **The macOS App Icon fits the Dock correctly.** Every ICNS slot preserves real transparency and uses the same visual safe area as standard macOS app icons.
+- **2.1.0** — Chinese typography, adjustable reading geometry, focus and typewriter modes, light/dark/system appearance, and the current app icon.
+- **2.0.0** — A document-first visual shell, semantic minimap, independent Western/CJK fonts, and a bilingual command palette.
+- **1.9.0** — A filename-first title bar with compact folder context.
+- **1.8.0** — A responsive directory tree for single-file and project navigation.
+- **1.7.0** — A redesigned workspace shell, persistent tabs, focused export entry, and rebuilt selection toolbar.
+- **1.6.0** — DOCX and long-PNG export.
+- **1.5.0** — Expanded table and link editing.
+- **1.3.0** — Migration to the TypeScript Muya engine and a complete in-app update flow.
 
-## What's new in 2.1.0
-
-- **Chinese typography is built in.** CJK/Latin spacing and punctuation trimming leave Markdown bytes untouched; smart quotes recognize Chinese context; the cleanup command exposes individual rules, protected regions and replacement counts.
-- **Reading geometry is adjustable.** Body size, reading-column width, line height and paragraph spacing update the editor and styled exports in real time; tables stay exactly 1 px smaller than body copy.
-- **Focus and typewriter modes are complete.** Typewriter mode centers only while typing by default, adapts to the viewport, protects IME composition and pauses cleanly in source mode.
-- **The workspace adopts Claude Code's information density.** Body/sidebar proportions, a three-segment view switcher and narrow rounded scrollbars now share one visual rhythm; the denser outline and 32 px minimap gain a true rendered-content hover magnifier.
-- **Built-in themes gain three appearance states.** Light, Dark and System cover both chrome and document content; imported themes lock to light and exports remain light.
-- **A new default App Icon.** Finder, Dock, the app bundle and DMG use the approved near-white warm-paper engraving of a hand holding a pencil; explicit alternative icon choices remain intact.
-
-## What's new in 2.0.0
-
-- **A new document-first visual shell.** The sidebar becomes a shallow translucent floating panel; Mermaid diagrams sit in calm visual cards; highlights use flat green, blue, orange and pink color blocks; quotes use a pale tinted surface and a single accent rule.
-- **A semantic minimap for long documents.** It follows the viewport, supports click and drag navigation, and withdraws in narrow windows, source mode and modal states.
-- **Independent Western and CJK reading fonts.** Searchable system-font pickers include live previews, report the effective CJK face, persist across restarts and flow into every styled export.
-- **A bilingual command workspace.** The upgraded palette adds three sections, recent-command ranking, document-aware disabled states, IME composition protection and reliable global Escape handling.
-- **Complete localization.** New 2.0 labels are present in all ten interface languages.
-
-## What's new in 1.9.0
-
-- **The title bar now leads with the document name.** The active filename is bold and shown without its final extension, so it remains the clearest piece of context at a glance.
-- **Folder context is compact and readable.** A muted capsule follows the filename and shows up to the three nearest folders in parent-to-child order, with restrained chevrons between levels.
-- **Long paths stay inside the window chrome.** Filenames and folder levels truncate independently when space is tight, while macOS rename behavior and the unsaved-document indicator remain intact.
-
-## What's new in 1.8.1
-
-- **The sidebar content now has consistent breathing room.** Files, Search and TOC sit inside an 8 px inset on all four sides, matching the annotated spacing target without changing the sidebar's outer width.
-- **The complete sidebar type scale is one pixel smaller.** View labels, file and folder rows, search fields and results, TOC entries, buttons and the word counter all use the same reduced hierarchy.
-- **Auto-fit and scrolling remain intact.** The double-click width calculation includes the new inset, while each view retains its existing selection, disabled-state and overflow behavior.
-
-## What's new in 1.8.0
-
-- **Files is now a real directory tree.** Opening a document shows its surrounding folder structure instead of a flat list of open tabs. You can move to the parent folder and expand child folders without first opening a project.
-- **File states stay clear.** Supported documents use the normal file treatment, unsupported formats are muted and disabled, and the active document remains visibly selected.
-- **Large folders stay responsive.** Directory entries are loaded in batches, cached while moving between documents in the same folder, and expanded only when needed.
-- **Safer navigation across filesystems.** Windows drive roots, UNC shares, symbolic links, unreadable folders and retry states are handled explicitly.
-- **Keyboard and localized access.** Tree rows support keyboard navigation and accessible current/disabled states; all new labels and errors are available in Reversion's ten interface languages.
-
-## What's new in 1.7.2
-
-- **Precisely aligned sidebar controls.** The Files / Search / TOC icons now sit at the geometric center of their compact buttons while the active view still reveals its label.
-- **The utility footer is back.** Settings returns to the lower-left corner, while the lower-right restores live CJK and Latin word counts with detailed totals in a tooltip.
-- **A calmer settings symbol.** The former gear is replaced with a rounded linear sliders icon that matches the workspace's restrained outlined language.
-- **An icon-first Export control.** The upper-right action is reduced to a tray-and-arrow symbol with a compact dropdown chevron; it stays borderless and transparent at rest, then gains a restrained highlight on hover or while its menu is open.
-- **Tabs stay bounded and reachable.** The persistent tab strip now scrolls inside the available workspace width; the new-tab button remains beside the final visible tab, and switching to an overflowed tab brings it back into view.
-
-## What's new in 1.7.0
-
-- **A redesigned workspace shell.** The sidebar now uses a paper-toned horizontal Files / Search / TOC switcher; the active view reveals its label while inactive views stay icon-first. A persistent workspace bar keeps the sidebar toggle, tabs, new-tab button and Export action in one stable place.
-- **A focused export entry point.** The upper-right action now exposes only Export, with clear enabled and disabled states and the existing HTML, PDF, DOCX and PNG routes behind it.
-- **A selection toolbar rebuilt around writing.** The floating toolbar now has a full-width paragraph trigger, a paragraph submenu for plain text, headings, lists, tasks, quotes and code, plus compact inline formatting rows. Links use an independent light-blue accent; comments and AI-writing actions are intentionally absent.
-- **Safer selection editing.** Cross-paragraph formatting, reverse selections, IME composition, Escape-level closing and keyboard focus behavior now share one selection-aware path.
-
-## What's new in 1.6.2
-
-- **Long table-of-contents entries wrap inside the sidebar.** Headings that exceed the available width now continue on the next line instead of ending in an ellipsis or creating horizontal overflow.
-- **The sidebar reopens at the silver ratio.** Every app launch resets the table-of-contents sidebar and editor to `1 : 2.414`. Dragging still adjusts the width for the current session, and narrow windows retain the 220 px safety minimum.
-
-## What's new in 1.6.1
-
-- **The table toolbar no longer covers the export dialog.** With the dialog open, moving the pointer across it found the table painted behind and popped the engine's column toolbar on top, hiding the tabs and options. The editor is dropped from hit-testing while a dialog is up.
-- **The export dialog has a cancel button.** Escape or a click outside were the only ways out; a quiet Cancel now sits beside Export, and the settings you changed are kept either way.
-
-## What's new in 1.6.0
-
-- **Export as DOCX.** File → Export → Export as DOCX converts from the markdown source: headings, lists, tables, quotes and code blocks become native Word structures, math becomes native Word equations (OMML) you can keep editing, `[TOC]` becomes a Word table-of-contents field, and relative image paths resolve against the document's own folder. The conversion is done by pandoc, which you install yourself (`brew install pandoc`); the export says so when it is missing. Word owns the styling, so the page, theme and font settings in the export dialog do not apply to it.
-- **Export as PNG (long image).** File → Export → Export as PNG renders the whole document into one tall, unpaginated image. The export dialog gains an "Image" tab: image width (400–2000 px), resolution (standard 1x or HiDPI 2x), margin and background colour. Styling follows the export theme and font settings, exactly as HTML export does, and the image is cropped to the article's real height.
-- **A new app icon.** Handwritten W on newsprint, used by Finder, the Dock and the installer alike. The "App icon" picker now offers five. Anyone still on the previous default is moved to the new icon; a deliberate pick is left alone.
-
-1.5.2 brought the app-icon picker and the single-bar quotes; 1.5.1 brought the double-click sidebar auto-fit and the wider reading columns.
-
-Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v2.1.2).
+Full notes and downloads: [Releases](https://github.com/mjlens-spec/Reversion/releases).
 
 ## Roadmap
 
 **Later.** Inline live rendering behavior parity with Typora (caret anchoring, click targeting, link editing), table editing (row/column handles, Excel/CSV paste, wide-table scrolling), and PDF export outline and page-break control.
 
-Known limitations are tracked in the repository's planning documents; a handful of IME edge cases are recorded with reproduction notes in `tests-e2e/helpers/known-issues.ts`.
+Known IME edge cases are recorded with reproduction notes in `tests-e2e/helpers/known-issues.ts`.
 
 ## Themes
 
@@ -166,7 +101,7 @@ The e2e suites drive a real packaged application and assert that the user's actu
 - `scripts/import-typora-theme.mjs`, `scripts/typora-import/`, `scripts/typora-map/` — Typora theme transpiler: six-stage pipeline plus the replaceable mapping data.
 - `scripts/brand-app.sh`, `scripts/build-icon.sh`, `scripts/install-icon.sh` — bundle localization and icon tooling.
 - `quicklook/` — Swift source and XcodeGen definition for the Finder Quick Look Preview Extension.
-- `icon/` — app icon sources and outputs, including the 1.0 production spec and earlier drafts.
+- `icon/` — the current app icon source and generated production outputs.
 - `tests/`, `tests-e2e/` — contract tests and Playwright suites.
 - `config/` — `app-update.yml` (the single source of truth for the update feed) and the bundle's localized `InfoPlist` strings.
 - `patches/` — runtime CSS for inline live rendering, kept in sync with the source tree.
