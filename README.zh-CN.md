@@ -6,7 +6,7 @@
 
 Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 所见即所得 Markdown 编辑器。它基于 [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` 与 TypeScript 编辑器引擎 `@muyajs/core`，加入行内实时渲染、原生 Finder Quick Look 扩展、两套排印主题、Typora 主题导入工具，以及 HTML / PDF / DOCX / PNG 长图四种导出格式。
 
-当前版本：**2.1.4**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
+当前版本：**2.1.5**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
 
 ## 核心功能
 
@@ -15,7 +15,7 @@ Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 
 - **中文排印** — 中西文自动间距与标点挤压只作用于渲染层，不改 Markdown 源文件；中文语境智能引号与「整理中文排印」命令处理实际输入。
 - **阅读排版与沉浸写作** — 正文字号、栏宽、行高、段距可独立调节；专注模式和打字机模式支持输入时居中、IME 保护与文首尾虚拟留白。
 - **语义缩略图** — 编辑区右缘以标题、段落、代码、引用、表格和图示呈现文档结构，支持点击、拖动和悬停放大器定位。
-- **明暗外观** — 内置主题支持浅色、深色与跟随系统；Typora 导入主题和所有导出继续使用稳定的浅色外观。
+- **明暗外观** — 内置浅色、深色主题可配合系统外观使用；Claude like 与 Lens Design 始终保留原始浅色设计，Typora 导入主题和所有导出也继续使用稳定的浅色外观。
 - **双语命令面板** — `Command+Shift+P` 统一检索命令、最近文件和当前文件夹，中英文均可匹配；`Command+K` 仍保留给目录。
 - **Typora 主题导入** — 「主题 ▸ 导入主题（Typora 兼容）」在应用内把 Typora 主题的 CSS 转译为反文的编辑器主题与配套 HTML/PDF 导出主题，并输出兼容报告列出无法映射的规则。同一条流水线也以 `scripts/import-typora-theme.mjs` 形式提供。已在 Typora 六套内置主题上验证。
 - **导出** — HTML、PDF、DOCX 与 PNG 长图四种格式。HTML 与 PDF 沿用导出主题、字体、目录与页眉页脚设置；DOCX 经 pandoc 转为 Word 原生结构；PNG 把整篇文档渲染成一张不分页长图。
@@ -32,11 +32,10 @@ Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 
 
 应用采用带稳定应用标识的 ad-hoc 签名，**未经 Apple 公证**。该稳定标识用于让相邻版本互相校验；下载另有 GitHub HTTPS 与 `latest-mac.yml` 中的 SHA-512 校验保护。首次启动时，macOS Gatekeeper 可能要求在访达中按住 Control 点击 →「打开」。
 
-## 2.1.4 更新内容
+## 2.1.5 更新内容
 
-- 侧栏收起后，正文标题栏左上角会保留展开按钮，不必再通过菜单找回侧栏。
-- 默认启动比例调整为 `1 : 3`；当前会话仍可手动细调，重新启动后恢复规范比例。
-- 修复「关于反文」打开后白屏的问题，关于页面现在会显示为可关闭、可键盘操作的对话框。
+- Claude like 与 Lens Design 恢复为原始浅色外观，不再随 macOS 夜间深色模式改变颜色。
+- 主题正文、侧栏、标题栏、底部标签区与原生窗口底色保持一致；其他浅色、深色主题仍沿用原有外观逻辑。
 
 ## 大版本记录
 
@@ -79,7 +78,7 @@ node scripts/import-typora-theme.mjs <typora主题.css> --name <名称> --out-di
 构建流程会取得上游源码树、应用反文的 commit，并产出已签名的发布产物。Node 版本钉在上游发布所用的版本（见 `.nvmrc`），pnpm 钉在上游 `packageManager` 字段声明的版本。
 
 ```bash
-./scripts/build-release-from-source.sh 2.1.4
+./scripts/build-release-from-source.sh 2.1.5
 ```
 
 产物落在 `releases/<版本>/`：DMG、更新用 ZIP、`latest-mac.yml` 与 SHA-256 校验文件。
