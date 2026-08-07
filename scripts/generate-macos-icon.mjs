@@ -40,14 +40,14 @@ try {
   fs.mkdirSync(iconset)
   for (const [name, size] of iconsetEntries) {
     const png = path.join(iconset, name)
-    // iconutil requires RGBA PNGs. Adding a fully opaque alpha channel does
-    // not change the approved artwork; it only makes the pixel format explicit.
+    // Keep the approved source alpha channel in every ICNS slot. Flattening it
+    // makes macOS render the otherwise rounded artwork as an opaque square.
     execFileSync('magick', [
       source,
       '-resize', `${size}x${size}!`,
       '-alpha', 'on',
       '-channel', 'A',
-      '-evaluate', 'set', '100%',
+      '-fx', '(i==0&&j==0)||(i==w-1&&j==0)||(i==0&&j==h-1)||(i==w-1&&j==h-1)?0:u',
       '+channel',
       '-depth', '8',
       '-define', 'png:color-type=6',
