@@ -153,12 +153,12 @@
   --floatHoverColor: rgba(31, 86, 107, 0.06);
   --floatBorderColor: rgba(21, 24, 28, 0.08);
   --maskColor: rgba(236, 239, 242, 0.82);
-  /* The 1300px container includes the engine's 100px horizontal padding,
-     leaving roughly 1200px for text on a wide reading window. */
+  /* The container includes the engine's 100px horizontal padding so the
+     actual text measure remains 76% of the live editor pane. */
   --reading-font-size: 16px;
   --reading-line-height: 1.72;
   --reading-paragraph-spacing: 0.8em;
-  --reading-column-width: min(1300px, 90%);
+  --reading-column-width: calc(76% + 100px);
   --reading-table-font-size: calc(var(--reading-font-size) - 2px);
   --focus-mode-dim-opacity: 0.28;
   --editorAreaWidth: var(--reading-column-width);

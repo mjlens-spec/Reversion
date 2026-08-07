@@ -157,25 +157,27 @@ test.describe.serial('Reversion e2e smoke', () => {
     await window.screenshot({ path: screenshotPath('03-sidebar-toc-default-open.png') })
   })
 
-  test('5. reversion default: lens-design theme is active', async () => {
+  test('5. reversion default: Claude-like theme is active', async () => {
     const themeVars = await window.evaluate(() => {
       const style = getComputedStyle(document.documentElement)
       return {
-        brandBlue: style.getPropertyValue('--brand-blue').trim(),
-        data1: style.getPropertyValue('--data-1').trim(),
+        accent: style.getPropertyValue('--claude-accent').trim(),
+        background: style.getPropertyValue('--claude-bg').trim(),
+        columnWidth: style.getPropertyValue('--reading-column-width').trim(),
         readingFontTitle: style.getPropertyValue('--reading-font-title').trim(),
         readingFontHeading: style.getPropertyValue('--reading-font-heading').trim(),
         readingFontBody: style.getPropertyValue('--reading-font-body').trim()
       }
     })
 
-    expect(themeVars.brandBlue.toUpperCase(), 'lens-design brand-blue (#1F566B, "孔雀蓝")').toBe('#1F566B')
-    expect(themeVars.data1.toUpperCase()).toBe('#1F566B')
+    expect(themeVars.accent.toUpperCase(), 'Claude-like accent (#BC6A3A)').toBe('#BC6A3A')
+    expect(themeVars.background.toUpperCase()).toBe('#F7F6F3')
+    expect(themeVars.columnWidth).toBe('calc(76% + 100px)')
     expect(themeVars.readingFontTitle, 'title font-role slot should be populated by the theme').not.toBe('')
     expect(themeVars.readingFontHeading, 'heading font-role slot should be populated by the theme').not.toBe('')
     expect(themeVars.readingFontBody, 'body font-role slot should be populated by the theme').not.toBe('')
 
-    await window.screenshot({ path: screenshotPath('04-theme-lens-design-active.png') })
+    await window.screenshot({ path: screenshotPath('04-theme-claude-like-active.png') })
   })
 
   test('6. reversion default: inline live-render runtime CSS is injected', async () => {

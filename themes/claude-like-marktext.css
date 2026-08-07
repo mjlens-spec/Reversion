@@ -71,7 +71,7 @@
   --reading-font-size: 16px;
   --reading-line-height: 1.72;
   --reading-paragraph-spacing: 0.82em;
-  --reading-column-width: min(1300px, 90%);
+  --reading-column-width: calc(76% + 100px);
   --reading-table-font-size: calc(var(--reading-font-size) - 2px);
   --focus-mode-dim-opacity: 0.3;
   --editorAreaWidth: var(--reading-column-width);
