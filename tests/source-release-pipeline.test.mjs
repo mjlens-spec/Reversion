@@ -215,7 +215,7 @@ test('the pipeline emits the same artifact set and layout as the 1.1.0 release',
     'shasum -a 256',
     'brand-app.sh',
     'build-quicklook.sh',
-    'lens-marktext-icon.icns',
+    'reversion-hand-pencil-engraving_OC_0807B.png',
     'themes/export',
     '*.lens-backup-*',
     '*.lens-*-backup-*'

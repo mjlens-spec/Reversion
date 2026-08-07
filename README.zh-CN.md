@@ -2,17 +2,20 @@
 
 [English](README.md) | **简体中文**
 
-<img src="icon/lens-marktext-icon.png" alt="反文图标" width="128" align="right" />
+<img src="icon/reversion-hand-pencil-engraving_OC_0807B.png" alt="反文图标" width="128" align="right" />
 
 Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 所见即所得 Markdown 编辑器。它基于 [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` 与 TypeScript 编辑器引擎 `@muyajs/core`，加入行内实时渲染、原生 Finder Quick Look 扩展、两套排印主题、Typora 主题导入工具，以及 HTML / PDF / DOCX / PNG 长图四种导出格式。
 
-当前版本：**2.0.0**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
+当前版本：**2.1.0**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
 
 ## 核心功能
 
 - **行内实时渲染** — 默认进入 Muya 所见即所得模式。粗体、斜体、链接、行内代码、数学公式随输入实时排版；光标进入语法范围时显示 Markdown 标记，移开后自动隐藏。
 - **双字体阅读系统** — 西文正文与中日韩字体可分别选择，也可继续跟随主题；编辑器与 HTML、PNG、PDF、打印共用同一字体栈。
-- **语义缩略图** — 编辑区右缘以标题、段落、代码、引用、表格和图示呈现文档结构，支持点击与拖动定位。
+- **中文排印** — 中西文自动间距与标点挤压只作用于渲染层，不改 Markdown 源文件；中文语境智能引号与「整理中文排印」命令处理实际输入。
+- **阅读排版与沉浸写作** — 正文字号、栏宽、行高、段距可独立调节；专注模式和打字机模式支持输入时居中、IME 保护与文首尾虚拟留白。
+- **语义缩略图** — 编辑区右缘以标题、段落、代码、引用、表格和图示呈现文档结构，支持点击、拖动和悬停放大器定位。
+- **明暗外观** — 内置主题支持浅色、深色与跟随系统；Typora 导入主题和所有导出继续使用稳定的浅色外观。
 - **双语命令面板** — `Command+Shift+P` 统一检索命令、最近文件和当前文件夹，中英文均可匹配；`Command+K` 仍保留给目录。
 - **Typora 主题导入** — 「主题 ▸ 导入主题（Typora 兼容）」在应用内把 Typora 主题的 CSS 转译为反文的编辑器主题与配套 HTML/PDF 导出主题，并输出兼容报告列出无法映射的规则。同一条流水线也以 `scripts/import-typora-theme.mjs` 形式提供。已在 Typora 六套内置主题上验证。
 - **导出** — HTML、PDF、DOCX 与 PNG 长图四种格式。HTML 与 PDF 沿用导出主题、字体、目录与页眉页脚设置；DOCX 经 pandoc 转为 Word 原生结构；PNG 把整篇文档渲染成一张不分页长图。
@@ -28,6 +31,15 @@ Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 
 应用会在首个窗口打开 15 秒后检查本仓库是否有更新的稳定版，没有新版时不打扰。发现新版后，右下方常驻进度卡会显示百分比、已下载容量、速率与预计剩余时间，不阻塞编辑。重启安装前会先处理未保存文档；新版本启动后，更新说明只显示一次。也可随时使用「Reversion → 检查更新」。
 
 应用采用带稳定应用标识的 ad-hoc 签名，**未经 Apple 公证**。该稳定标识用于让相邻版本互相校验；下载另有 GitHub HTTPS 与 `latest-mac.yml` 中的 SHA-512 校验保护。首次启动时，macOS Gatekeeper 可能要求在访达中按住 Control 点击 →「打开」。
+
+## 2.1.0 更新内容
+
+- **中文排印进入编辑器。** 中西文间距与标点挤压保持 Markdown 源文件不变；智能引号识别中文语境；「整理中文排印」提供逐项规则、豁免区与替换计数。
+- **阅读参数可以独立调整。** 正文字号、正文栏宽、行高与段距实时作用于编辑器和样式化导出，表格字号始终比正文小 1 px。
+- **专注与打字机模式补齐。** 打字机模式默认只在输入时回中，适配窗口高度并保护 IME 组合输入；源码模式期间暂停，退出后恢复。
+- **界面按 Claude Code 的信息密度重新收敛。** 正文、侧栏、三段式顶部切换和全局窄滚动条使用统一比例；大纲条目更紧凑，32 px 语义缩略图新增真实内容悬停放大器。
+- **内置主题支持明暗三态。** 浅色、深色、跟随系统覆盖界面与正文；导入主题期间锁定浅色，导出恒为浅色。
+- **默认 App Icon 更新。** Finder、Dock、应用包与 DMG 统一使用近白暖纸底、深褐色手持铅笔雕版图标；应用内主动选择过的其他图标保持不变。
 
 ## 2.0.0 更新内容
 
@@ -90,11 +102,11 @@ Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 
 
 1.5.2 带来了应用图标选择器与引用块单竖线修正；1.5.1 带来了侧栏分隔条双击自适应与两套主题的阅读排版调整。
 
-完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v2.0.0)。
+完整说明见 [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v2.1.0)。
 
 ## 开发计划
 
-**后续。** 行内实时渲染的行为对齐 Typora（光标锚定、点击落点、链接编辑）、表格编辑（行列拖拽手柄、Excel/CSV 粘贴成表、宽表格滚动）、PDF 导出的大纲书签与分页控制，以及中文排印细化（中西文间距、标点挤压、智能引号）。
+**后续。** 行内实时渲染的行为对齐 Typora（光标锚定、点击落点、链接编辑）、表格编辑（行列拖拽手柄、Excel/CSV 粘贴成表、宽表格滚动），以及 PDF 导出的大纲书签与分页控制。
 
 已知限制记录在仓库的规划文档中；少数输入法边缘用例连同复现说明记录在 `tests-e2e/helpers/known-issues.ts`。
 
@@ -120,7 +132,7 @@ node scripts/import-typora-theme.mjs <typora主题.css> --name <名称> --out-di
 构建流程会取得上游源码树、应用反文的 commit，并产出已签名的发布产物。Node 版本钉在上游发布所用的版本（见 `.nvmrc`），pnpm 钉在上游 `packageManager` 字段声明的版本。
 
 ```bash
-./scripts/build-release-from-source.sh 2.0.0
+./scripts/build-release-from-source.sh 2.1.0
 ```
 
 产物落在 `releases/<版本>/`：DMG、更新用 ZIP、`latest-mac.yml` 与 SHA-256 校验文件。

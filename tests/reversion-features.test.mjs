@@ -6,6 +6,61 @@ import { fileURLToPath } from 'node:url'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'utf8')
+const readBuffer = (relativePath) => fs.readFileSync(path.join(root, relativePath))
+
+test('2.1.0 App Icon is controlled, generated, and consumed by every macOS package surface', () => {
+  const source = readBuffer('icon/reversion-hand-pencil-engraving_OC_0807B.png')
+  const pngTargets = [
+    'upstream/marktext/packages/desktop/static/icon.png',
+    'upstream/marktext/packages/desktop/static/appIcons/hand-pencil-engraving.png',
+    'upstream/marktext/packages/desktop/src/renderer/src/assets/appIcons/hand-pencil-engraving.png',
+    'upstream/marktext/packages/desktop/build/icons/icon.png'
+  ]
+
+  assert.equal(source.subarray(0, 8).toString('hex'), '89504e470d0a1a0a')
+  assert.equal(source.readUInt32BE(16), 1024)
+  assert.equal(source.readUInt32BE(20), 1024)
+  for (const target of pngTargets) {
+    assert.deepEqual(readBuffer(target), source, `${target} must remain byte-identical to the approved source`)
+  }
+
+  for (const target of [
+    'upstream/marktext/packages/desktop/static/icon.icns',
+    'upstream/marktext/packages/desktop/build/icons/icon.icns'
+  ]) {
+    const icns = readBuffer(target)
+    assert.equal(icns.subarray(0, 4).toString('ascii'), 'icns')
+    assert.equal(icns.readUInt32BE(4), icns.length)
+    const expectedSlots = new Map([
+      ['icp4', 16], ['icp5', 32], ['icp6', 64], ['ic07', 128],
+      ['ic08', 256], ['ic09', 512], ['ic10', 1024]
+    ])
+    let offset = 8
+    while (offset < icns.length) {
+      const type = icns.subarray(offset, offset + 4).toString('ascii')
+      const length = icns.readUInt32BE(offset + 4)
+      const payload = icns.subarray(offset + 8, offset + length)
+      if (expectedSlots.has(type)) {
+        assert.equal(payload.subarray(0, 8).toString('hex'), '89504e470d0a1a0a')
+        assert.equal(payload.readUInt32BE(16), expectedSlots.get(type), `${target} has the wrong ${type} width`)
+        assert.equal(payload.readUInt32BE(20), expectedSlots.get(type), `${target} has the wrong ${type} height`)
+        expectedSlots.delete(type)
+      }
+      offset += length
+    }
+    assert.deepEqual([...expectedSlots.keys()], [], `${target} is missing ICNS slots`)
+  }
+
+  const builder = read('upstream/marktext/packages/desktop/electron-builder.yml')
+  const releaseBuilder = read('scripts/build-release-from-source.sh')
+  const generator = read('scripts/generate-macos-icon.mjs')
+  assert.match(builder, /mac:[\s\S]*icon:\s*static\/icon\.icns/)
+  assert.match(builder, /linux:[\s\S]*icon:\s*['"]?static\/icon\.png['"]?/)
+  assert.match(releaseBuilder, /APP_ICON_SOURCE=.*reversion-hand-pencil-engraving_OC_0807B\.png/)
+  assert.match(releaseBuilder, /generate-macos-icon\.mjs/)
+  assert.match(generator, /\['icon_512x512@2x\.png', 1024\]/)
+  assert.match(generator, /make-icns\.mjs/)
+})
 
 test('inline live rendering preserves Muya hidden markers and active syntax feedback', () => {
   const css = read('patches/reversion-runtime.css')
@@ -54,18 +109,45 @@ test('Reversion 2.0 themes render diagrams, flat highlights, and editorial quote
   }
 })
 
+test('theme stylesheets keep braces balanced', () => {
+  // A stray top-level `}` is silently discarded by Chromium's error recovery
+  // but breaks stricter CSS tooling; 2.0.0 shipped one in each export theme.
+  const themeFiles = [
+    'themes/lens-design-marktext.css',
+    'themes/claude-like-marktext.css',
+    'themes/export/lens-design.css',
+    'themes/export/claude-like.css',
+    'patches/reversion-runtime.css'
+  ]
+  for (const themePath of themeFiles) {
+    const css = read(themePath)
+    let depth = 0
+    let line = 1
+    for (const ch of css) {
+      if (ch === '\n') line += 1
+      else if (ch === '{') depth += 1
+      else if (ch === '}') {
+        depth -= 1
+        assert.ok(depth >= 0, `${themePath}: stray closing brace at line ${line}`)
+      }
+    }
+    assert.equal(depth, 0, `${themePath}: ${depth} unclosed brace(s) at end of file`)
+  }
+})
+
 test('editor and export themes balance narrow and wide tables', () => {
   // In the editor a wide table now scrolls inside `.mu-table` (muya's
   // blockSyntax.css sets `overflow-x: auto` on the figure), so the table sizes
   // to its content and the 13px compression that used to be the only way to
   // fit it is gone. `min-width: 100%` still makes a narrow table fill the
-  // column. Export keeps 100% + 13px: a printed page cannot scroll.
+  // column. In 2.1 both editor and export derive table type from the active
+  // reading size so it is always exactly one pixel smaller.
   for (const themePath of ['themes/lens-design-marktext.css', 'themes/claude-like-marktext.css']) {
     const css = read(themePath)
     assert.match(css, /\.mu-container table \{[\s\S]*width: max-content;[\s\S]*min-width: 100%;[\s\S]*table-layout: auto;/)
-    assert.doesNotMatch(css, /\.mu-container table \{[^}]*font-size: 13px/)
+    assert.match(css, /--reading-table-font-size:\s*calc\(var\(--reading-font-size\) - 1px\)/)
     assert.match(css, /\.mu-container table th \{[\s\S]*line-height: 1\.45 !important;[\s\S]*white-space: normal;/)
-    assert.match(css, /\.mu-container table td,[\s\S]*\.mu-container table th \{[\s\S]*min-width: 4\.5em;/)
+    assert.match(css, /\.mu-container table td,[\s\S]*\.mu-container table th \{[\s\S]*min-width: 4\.5em;[\s\S]*font-size: var\(--reading-table-font-size\) !important;/)
     assert.match(css, /\.mu-container table td:first-child,[\s\S]*\.mu-container table th:first-child \{[\s\S]*min-width: 3\.25em;/)
     assert.match(css, /\.mu-container table td:last-child,[\s\S]*\.mu-container table th:last-child \{[\s\S]*min-width: 8\.5em;/)
     assert.match(css, /\.mu-container table td \*,[\s\S]*\.mu-container table th \* \{[\s\S]*font-size: inherit !important;[\s\S]*line-height: inherit !important;/)
@@ -74,7 +156,9 @@ test('editor and export themes balance narrow and wide tables', () => {
 
   for (const themePath of ['themes/export/lens-design.css', 'themes/export/claude-like.css']) {
     const css = read(themePath)
-    assert.match(css, /\.markdown-body table \{[\s\S]*width: 100%;[\s\S]*table-layout: auto;[\s\S]*font-size: 13px;/)
+    assert.match(css, /--reading-table-font-size:\s*calc\(var\(--reading-font-size\) - 1px\)/)
+    assert.match(css, /\.markdown-body table \{[\s\S]*width: 100%;[\s\S]*table-layout: auto;/)
+    assert.match(css, /\.markdown-body table td,[\s\S]*\.markdown-body table th \{[\s\S]*font-size: var\(--reading-table-font-size\);/)
     assert.match(css, /\.markdown-body table th \{[\s\S]*line-height: 1\.45;[\s\S]*white-space: normal;/)
     assert.match(css, /\.markdown-body table td \*,[\s\S]*font-size: inherit !important;[\s\S]*line-height: inherit !important;/)
     assert.match(css, /@media print[\s\S]*\.markdown-body table th \{[\s\S]*white-space: normal;/)

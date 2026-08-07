@@ -29,6 +29,9 @@
   --reading-font-heading: var(--claude-font-heading);
   --reading-font-body: var(--claude-font-reading);
   --reading-font-quote: var(--claude-font-reading);
+  --reading-font-size: 16px;
+  --reading-line-height: 1.72;
+  --reading-table-font-size: calc(var(--reading-font-size) - 1px);
 }
 
 html,
@@ -42,8 +45,8 @@ body {
   max-width: 820px;
   color: var(--claude-text);
   font-family: var(--reading-font-body);
-  font-size: 16px;
-  line-height: 1.78;
+  font-size: var(--reading-font-size);
+  line-height: var(--reading-line-height);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -212,7 +215,6 @@ body {
   min-width: 100%;
   max-width: none;
   table-layout: auto;
-  font-size: 13px;
   line-height: 1.55;
   border-collapse: collapse;
   overflow: visible;
@@ -234,7 +236,7 @@ body {
 .markdown-body table th {
   box-sizing: border-box;
   min-width: 4.5em;
-  font-size: inherit;
+  font-size: var(--reading-table-font-size);
   border-color: var(--claude-line);
   vertical-align: top;
   overflow-wrap: break-word;
@@ -273,7 +275,6 @@ body {
 .markdown-body mark[data-color='blue'] { background: rgba(143, 206, 232, 0.4); }
 .markdown-body mark[data-color='orange'] { background: rgba(244, 190, 107, 0.4); }
 .markdown-body mark[data-color='pink'] { background: rgba(238, 164, 194, 0.38); }
-}
 
 .toc-container .toc-title {
   color: var(--claude-accent-dark);

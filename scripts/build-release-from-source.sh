@@ -212,7 +212,33 @@ fs.writeFileSync(file, next);
 log "version $VERSION written into $DESKTOP_PKG"
 
 # ---------------------------------------------------------------------------
-# 4. Build from source
+# 4. Brand asset integration: Lens-approved 2.1.0 App Icon
+# ---------------------------------------------------------------------------
+
+APP_ICON_SOURCE="$ROOT/icon/reversion-hand-pencil-engraving_OC_0807B.png"
+APP_ICON_STATIC_PNG="$DESKTOP/static/icon.png"
+APP_ICON_DOCK_PNG="$DESKTOP/static/appIcons/hand-pencil-engraving.png"
+APP_ICON_RENDERER_PNG="$DESKTOP/src/renderer/src/assets/appIcons/hand-pencil-engraving.png"
+APP_ICON_STATIC_ICNS="$DESKTOP/static/icon.icns"
+APP_ICON_BUILD_ICNS="$DESKTOP/build/icons/icon.icns"
+
+[[ -f "$APP_ICON_SOURCE" ]] || fail "missing Lens-approved 2.1.0 App Icon source: $APP_ICON_SOURCE"
+for png_target in "$APP_ICON_STATIC_PNG" "$APP_ICON_DOCK_PNG" "$APP_ICON_RENDERER_PNG"; do
+  mkdir -p "$(dirname "$png_target")"
+  cp "$APP_ICON_SOURCE" "$png_target"
+  cmp -s "$APP_ICON_SOURCE" "$png_target" \
+    || fail "App Icon PNG did not remain byte-identical after synchronization: $png_target"
+done
+
+node "$ROOT/scripts/generate-macos-icon.mjs" "$APP_ICON_SOURCE" "$APP_ICON_STATIC_ICNS" >/dev/null
+mkdir -p "$(dirname "$APP_ICON_BUILD_ICNS")"
+cp "$APP_ICON_STATIC_ICNS" "$APP_ICON_BUILD_ICNS"
+cmp -s "$APP_ICON_STATIC_ICNS" "$APP_ICON_BUILD_ICNS" \
+  || fail "static and build ICNS assets differ"
+log "2.1.0 App Icon integrated from controlled source: $(basename "$APP_ICON_SOURCE")"
+
+# ---------------------------------------------------------------------------
+# 5. Build from source
 # ---------------------------------------------------------------------------
 
 log "installing dependencies (frozen lockfile, scripts deferred to postinstall)"
@@ -280,14 +306,14 @@ fi
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$STAGED_APP/Contents/Info.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION" "$STAGED_APP/Contents/Info.plist"
 
-# Icon install — same kernel as scripts/install-icon.sh, minus the backup/cache
-# handling that only makes sense against an already-installed bundle.
-if [[ ! -f "$ROOT/icon/lens-marktext-icon.icns" || ! -f "$ROOT/icon/lens-marktext-icon.png" ]]; then
-  "$ROOT/scripts/build-icon.sh"
-fi
-cp "$ROOT/icon/lens-marktext-icon.icns" "$STAGED_APP/Contents/Resources/icon.icns"
-cp "$ROOT/icon/lens-marktext-icon.icns" "$STAGED_APP/Contents/Resources/static/icon.icns"
-cp "$ROOT/icon/lens-marktext-icon.png" "$STAGED_APP/Contents/Resources/static/icon.png"
+# Re-assert the approved icon after every post-packaging customization. This is
+# intentionally after brand-app.sh and Quick Look staging: the historical
+# pipeline used to overwrite electron-builder's icon here with the legacy W.
+cp "$APP_ICON_STATIC_ICNS" "$STAGED_APP/Contents/Resources/icon.icns"
+cp "$APP_ICON_STATIC_ICNS" "$STAGED_APP/Contents/Resources/static/icon.icns"
+cp "$APP_ICON_SOURCE" "$STAGED_APP/Contents/Resources/static/icon.png"
+mkdir -p "$STAGED_APP/Contents/Resources/static/appIcons"
+cp "$APP_ICON_SOURCE" "$STAGED_APP/Contents/Resources/static/appIcons/hand-pencil-engraving.png"
 
 find "$STAGED_APP" \( -name '*.lens-backup-*' -o -name '*.lens-*-backup-*' \) -delete
 xattr -cr "$STAGED_APP"
@@ -328,6 +354,12 @@ grep -q "^repo: $(yaml_scalar "$APP_UPDATE_SRC" repo)\$" "$STAGED_UPDATE_YML" \
   || fail "CFBundleIdentifier drifted away from $APP_ID"
 [[ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$STAGED_APP/Contents/Info.plist")" == "$VERSION" ]] \
   || fail "CFBundleShortVersionString is not $VERSION"
+cmp -s "$APP_ICON_STATIC_ICNS" "$STAGED_APP/Contents/Resources/icon.icns" \
+  || fail "shipping bundle App Icon ICNS differs from the generated 2.1.0 asset"
+cmp -s "$APP_ICON_SOURCE" "$STAGED_APP/Contents/Resources/static/icon.png" \
+  || fail "shipping bundle static App Icon PNG differs from the approved 2.1.0 source"
+cmp -s "$APP_ICON_SOURCE" "$STAGED_APP/Contents/Resources/static/appIcons/hand-pencil-engraving.png" \
+  || fail "shipping bundle Dock icon PNG differs from the approved 2.1.0 source"
 # The B2 acceptance criterion: the macOS menu-bar application menu title and the
 # Dock tile name are driven by CFBundleName on current macOS, so this is the one
 # field that decides whether the shipped app says "Reversion" or "marktext"

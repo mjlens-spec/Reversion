@@ -7,8 +7,8 @@ if [[ ! -d "$DEFAULT_APP" && -d "/Applications/MarkText.app" ]]; then
   DEFAULT_APP="/Applications/MarkText.app"
 fi
 APP="${1:-$DEFAULT_APP}"
-ICON="$ROOT/icon/lens-marktext-icon.icns"
-PNG="$ROOT/icon/lens-marktext-icon.png"
+PNG="$ROOT/icon/reversion-hand-pencil-engraving_OC_0807B.png"
+ICON="$ROOT/upstream/marktext/packages/desktop/static/icon.icns"
 STAMP="$(date +%Y%m%d-%H%M%S)"
 BACKUP_DIR="${LENS_BACKUP_DIR:-$HOME/Library/Application Support/marktext/lens-backups/icons-$STAMP}"
 
@@ -17,9 +17,8 @@ if [[ ! -d "$APP" ]]; then
   exit 1
 fi
 
-if [[ ! -f "$ICON" || ! -f "$PNG" ]]; then
-  "$ROOT/scripts/build-icon.sh"
-fi
+[[ -f "$PNG" ]] || { echo "Approved App Icon source not found: $PNG" >&2; exit 1; }
+node "$ROOT/scripts/generate-macos-icon.mjs" "$PNG" "$ICON" >/dev/null
 
 RES="$APP/Contents/Resources"
 mkdir -p "$BACKUP_DIR"
@@ -40,6 +39,8 @@ backup_if_exists "$RES/static/icon.png"
 cp "$ICON" "$RES/icon.icns"
 cp "$ICON" "$RES/static/icon.icns"
 cp "$PNG" "$RES/static/icon.png"
+mkdir -p "$RES/static/appIcons"
+cp "$PNG" "$RES/static/appIcons/hand-pencil-engraving.png"
 
 touch "$APP"
 

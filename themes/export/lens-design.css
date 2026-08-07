@@ -61,6 +61,9 @@
   --reading-font-heading: var(--lens-font-display);
   --reading-font-body: var(--lens-font-sans);
   --reading-font-quote: var(--lens-font-serif);
+  --reading-font-size: 16px;
+  --reading-line-height: 1.72;
+  --reading-table-font-size: calc(var(--reading-font-size) - 1px);
 }
 
 html,
@@ -74,9 +77,8 @@ body {
   /* ~44 CJK chars per line at 17px, inside the 35-45 char comfort range. */
   max-width: 760px;
   font-family: var(--reading-font-body);
-  /* Lens CJK rule: Chinese body runs 17px at 1.7 line height. */
-  font-size: 17px;
-  line-height: 1.7;
+  font-size: var(--reading-font-size);
+  line-height: var(--reading-line-height);
   color: var(--lens-text-body);
   -webkit-font-smoothing: antialiased;
 }
@@ -252,7 +254,6 @@ body {
   min-width: 100%;
   max-width: none;
   table-layout: auto;
-  font-size: 13px;
   line-height: 1.55;
   border-collapse: collapse;
   overflow: visible;
@@ -273,7 +274,7 @@ body {
 .markdown-body table th {
   box-sizing: border-box;
   min-width: 4.5em;
-  font-size: inherit;
+  font-size: var(--reading-table-font-size);
   border-color: var(--lens-line);
   vertical-align: top;
   overflow-wrap: break-word;
@@ -312,7 +313,6 @@ body {
 .markdown-body mark[data-color='blue'] { background: rgba(143, 206, 232, 0.42); }
 .markdown-body mark[data-color='orange'] { background: rgba(244, 190, 107, 0.42); }
 .markdown-body mark[data-color='pink'] { background: rgba(238, 164, 194, 0.4); }
-}
 
 .toc-container .toc-title {
   color: var(--lens-blue);

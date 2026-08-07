@@ -58,12 +58,16 @@ REVERSION_VERSION="$VERSION" "$ROOT/scripts/build-quicklook.sh" "$STAGED_APP/Con
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$STAGED_APP/Contents/Info.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION" "$STAGED_APP/Contents/Info.plist"
 
-if [[ ! -f "$ROOT/icon/lens-marktext-icon.icns" || ! -f "$ROOT/icon/lens-marktext-icon.png" ]]; then
-  "$ROOT/scripts/build-icon.sh"
-fi
-cp "$ROOT/icon/lens-marktext-icon.icns" "$STAGED_APP/Contents/Resources/icon.icns"
-cp "$ROOT/icon/lens-marktext-icon.icns" "$STAGED_APP/Contents/Resources/static/icon.icns"
-cp "$ROOT/icon/lens-marktext-icon.png" "$STAGED_APP/Contents/Resources/static/icon.png"
+# Historical reproduction path, kept visually consistent with the current
+# default App Icon so it cannot reintroduce the legacy W into a staged bundle.
+APP_ICON_SOURCE="$ROOT/icon/reversion-hand-pencil-engraving_OC_0807B.png"
+APP_ICON_ICNS="$WORK/reversion-2.1.0-default-icon.icns"
+node "$ROOT/scripts/generate-macos-icon.mjs" "$APP_ICON_SOURCE" "$APP_ICON_ICNS" >/dev/null
+cp "$APP_ICON_ICNS" "$STAGED_APP/Contents/Resources/icon.icns"
+cp "$APP_ICON_ICNS" "$STAGED_APP/Contents/Resources/static/icon.icns"
+cp "$APP_ICON_SOURCE" "$STAGED_APP/Contents/Resources/static/icon.png"
+mkdir -p "$STAGED_APP/Contents/Resources/static/appIcons"
+cp "$APP_ICON_SOURCE" "$STAGED_APP/Contents/Resources/static/appIcons/hand-pencil-engraving.png"
 
 find "$STAGED_APP" \( -name '*.lens-backup-*' -o -name '*.lens-*-backup-*' \) -delete
 xattr -cr "$STAGED_APP"

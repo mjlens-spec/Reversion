@@ -68,7 +68,13 @@
   --floatBgColor: rgba(255, 253, 248, 0.98);
   --floatHoverColor: rgba(188, 106, 58, 0.08);
   --floatBorderColor: rgba(43, 38, 33, 0.1);
-  --editorAreaWidth: 900px;
+  --reading-font-size: 16px;
+  --reading-line-height: 1.72;
+  --reading-paragraph-spacing: 0.82em;
+  --reading-column-width: min(1080px, 58vw);
+  --reading-table-font-size: calc(var(--reading-font-size) - 1px);
+  --focus-mode-dim-opacity: 0.3;
+  --editorAreaWidth: var(--reading-column-width);
 
   --theme-color: var(--themeColor);
   --highlight-color: var(--highlightColor);
@@ -104,6 +110,83 @@
   --list-marker-color: var(--claude-accent);
   --hr-color: var(--claude-line);
 }
+/* Reversion 2.1 dark appearance. Export and print deliberately stay light. */
+@media not print {
+  :root[data-reversion-appearance='dark'] {
+    --claude-bg: #1d1a18;
+    --claude-window: #191715;
+    --claude-surface: #25211e;
+    --claude-surface-muted: #2c2723;
+    --claude-surface-soft: #221f1c;
+    --claude-line: #443b34;
+    --claude-line-strong: #5a4c42;
+    --claude-text: #eee8e1;
+    --claude-text-muted: #b9ada2;
+    --claude-heading: #fffaf4;
+    --claude-accent: #df8a58;
+    --claude-accent-dark: #ef9b67;
+    --claude-code-text: #e4a17d;
+    --claude-code-bg: #302923;
+    --claude-selection: rgb(223 138 88 / 30%);
+    --claude-shadow: 0 1px 0 rgb(255 255 255 / 4%), 0 16px 36px rgb(0 0 0 / 30%);
+    --themeColor: rgb(223, 138, 88);
+    --themeColor90: rgb(223 138 88 / 90%);
+    --themeColor80: rgb(223 138 88 / 80%);
+    --themeColor70: rgb(223 138 88 / 70%);
+    --themeColor60: rgb(223 138 88 / 60%);
+    --themeColor50: rgb(223 138 88 / 50%);
+    --themeColor40: rgb(223 138 88 / 40%);
+    --themeColor30: rgb(223 138 88 / 30%);
+    --themeColor20: rgb(223 138 88 / 20%);
+    --themeColor10: rgb(223 138 88 / 10%);
+    --highlightColor: rgb(223 138 88 / 22%);
+    --editorColor: rgb(238 232 225 / 92%);
+    --editorColor80: rgb(238 232 225 / 82%);
+    --editorColor60: rgb(185 173 162 / 74%);
+    --editorColor50: rgb(185 173 162 / 58%);
+    --editorColor40: rgb(185 173 162 / 44%);
+    --editorColor30: rgb(185 173 162 / 32%);
+    --editorColor10: rgb(238 232 225 / 12%);
+    --editorColor04: rgb(238 232 225 / 5%);
+    --deleteColor: #ef857d;
+    --iconColor: rgb(185 173 162 / 82%);
+    --inputBgColor: rgb(238 232 225 / 7%);
+    --sideBarBgColor: rgb(25 23 21 / 96%);
+    --sideBarItemHoverBgColor: rgb(223 138 88 / 13%);
+    --floatBgColor: rgb(37 33 30 / 97%);
+    --floatHoverColor: rgb(223 138 88 / 13%);
+    --floatBorderColor: rgb(238 232 225 / 12%);
+    --focus-mode-dim-opacity: 0.46;
+  }
+
+  :root[data-reversion-appearance='dark'] .mu-container mark,
+  :root[data-reversion-appearance='dark'] .mu-container mark[data-color='green'] {
+    background: rgb(100 158 87 / 36%);
+  }
+
+  :root[data-reversion-appearance='dark'] .mu-container mark[data-color='blue'] {
+    background: rgb(74 135 175 / 38%);
+  }
+
+  :root[data-reversion-appearance='dark'] .mu-container mark[data-color='orange'] {
+    background: rgb(203 132 62 / 40%);
+  }
+
+  :root[data-reversion-appearance='dark'] .mu-container mark[data-color='pink'] {
+    background: rgb(178 88 129 / 38%);
+  }
+
+  :root[data-reversion-appearance='dark'] figure.mu-diagram-block .mu-diagram-preview {
+    background: rgb(37 33 30 / 94%) !important;
+  }
+
+  :root[data-reversion-appearance='dark'] .cm-keyword { color: #c6a0f6 !important; }
+  :root[data-reversion-appearance='dark'] .cm-string { color: #a6da95 !important; }
+  :root[data-reversion-appearance='dark'] .cm-number { color: #f5a97f !important; }
+  :root[data-reversion-appearance='dark'] :is(.cm-variable, .cm-property) { color: #8aadf4 !important; }
+  :root[data-reversion-appearance='dark'] .cm-comment { color: #92857a !important; }
+}
+
 
 @media not print {
   body,
@@ -165,8 +248,8 @@
   .mu-editor,
   .mu-container {
     font-family: var(--editor-body-font-family, var(--reading-font-body)), var(--claude-font-reading) !important;
-    font-size: 16px !important;
-    line-height: 1.78 !important;
+    font-size: var(--reading-font-size) !important;
+    line-height: var(--reading-line-height) !important;
     color: var(--claude-text) !important;
     letter-spacing: 0 !important;
   }
@@ -177,7 +260,7 @@
   .mu-container th {
     font-family: var(--editor-body-font-family, var(--reading-font-body)), var(--claude-font-reading) !important;
     color: var(--claude-text) !important;
-    line-height: 1.78 !important;
+    line-height: var(--reading-line-height) !important;
   }
 
   .mu-container h1,
@@ -343,7 +426,7 @@
   .mu-container table th {
     box-sizing: border-box;
     min-width: 4.5em;
-    font-size: inherit !important;
+    font-size: var(--reading-table-font-size) !important;
     border-color: var(--claude-line) !important;
     vertical-align: top;
     overflow-wrap: break-word;
