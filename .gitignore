@@ -36,8 +36,7 @@ upstream/
 tests-e2e/.artifacts/
 tests-e2e/.cache/
 
-# Local execution reports and scratch build output (working notes, kept out of
-# the public repo; the durable plans live in 开发规划_*.md / 编程规划_*.md).
+# Local execution reports, working notes, and scratch build output.
 outputs/
 output/
 .pnpm-store/
