@@ -54,6 +54,8 @@ test('2.1.0 App Icon is controlled, transparent, and consumed by every macOS pac
         assert.equal(payload.subarray(0, 8).toString('hex'), '89504e470d0a1a0a')
         assert.equal(payload.readUInt32BE(16), expectedSlots.get(type), `${target} has the wrong ${type} width`)
         assert.equal(payload.readUInt32BE(20), expectedSlots.get(type), `${target} has the wrong ${type} height`)
+        const slot = await sharp(payload).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+        assert.equal(slot.data[3], 0, `${target} ${type} must preserve its transparent corner`)
         expectedSlots.delete(type)
       }
       offset += length
