@@ -2,17 +2,20 @@
 
 **English** | [简体中文](README.zh-CN.md)
 
-<img src="icon/lens-marktext-icon.png" alt="Reversion icon" width="128" align="right" />
+<img src="icon/reversion-hand-pencil-engraving_OC_0807B.png" alt="Reversion icon" width="128" align="right" />
 
 Reversion, Chinese name `反文`, is a macOS WYSIWYG Markdown editor for Chinese-language writing. It is based on [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` and its TypeScript editor engine, `@muyajs/core`, with inline live rendering, a native Finder Quick Look extension, two typographic themes, an importer for Typora themes, and export to HTML, PDF, DOCX and a single long PNG.
 
-Current release: **2.0.0** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
+Current release: **2.1.0** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
 
 ## Core features
 
 - **Inline live rendering** — Muya stays in WYSIWYG mode by default. Bold, italic, links, inline code, and math render as you type; Markdown markers appear inside the active syntax range and collapse once the caret leaves it.
 - **Dual-font reading system** — choose Western body and CJK fonts independently or keep following the active theme. The editor and HTML, PNG, PDF and print exports share the same composed font stack.
-- **Semantic minimap** — a narrow right-edge overview maps headings, paragraphs, code, quotes, tables and diagrams, with click and drag navigation.
+- **Chinese typography** — CJK/Latin spacing and punctuation trimming stay in the render layer without changing Markdown source; context-aware smart quotes and a Chinese Typography Cleanup command handle actual input.
+- **Reading controls and immersive writing** — body size, column width, line height and paragraph spacing are independent; focus and typewriter modes add input-only centering, IME protection and virtual document-edge space.
+- **Semantic minimap** — a narrow right-edge overview maps headings, paragraphs, code, quotes, tables and diagrams, with click, drag and a rendered-content hover magnifier.
+- **Light and dark appearance** — built-in themes support Light, Dark and System; imported Typora themes and all exports remain predictably light.
 - **Bilingual command palette** — `Command+Shift+P` searches commands, recent files and current-folder files in English or Chinese; `Command+K` remains assigned to the table of contents.
 - **Typora theme import** — Theme ▸ Import Theme (Typora compatible) converts a Typora theme's CSS, in the app, into a Reversion editor theme plus a matching HTML/PDF export theme, and writes a compatibility report listing anything it could not map. The same pipeline is available as `scripts/import-typora-theme.mjs`. Verified against six of Typora's built-in themes.
 - **Export** — HTML, PDF, DOCX and a single long PNG. HTML and PDF carry the export themes, fonts, TOC and header/footer settings; DOCX goes through pandoc into native Word structures; PNG renders the whole document as one unpaginated image.
@@ -28,6 +31,15 @@ Prebuilt `arm64` DMGs are on the [Releases page](https://github.com/mjlens-spec/
 The app checks this repository for a newer stable release 15 seconds after the first window opens and stays quiet when already current. When an update is found, a compact progress card shows percentage, transfer size, speed and remaining time without blocking the editor. Reversion asks before restarting, protects unsaved documents, and shows the release notes once after the new version opens. **Reversion → Check for Updates** works at any time.
 
 The app is ad-hoc signed with a stable application requirement and is **not Apple notarized**. The stable requirement is what lets one release validate the next; downloads are additionally covered by GitHub HTTPS and the SHA-512 digest in `latest-mac.yml`. On first launch macOS Gatekeeper may require Control-click → Open in Finder.
+
+## What's new in 2.1.0
+
+- **Chinese typography is built in.** CJK/Latin spacing and punctuation trimming leave Markdown bytes untouched; smart quotes recognize Chinese context; the cleanup command exposes individual rules, protected regions and replacement counts.
+- **Reading geometry is adjustable.** Body size, reading-column width, line height and paragraph spacing update the editor and styled exports in real time; tables stay exactly 1 px smaller than body copy.
+- **Focus and typewriter modes are complete.** Typewriter mode centers only while typing by default, adapts to the viewport, protects IME composition and pauses cleanly in source mode.
+- **The workspace adopts Claude Code's information density.** Body/sidebar proportions, a three-segment view switcher and narrow rounded scrollbars now share one visual rhythm; the denser outline and 32 px minimap gain a true rendered-content hover magnifier.
+- **Built-in themes gain three appearance states.** Light, Dark and System cover both chrome and document content; imported themes lock to light and exports remain light.
+- **A new default App Icon.** Finder, Dock, the app bundle and DMG use the approved near-white warm-paper engraving of a hand holding a pencil; explicit alternative icon choices remain intact.
 
 ## What's new in 2.0.0
 
@@ -90,11 +102,11 @@ The app is ad-hoc signed with a stable application requirement and is **not Appl
 
 1.5.2 brought the app-icon picker and the single-bar quotes; 1.5.1 brought the double-click sidebar auto-fit and the wider reading columns.
 
-Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v2.0.0).
+Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v2.1.0).
 
 ## Roadmap
 
-**Later.** Inline live rendering behavior parity with Typora (caret anchoring, click targeting, link editing), table editing (row/column handles, Excel/CSV paste, wide-table scrolling), PDF export outline and page-break control, and Chinese typography refinements (CJK/Latin spacing, punctuation compression, smart quotes).
+**Later.** Inline live rendering behavior parity with Typora (caret anchoring, click targeting, link editing), table editing (row/column handles, Excel/CSV paste, wide-table scrolling), and PDF export outline and page-break control.
 
 Known limitations are tracked in the repository's planning documents; a handful of IME edge cases are recorded with reproduction notes in `tests-e2e/helpers/known-issues.ts`.
 
@@ -120,7 +132,7 @@ This writes `<name>-marktext.css` (editor), `export/<name>.css` (HTML/PDF), and 
 The build resolves the upstream source tree, applies Reversion's commits, and produces signed artifacts. It pins Node to the version upstream releases with (see `.nvmrc`) and pnpm to the version in upstream's `packageManager` field.
 
 ```bash
-./scripts/build-release-from-source.sh 2.0.0
+./scripts/build-release-from-source.sh 2.1.0
 ```
 
 Artifacts land in `releases/<version>/`: DMG, updater ZIP, `latest-mac.yml`, and SHA-256 sidecars.

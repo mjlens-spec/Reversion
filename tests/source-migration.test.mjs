@@ -146,7 +146,7 @@ test('both themes are wired into addThemeStyle(), the Preferences grid, and the 
   assert.match(commonTheme, /\['lens-design', '#f4f6f8'\]/)
   assert.match(commonTheme, /\['claude-like', '#f7f6f3'\]/)
   const windowBase = read('src/main/windows/base.ts')
-  assert.match(windowBase, /getThemeBackgroundColor\(theme\)/)
+  assert.match(windowBase, /getThemeBackgroundColor\(theme, effectiveAppearance\)/)
 })
 
 test('Lens Design is the schema default theme (was scripts/install-theme.mjs)', (t) => {
