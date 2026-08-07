@@ -8,7 +8,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'utf8')
 const readBuffer = (relativePath) => fs.readFileSync(path.join(root, relativePath))
 
-test('2.1.0 App Icon is controlled, generated, and consumed by every macOS package surface', () => {
+test('2.1.0 App Icon is controlled, transparent, and consumed by every macOS package surface', async() => {
   const source = readBuffer('icon/reversion-hand-pencil-engraving_OC_0807B.png')
   const pngTargets = [
     'upstream/marktext/packages/desktop/static/icon.png',
@@ -20,6 +20,40 @@ test('2.1.0 App Icon is controlled, generated, and consumed by every macOS packa
   assert.equal(source.subarray(0, 8).toString('hex'), '89504e470d0a1a0a')
   assert.equal(source.readUInt32BE(16), 1024)
   assert.equal(source.readUInt32BE(20), 1024)
+  const { default: sharp } = await import('../upstream/marktext/node_modules/sharp/lib/index.js')
+  const { data, info } = await sharp(source)
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true })
+  const alphaAt = (x, y) => data[(y * info.width + x) * info.channels + 3]
+  for (const [x, y] of [[0, 0], [1023, 0], [0, 1023], [1023, 1023]]) {
+    assert.equal(alphaAt(x, y), 0, `icon corner ${x},${y} must be transparent`)
+  }
+  assert.equal(alphaAt(512, 512), 255, 'icon artwork must remain opaque at its center')
+  let minVisibleX = info.width
+  let minVisibleY = info.height
+  let maxVisibleX = -1
+  let maxVisibleY = -1
+  for (let y = 0; y < info.height; y += 1) {
+    for (let x = 0; x < info.width; x += 1) {
+      if (alphaAt(x, y) > 16) {
+        minVisibleX = Math.min(minVisibleX, x)
+        minVisibleY = Math.min(minVisibleY, y)
+        maxVisibleX = Math.max(maxVisibleX, x)
+        maxVisibleY = Math.max(maxVisibleY, y)
+      }
+    }
+  }
+  const visibleWidthRatio = (maxVisibleX - minVisibleX + 1) / info.width
+  const visibleHeightRatio = (maxVisibleY - minVisibleY + 1) / info.height
+  assert.ok(
+    visibleWidthRatio >= 0.8 && visibleWidthRatio <= 0.84,
+    `icon visible width must match the macOS Dock safe area, received ${visibleWidthRatio}`
+  )
+  assert.ok(
+    visibleHeightRatio >= 0.8 && visibleHeightRatio <= 0.84,
+    `icon visible height must match the macOS Dock safe area, received ${visibleHeightRatio}`
+  )
   for (const target of pngTargets) {
     assert.deepEqual(readBuffer(target), source, `${target} must remain byte-identical to the approved source`)
   }
@@ -44,6 +78,47 @@ test('2.1.0 App Icon is controlled, generated, and consumed by every macOS packa
         assert.equal(payload.subarray(0, 8).toString('hex'), '89504e470d0a1a0a')
         assert.equal(payload.readUInt32BE(16), expectedSlots.get(type), `${target} has the wrong ${type} width`)
         assert.equal(payload.readUInt32BE(20), expectedSlots.get(type), `${target} has the wrong ${type} height`)
+        const slot = await sharp(payload).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+        const alphaAt = (x, y) => slot.data[(y * slot.info.width + x) * slot.info.channels + 3]
+        for (const [x, y] of [
+          [0, 0],
+          [slot.info.width - 1, 0],
+          [0, slot.info.height - 1],
+          [slot.info.width - 1, slot.info.height - 1]
+        ]) {
+          assert.ok(alphaAt(x, y) <= 16, `${target} ${type} corner ${x},${y} must be transparent`)
+        }
+        let nonOpaquePixels = 0
+        let minVisibleX = slot.info.width
+        let minVisibleY = slot.info.height
+        let maxVisibleX = -1
+        let maxVisibleY = -1
+        for (let index = 3; index < slot.data.length; index += slot.info.channels) {
+          if (slot.data[index] < 250) nonOpaquePixels += 1
+          if (slot.data[index] > 16) {
+            const pixelIndex = (index - 3) / slot.info.channels
+            const x = pixelIndex % slot.info.width
+            const y = Math.floor(pixelIndex / slot.info.width)
+            minVisibleX = Math.min(minVisibleX, x)
+            minVisibleY = Math.min(minVisibleY, y)
+            maxVisibleX = Math.max(maxVisibleX, x)
+            maxVisibleY = Math.max(maxVisibleY, y)
+          }
+        }
+        assert.ok(
+          nonOpaquePixels > slot.info.width * slot.info.height * 0.05,
+          `${target} ${type} must preserve the rounded alpha mask, not only its four corners`
+        )
+        const slotWidthRatio = (maxVisibleX - minVisibleX + 1) / slot.info.width
+        const slotHeightRatio = (maxVisibleY - minVisibleY + 1) / slot.info.height
+        assert.ok(
+          slotWidthRatio >= 0.75 && slotWidthRatio <= 0.88,
+          `${target} ${type} visible width must stay inside the Dock safe area`
+        )
+        assert.ok(
+          slotHeightRatio >= 0.75 && slotHeightRatio <= 0.88,
+          `${target} ${type} visible height must stay inside the Dock safe area`
+        )
         expectedSlots.delete(type)
       }
       offset += length
