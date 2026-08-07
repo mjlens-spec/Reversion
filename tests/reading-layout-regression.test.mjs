@@ -17,8 +17,8 @@ const preferenceSchema = JSON.parse(readSource('packages/desktop/src/main/prefer
 const preferenceSeed = JSON.parse(readSource('packages/desktop/static/preference.json'))
 const rendererPreferences = readSource('packages/desktop/src/renderer/src/store/preferences.ts')
 
-test('startup restores a 1:2.34 sidebar-to-editor split instead of the 19% regression', () => {
-  assert.match(layoutStore, /const SIDEBAR_EDITOR_RATIO = 2\.34/)
+test('startup restores a 1:3 sidebar-to-editor split instead of the 19% regression', () => {
+  assert.match(layoutStore, /const SIDEBAR_EDITOR_RATIO = 3/)
   assert.match(
     layoutStore,
     /viewportWidth\s*\/\s*\(1\s*\+\s*SIDEBAR_EDITOR_RATIO\)/

@@ -6,7 +6,7 @@
 
 Reversion, Chinese name `反文`, is a macOS WYSIWYG Markdown editor for Chinese-language writing. It is based on [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` and its TypeScript editor engine, `@muyajs/core`, with inline live rendering, a native Finder Quick Look extension, two typographic themes, an importer for Typora themes, and export to HTML, PDF, DOCX and a single long PNG.
 
-Current release: **2.1.3** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
+Current release: **2.1.4** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
 
 ## Core features
 
@@ -32,11 +32,11 @@ The app checks this repository for a newer stable release 15 seconds after the f
 
 The app is ad-hoc signed with a stable application requirement and is **not Apple notarized**. The stable requirement is what lets one release validate the next; downloads are additionally covered by GitHub HTTPS and the SHA-512 digest in `latest-mac.yml`. On first launch macOS Gatekeeper may require Control-click → Open in Finder.
 
-## What's new in 2.1.3
+## What's new in 2.1.4
 
-- The sidebar opens with the agreed `1 : 2.34` sidebar-to-editor split; manual dragging remains available for the active session.
-- The actual body-text measure now follows 76% of the live reading pane, leaving 12% on each side at every supported window size.
-- Fresh profiles now open with Claude-like as the default theme; explicit theme choices on existing profiles remain intact.
+- When the sidebar is collapsed, a dedicated control remains at the upper-left of the document header so it can always be restored without using the menu.
+- Startup now restores a `1 : 3` sidebar-to-editor split; manual dragging remains available for the active session and the reference split returns after restart.
+- About Reversion now opens as a visible, keyboard-accessible dialog instead of a blank window.
 
 ## Major releases
 
@@ -79,7 +79,7 @@ This writes `<name>-marktext.css` (editor), `export/<name>.css` (HTML/PDF), and 
 The build resolves the upstream source tree, applies Reversion's commits, and produces signed artifacts. It pins Node to the version upstream releases with (see `.nvmrc`) and pnpm to the version in upstream's `packageManager` field.
 
 ```bash
-./scripts/build-release-from-source.sh 2.1.3
+./scripts/build-release-from-source.sh 2.1.4
 ```
 
 Artifacts land in `releases/<version>/`: DMG, updater ZIP, `latest-mac.yml`, and SHA-256 sidecars.

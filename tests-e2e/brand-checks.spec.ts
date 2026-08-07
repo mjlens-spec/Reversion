@@ -156,23 +156,26 @@ test.describe.serial('B1 brand checks', () => {
   })
 
   test('4. About dialog: Reversion-attributed copyright, upstream acknowledgment, no Luo Ran residue', async () => {
-    // Same trigger the Help/marktext menu actions use (actions/help.ts:
-    // `win.webContents.send('mt::about-dialog')`) -- exercises the real
-    // main -> preload -> renderer-bus -> Vue wiring, not just the component
-    // in isolation.
-    await electronApp.evaluate(({ BrowserWindow }) => {
-      const win = BrowserWindow.getAllWindows()[0]
-      win.webContents.send('mt::about-dialog')
+    await electronApp.evaluate(({ Menu }) => {
+      const findById = (items: Electron.MenuItem[]): Electron.MenuItem | undefined => {
+        for (const item of items) {
+          if (item.id === 'aboutMenuItem') return item
+          if (item.submenu) {
+            const found = findById(item.submenu.items)
+            if (found) return found
+          }
+        }
+        return undefined
+      }
+      const menu = Menu.getApplicationMenu()
+      const item = menu ? findById(menu.items) : undefined
+      if (!item) throw new Error('About Reversion menu item not found')
+      item.click()
     })
 
-    // `.about-dialog` (the SFC's own root wrapper div) collapses to 0
-    // height in the accessibility tree once its child `.el-overlay` goes
-    // `position: fixed` (a normal, harmless CSS characteristic -- a real
-    // user still sees the full-viewport overlay just fine), which makes
-    // Playwright's strict `toBeVisible()` bounding-box check false-negative
-    // on the wrapper itself. Assert visibility on the actual dialog body
-    // instead, and read text from that.
-    const dialogBody = window.locator('.about-dialog .el-dialog__body')
+    const overlay = window.locator('.about-dialog')
+    const dialogBody = window.locator('.about-dialog__panel')
+    await expect(overlay).toBeVisible({ timeout: 10_000 })
     await expect(dialogBody).toBeVisible({ timeout: 10_000 })
 
     const text = await dialogBody.innerText()
@@ -182,7 +185,27 @@ test.describe.serial('B1 brand checks', () => {
     expect(text).not.toMatch(/Luo Ran/i)
     expect(text).not.toMatch(/luo han/i)
 
+    const visual = await dialogBody.evaluate((element) => {
+      const panelStyle = getComputedStyle(element)
+      const overlayStyle = getComputedStyle(element.parentElement as HTMLElement)
+      const rect = element.getBoundingClientRect()
+      return {
+        width: rect.width,
+        height: rect.height,
+        background: panelStyle.backgroundColor,
+        color: panelStyle.color,
+        overlay: overlayStyle.backgroundColor
+      }
+    })
+    expect(visual.width).toBeGreaterThanOrEqual(360)
+    expect(visual.height).toBeGreaterThan(250)
+    expect(visual.background).not.toBe('rgba(0, 0, 0, 0)')
+    expect(visual.overlay).not.toBe('rgba(0, 0, 0, 0)')
+    expect(visual.color).not.toBe(visual.background)
+
     await window.screenshot({ path: path.join(SCREENSHOT_DIR, 'brand-02-about-dialog.png') })
+    await dialogBody.locator('.about-dialog__close').click()
+    await expect(overlay).toBeHidden()
   })
 
   test('5. Help menu: Changelog / Report Bug / License open the Reversion-fork URLs at runtime', async () => {
