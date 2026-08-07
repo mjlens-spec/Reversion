@@ -8,7 +8,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'utf8')
 const readBuffer = (relativePath) => fs.readFileSync(path.join(root, relativePath))
 
-test('2.1.0 App Icon is controlled, generated, and consumed by every macOS package surface', () => {
+test('2.1.0 App Icon is controlled, transparent, and consumed by every macOS package surface', async() => {
   const source = readBuffer('icon/reversion-hand-pencil-engraving_OC_0807B.png')
   const pngTargets = [
     'upstream/marktext/packages/desktop/static/icon.png',
@@ -20,6 +20,16 @@ test('2.1.0 App Icon is controlled, generated, and consumed by every macOS packa
   assert.equal(source.subarray(0, 8).toString('hex'), '89504e470d0a1a0a')
   assert.equal(source.readUInt32BE(16), 1024)
   assert.equal(source.readUInt32BE(20), 1024)
+  const { default: sharp } = await import('../upstream/marktext/node_modules/sharp/lib/index.js')
+  const { data, info } = await sharp(source)
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true })
+  const alphaAt = (x, y) => data[(y * info.width + x) * info.channels + 3]
+  for (const [x, y] of [[0, 0], [1023, 0], [0, 1023], [1023, 1023]]) {
+    assert.equal(alphaAt(x, y), 0, `icon corner ${x},${y} must be transparent`)
+  }
+  assert.equal(alphaAt(512, 512), 255, 'icon artwork must remain opaque at its center')
   for (const target of pngTargets) {
     assert.deepEqual(readBuffer(target), source, `${target} must remain byte-identical to the approved source`)
   }
