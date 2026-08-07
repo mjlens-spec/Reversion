@@ -6,7 +6,7 @@
 
 Reversion, Chinese name `反文`, is a macOS WYSIWYG Markdown editor for Chinese-language writing. It is based on [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` and its TypeScript editor engine, `@muyajs/core`, with inline live rendering, a native Finder Quick Look extension, two typographic themes, an importer for Typora themes, and export to HTML, PDF, DOCX and a single long PNG.
 
-Current release: **2.1.1** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
+Current release: **2.1.2** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
 
 ## Core features
 
@@ -31,6 +31,12 @@ Prebuilt `arm64` DMGs are on the [Releases page](https://github.com/mjlens-spec/
 The app checks this repository for a newer stable release 15 seconds after the first window opens and stays quiet when already current. When an update is found, a compact progress card shows percentage, transfer size, speed and remaining time without blocking the editor. Reversion asks before restarting, protects unsaved documents, and shows the release notes once after the new version opens. **Reversion → Check for Updates** works at any time.
 
 The app is ad-hoc signed with a stable application requirement and is **not Apple notarized**. The stable requirement is what lets one release validate the next; downloads are additionally covered by GitHub HTTPS and the SHA-512 digest in `latest-mac.yml`. On first launch macOS Gatekeeper may require Control-click → Open in Finder.
+
+## What's new in 2.1.2
+
+- **Long documents end cleanly.** Normal reading mode now leaves a compact 64 px tail instead of an extra viewport of blank space; typewriter mode keeps its intentional centering space.
+- **The reading measure uses more of the window.** On a wide window the column grows to 1300 px including editor padding, leaving about 1200 px for text, and still contracts without horizontal overflow on smaller windows.
+- **Table type is consistently compact.** Every table cell and its nested formatting render exactly 2 px below the active body size across both built-in themes and styled exports.
 
 ## What's new in 2.1.1
 
@@ -108,7 +114,7 @@ The app is ad-hoc signed with a stable application requirement and is **not Appl
 
 1.5.2 brought the app-icon picker and the single-bar quotes; 1.5.1 brought the double-click sidebar auto-fit and the wider reading columns.
 
-Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v2.1.1).
+Full notes: [Releases](https://github.com/mjlens-spec/Reversion/releases/tag/v2.1.2).
 
 ## Roadmap
 
@@ -138,7 +144,7 @@ This writes `<name>-marktext.css` (editor), `export/<name>.css` (HTML/PDF), and 
 The build resolves the upstream source tree, applies Reversion's commits, and produces signed artifacts. It pins Node to the version upstream releases with (see `.nvmrc`) and pnpm to the version in upstream's `packageManager` field.
 
 ```bash
-./scripts/build-release-from-source.sh 2.1.1
+./scripts/build-release-from-source.sh 2.1.2
 ```
 
 Artifacts land in `releases/<version>/`: DMG, updater ZIP, `latest-mac.yml`, and SHA-256 sidecars.
