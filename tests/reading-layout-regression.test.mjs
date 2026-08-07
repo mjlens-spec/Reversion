@@ -43,6 +43,10 @@ test('tables are globally two pixels smaller than surrounding body text', () => 
     editor,
     /\.editor-component \.mu-container table :is\(td, th\)\s*\{[^}]*font-size:\s*var\(--reading-table-font-size, calc\(1em - 2px\)\) !important;/s
   )
+  assert.match(
+    editor,
+    /\.editor-component \.mu-container table :is\(td, th\) \*\s*\{[^}]*font-size:\s*inherit !important;/s
+  )
 
   for (const [name, source] of [['Claude-like', claudeTheme], ['Lens Design', lensTheme]]) {
     assert.match(

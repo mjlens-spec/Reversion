@@ -216,11 +216,11 @@ test('editor and export themes balance narrow and wide tables', () => {
   // to its content and the 13px compression that used to be the only way to
   // fit it is gone. `min-width: 100%` still makes a narrow table fill the
   // column. In 2.1 both editor and export derive table type from the active
-  // reading size so it is always exactly one pixel smaller.
+  // reading size so it is always exactly two pixels smaller.
   for (const themePath of ['themes/lens-design-marktext.css', 'themes/claude-like-marktext.css']) {
     const css = read(themePath)
     assert.match(css, /\.mu-container table \{[\s\S]*width: max-content;[\s\S]*min-width: 100%;[\s\S]*table-layout: auto;/)
-    assert.match(css, /--reading-table-font-size:\s*calc\(var\(--reading-font-size\) - 1px\)/)
+    assert.match(css, /--reading-table-font-size:\s*calc\(var\(--reading-font-size\) - 2px\)/)
     assert.match(css, /\.mu-container table th \{[\s\S]*line-height: 1\.45 !important;[\s\S]*white-space: normal;/)
     assert.match(css, /\.mu-container table td,[\s\S]*\.mu-container table th \{[\s\S]*min-width: 4\.5em;[\s\S]*font-size: var\(--reading-table-font-size\) !important;/)
     assert.match(css, /\.mu-container table td:first-child,[\s\S]*\.mu-container table th:first-child \{[\s\S]*min-width: 3\.25em;/)
@@ -231,7 +231,7 @@ test('editor and export themes balance narrow and wide tables', () => {
 
   for (const themePath of ['themes/export/lens-design.css', 'themes/export/claude-like.css']) {
     const css = read(themePath)
-    assert.match(css, /--reading-table-font-size:\s*calc\(var\(--reading-font-size\) - 1px\)/)
+    assert.match(css, /--reading-table-font-size:\s*calc\(var\(--reading-font-size\) - 2px\)/)
     assert.match(css, /\.markdown-body table \{[\s\S]*width: 100%;[\s\S]*table-layout: auto;/)
     assert.match(css, /\.markdown-body table td,[\s\S]*\.markdown-body table th \{[\s\S]*font-size: var\(--reading-table-font-size\);/)
     assert.match(css, /\.markdown-body table th \{[\s\S]*line-height: 1\.45;[\s\S]*white-space: normal;/)

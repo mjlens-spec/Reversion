@@ -31,7 +31,7 @@
   --reading-font-quote: var(--claude-font-reading);
   --reading-font-size: 16px;
   --reading-line-height: 1.72;
-  --reading-table-font-size: calc(var(--reading-font-size) - 1px);
+  --reading-table-font-size: calc(var(--reading-font-size) - 2px);
 }
 
 html,
