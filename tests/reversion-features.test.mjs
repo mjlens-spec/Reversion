@@ -89,12 +89,35 @@ test('2.1.0 App Icon is controlled, transparent, and consumed by every macOS pac
           assert.ok(alphaAt(x, y) <= 16, `${target} ${type} corner ${x},${y} must be transparent`)
         }
         let nonOpaquePixels = 0
+        let minVisibleX = slot.info.width
+        let minVisibleY = slot.info.height
+        let maxVisibleX = -1
+        let maxVisibleY = -1
         for (let index = 3; index < slot.data.length; index += slot.info.channels) {
           if (slot.data[index] < 250) nonOpaquePixels += 1
+          if (slot.data[index] > 16) {
+            const pixelIndex = (index - 3) / slot.info.channels
+            const x = pixelIndex % slot.info.width
+            const y = Math.floor(pixelIndex / slot.info.width)
+            minVisibleX = Math.min(minVisibleX, x)
+            minVisibleY = Math.min(minVisibleY, y)
+            maxVisibleX = Math.max(maxVisibleX, x)
+            maxVisibleY = Math.max(maxVisibleY, y)
+          }
         }
         assert.ok(
           nonOpaquePixels > slot.info.width * slot.info.height * 0.05,
           `${target} ${type} must preserve the rounded alpha mask, not only its four corners`
+        )
+        const slotWidthRatio = (maxVisibleX - minVisibleX + 1) / slot.info.width
+        const slotHeightRatio = (maxVisibleY - minVisibleY + 1) / slot.info.height
+        assert.ok(
+          slotWidthRatio >= 0.75 && slotWidthRatio <= 0.88,
+          `${target} ${type} visible width must stay inside the Dock safe area`
+        )
+        assert.ok(
+          slotHeightRatio >= 0.75 && slotHeightRatio <= 0.88,
+          `${target} ${type} visible height must stay inside the Dock safe area`
         )
         expectedSlots.delete(type)
       }

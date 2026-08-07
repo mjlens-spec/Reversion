@@ -46,9 +46,6 @@ try {
       source,
       '-resize', `${size}x${size}!`,
       '-alpha', 'on',
-      '-channel', 'A',
-      '-fx', '(i==0&&j==0)||(i==w-1&&j==0)||(i==0&&j==h-1)||(i==w-1&&j==h-1)?0:u',
-      '+channel',
       '-depth', '8',
       '-define', 'png:color-type=6',
       png
