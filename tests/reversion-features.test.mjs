@@ -30,6 +30,30 @@ test('2.1.0 App Icon is controlled, transparent, and consumed by every macOS pac
     assert.equal(alphaAt(x, y), 0, `icon corner ${x},${y} must be transparent`)
   }
   assert.equal(alphaAt(512, 512), 255, 'icon artwork must remain opaque at its center')
+  let minVisibleX = info.width
+  let minVisibleY = info.height
+  let maxVisibleX = -1
+  let maxVisibleY = -1
+  for (let y = 0; y < info.height; y += 1) {
+    for (let x = 0; x < info.width; x += 1) {
+      if (alphaAt(x, y) > 16) {
+        minVisibleX = Math.min(minVisibleX, x)
+        minVisibleY = Math.min(minVisibleY, y)
+        maxVisibleX = Math.max(maxVisibleX, x)
+        maxVisibleY = Math.max(maxVisibleY, y)
+      }
+    }
+  }
+  const visibleWidthRatio = (maxVisibleX - minVisibleX + 1) / info.width
+  const visibleHeightRatio = (maxVisibleY - minVisibleY + 1) / info.height
+  assert.ok(
+    visibleWidthRatio >= 0.8 && visibleWidthRatio <= 0.84,
+    `icon visible width must match the macOS Dock safe area, received ${visibleWidthRatio}`
+  )
+  assert.ok(
+    visibleHeightRatio >= 0.8 && visibleHeightRatio <= 0.84,
+    `icon visible height must match the macOS Dock safe area, received ${visibleHeightRatio}`
+  )
   for (const target of pngTargets) {
     assert.deepEqual(readBuffer(target), source, `${target} must remain byte-identical to the approved source`)
   }
