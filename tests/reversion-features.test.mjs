@@ -184,6 +184,14 @@ test('Reversion 2.0 themes render diagrams, flat highlights, and editorial quote
   }
 })
 
+test('Claude like and Lens Design keep their original light palettes', () => {
+  for (const themePath of ['themes/lens-design-marktext.css', 'themes/claude-like-marktext.css']) {
+    const css = read(themePath)
+    assert.doesNotMatch(css, /data-reversion-appearance=['"]dark['"]/)
+    assert.doesNotMatch(css, /Reversion 2\.1 dark appearance/)
+  }
+})
+
 test('theme stylesheets keep braces balanced', () => {
   // A stray top-level `}` is silently discarded by Chromium's error recovery
   // but breaks stricter CSS tooling; 2.0.0 shipped one in each export theme.

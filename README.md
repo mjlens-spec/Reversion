@@ -6,7 +6,7 @@
 
 Reversion, Chinese name `反文`, is a macOS WYSIWYG Markdown editor for Chinese-language writing. It is based on [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` and its TypeScript editor engine, `@muyajs/core`, with inline live rendering, a native Finder Quick Look extension, two typographic themes, an importer for Typora themes, and export to HTML, PDF, DOCX and a single long PNG.
 
-Current release: **2.1.4** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
+Current release: **2.1.5** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
 
 ## Core features
 
@@ -15,7 +15,7 @@ Current release: **2.1.4** (Apple Silicon). Reversion keeps MarkText's applicati
 - **Chinese typography** — CJK/Latin spacing and punctuation trimming stay in the render layer without changing Markdown source; context-aware smart quotes and a Chinese Typography Cleanup command handle actual input.
 - **Reading controls and immersive writing** — body size, column width, line height and paragraph spacing are independent; focus and typewriter modes add input-only centering, IME protection and virtual document-edge space.
 - **Semantic minimap** — a narrow right-edge overview maps headings, paragraphs, code, quotes, tables and diagrams, with click, drag and a rendered-content hover magnifier.
-- **Light and dark appearance** — built-in themes support Light, Dark and System; imported Typora themes and all exports remain predictably light.
+- **Light and dark appearance** — built-in light and dark themes work with the system appearance; Claude like and Lens Design keep their original light designs, while imported Typora themes and all exports also remain predictably light.
 - **Bilingual command palette** — `Command+Shift+P` searches commands, recent files and current-folder files in English or Chinese; `Command+K` remains assigned to the table of contents.
 - **Typora theme import** — Theme ▸ Import Theme (Typora compatible) converts a Typora theme's CSS, in the app, into a Reversion editor theme plus a matching HTML/PDF export theme, and writes a compatibility report listing anything it could not map. The same pipeline is available as `scripts/import-typora-theme.mjs`. Verified against six of Typora's built-in themes.
 - **Export** — HTML, PDF, DOCX and a single long PNG. HTML and PDF carry the export themes, fonts, TOC and header/footer settings; DOCX goes through pandoc into native Word structures; PNG renders the whole document as one unpaginated image.
@@ -32,11 +32,10 @@ The app checks this repository for a newer stable release 15 seconds after the f
 
 The app is ad-hoc signed with a stable application requirement and is **not Apple notarized**. The stable requirement is what lets one release validate the next; downloads are additionally covered by GitHub HTTPS and the SHA-512 digest in `latest-mac.yml`. On first launch macOS Gatekeeper may require Control-click → Open in Finder.
 
-## What's new in 2.1.4
+## What's new in 2.1.5
 
-- When the sidebar is collapsed, a dedicated control remains at the upper-left of the document header so it can always be restored without using the menu.
-- Startup now restores a `1 : 3` sidebar-to-editor split; manual dragging remains available for the active session and the reference split returns after restart.
-- About Reversion now opens as a visible, keyboard-accessible dialog instead of a blank window.
+- Claude like and Lens Design retain their original light appearances instead of changing colour with macOS dark mode at night.
+- The editor, sidebar, title bar, bottom tabs and native window background now stay visually consistent; other light and dark themes keep their existing appearance behaviour.
 
 ## Major releases
 
@@ -79,7 +78,7 @@ This writes `<name>-marktext.css` (editor), `export/<name>.css` (HTML/PDF), and 
 The build resolves the upstream source tree, applies Reversion's commits, and produces signed artifacts. It pins Node to the version upstream releases with (see `.nvmrc`) and pnpm to the version in upstream's `packageManager` field.
 
 ```bash
-./scripts/build-release-from-source.sh 2.1.4
+./scripts/build-release-from-source.sh 2.1.5
 ```
 
 Artifacts land in `releases/<version>/`: DMG, updater ZIP, `latest-mac.yml`, and SHA-256 sidecars.
