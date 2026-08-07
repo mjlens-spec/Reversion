@@ -6,7 +6,7 @@
 
 Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 所见即所得 Markdown 编辑器。它基于 [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` 与 TypeScript 编辑器引擎 `@muyajs/core`，加入行内实时渲染、原生 Finder Quick Look 扩展、两套排印主题、Typora 主题导入工具，以及 HTML / PDF / DOCX / PNG 长图四种导出格式。
 
-当前版本：**2.1.3**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
+当前版本：**2.1.4**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
 
 ## 核心功能
 
@@ -32,11 +32,11 @@ Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 
 
 应用采用带稳定应用标识的 ad-hoc 签名，**未经 Apple 公证**。该稳定标识用于让相邻版本互相校验；下载另有 GitHub HTTPS 与 `latest-mac.yml` 中的 SHA-512 校验保护。首次启动时，macOS Gatekeeper 可能要求在访达中按住 Control 点击 →「打开」。
 
-## 2.1.3 更新内容
+## 2.1.4 更新内容
 
-- 侧栏启动时恢复为约定的 `1 : 2.34` 侧栏与编辑区比例；当前会话仍可手动拖动调整。
-- 正文文字区域动态占可读区域的 76%，不同窗口尺寸下左右各保留 12%。
-- 全新配置默认使用 Claude-like；已有配置中用户主动选择的主题保持不变。
+- 侧栏收起后，正文标题栏左上角会保留展开按钮，不必再通过菜单找回侧栏。
+- 默认启动比例调整为 `1 : 3`；当前会话仍可手动细调，重新启动后恢复规范比例。
+- 修复「关于反文」打开后白屏的问题，关于页面现在会显示为可关闭、可键盘操作的对话框。
 
 ## 大版本记录
 
@@ -79,7 +79,7 @@ node scripts/import-typora-theme.mjs <typora主题.css> --name <名称> --out-di
 构建流程会取得上游源码树、应用反文的 commit，并产出已签名的发布产物。Node 版本钉在上游发布所用的版本（见 `.nvmrc`），pnpm 钉在上游 `packageManager` 字段声明的版本。
 
 ```bash
-./scripts/build-release-from-source.sh 2.1.3
+./scripts/build-release-from-source.sh 2.1.4
 ```
 
 产物落在 `releases/<版本>/`：DMG、更新用 ZIP、`latest-mac.yml` 与 SHA-256 校验文件。
