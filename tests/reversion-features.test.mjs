@@ -55,7 +55,23 @@ test('2.1.0 App Icon is controlled, transparent, and consumed by every macOS pac
         assert.equal(payload.readUInt32BE(16), expectedSlots.get(type), `${target} has the wrong ${type} width`)
         assert.equal(payload.readUInt32BE(20), expectedSlots.get(type), `${target} has the wrong ${type} height`)
         const slot = await sharp(payload).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
-        assert.equal(slot.data[3], 0, `${target} ${type} must preserve its transparent corner`)
+        const alphaAt = (x, y) => slot.data[(y * slot.info.width + x) * slot.info.channels + 3]
+        for (const [x, y] of [
+          [0, 0],
+          [slot.info.width - 1, 0],
+          [0, slot.info.height - 1],
+          [slot.info.width - 1, slot.info.height - 1]
+        ]) {
+          assert.ok(alphaAt(x, y) <= 16, `${target} ${type} corner ${x},${y} must be transparent`)
+        }
+        let nonOpaquePixels = 0
+        for (let index = 3; index < slot.data.length; index += slot.info.channels) {
+          if (slot.data[index] < 250) nonOpaquePixels += 1
+        }
+        assert.ok(
+          nonOpaquePixels > slot.info.width * slot.info.height * 0.05,
+          `${target} ${type} must preserve the rounded alpha mask, not only its four corners`
+        )
         expectedSlots.delete(type)
       }
       offset += length
