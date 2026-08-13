@@ -175,6 +175,34 @@ test('macOS update manifest uses the electron-updater latest-mac.yml contract', 
   )
 })
 
+test('macOS update manifest keeps arm64 and Intel ZIPs in one architecture-aware channel', async () => {
+  const modulePath = path.join(root, 'scripts', 'make-update-manifest.mjs')
+  const { createMultiFileMacUpdateManifest } = await import(pathToFileURL(modulePath))
+  const manifest = createMultiFileMacUpdateManifest({
+    version: '2.1.6',
+    files: [
+      { fileName: 'Reversion-2.1.6-arm64-mac.zip', size: 111, sha512: 'arm-digest' },
+      { fileName: 'Reversion-2.1.6-x64-mac.zip', size: 222, sha512: 'intel-digest' }
+    ],
+    releaseDate: '2026-08-13T12:00:00.000Z'
+  })
+
+  assert.equal(manifest, [
+    'version: 2.1.6',
+    'files:',
+    '  - url: Reversion-2.1.6-arm64-mac.zip',
+    '    sha512: arm-digest',
+    '    size: 111',
+    '  - url: Reversion-2.1.6-x64-mac.zip',
+    '    sha512: intel-digest',
+    '    size: 222',
+    'path: Reversion-2.1.6-arm64-mac.zip',
+    'sha512: arm-digest',
+    'releaseDate: 2026-08-13T12:00:00.000Z',
+    ''
+  ].join('\n'))
+})
+
 test('release builder produces a signed app, updater ZIP, DMG, manifest, and checksums', () => {
   const scriptPath = path.join(root, 'scripts', 'build-release.sh')
   assert.ok(fs.existsSync(scriptPath), 'scripts/build-release.sh must exist')

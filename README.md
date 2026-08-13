@@ -4,9 +4,9 @@
 
 <img src="icon/reversion-hand-pencil-engraving_OC_0807B.png" alt="Reversion icon" width="128" align="right" />
 
-Reversion, Chinese name `反文`, is a macOS WYSIWYG Markdown editor for Chinese-language writing. It is based on [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` and its TypeScript editor engine, `@muyajs/core`, with inline live rendering, a native Finder Quick Look extension, two typographic themes, an importer for Typora themes, and export to HTML, PDF, DOCX and a single long PNG.
+Reversion, Chinese name `反文`, is a WYSIWYG Markdown editor for Chinese-language writing. It is based on [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` and its TypeScript editor engine, `@muyajs/core`, with inline live rendering, a native macOS Finder Quick Look extension, two typographic themes, an importer for Typora themes, and export to HTML, PDF, DOCX and a single long PNG.
 
-Current release: **2.1.5** (Apple Silicon). Reversion keeps MarkText's application data directory and bundle identifier, so preferences, history, and updater continuity survive migration from earlier versions.
+Current release: **2.1.6**, for macOS Apple Silicon, macOS Intel, and Windows x64. Reversion keeps MarkText's application data directory and technical identifiers, so preferences, history, and updater continuity survive migration from earlier versions.
 
 ## Core features
 
@@ -26,16 +26,23 @@ Current release: **2.1.5** (Apple Silicon). Reversion keeps MarkText's applicati
 
 ## Download
 
-Prebuilt `arm64` DMGs are on the [Releases page](https://github.com/mjlens-spec/Reversion/releases). Each release ships `Reversion-<version>-arm64.dmg` together with the updater ZIP, `latest-mac.yml`, and SHA-256 sidecars.
+Prebuilt installers are on the [Releases page](https://github.com/mjlens-spec/Reversion/releases):
+
+- Windows 10 / 11 x64: `Reversion-<version>-windows-x64-setup.exe`
+- Intel Mac: `Reversion-<version>-x64.dmg`
+- Apple Silicon Mac: `Reversion-<version>-arm64.dmg`
+
+The same release includes macOS updater ZIPs, a Windows differential-update file, `latest-mac.yml`, `latest.yml`, and SHA-256 checksums.
 
 The app checks this repository for a newer stable release 15 seconds after the first window opens and stays quiet when already current. When an update is found, a compact progress card shows percentage, transfer size, speed and remaining time without blocking the editor. Reversion asks before restarting, protects unsaved documents, and shows the release notes once after the new version opens. **Reversion → Check for Updates** works at any time.
 
-The app is ad-hoc signed with a stable application requirement and is **not Apple notarized**. The stable requirement is what lets one release validate the next; downloads are additionally covered by GitHub HTTPS and the SHA-512 digest in `latest-mac.yml`. On first launch macOS Gatekeeper may require Control-click → Open in Finder.
+The macOS app is ad-hoc signed with a stable application requirement and is **not Apple notarized**. The stable requirement is what lets one release validate the next; downloads are additionally covered by GitHub HTTPS and the SHA-512 digest in `latest-mac.yml`. On first launch macOS Gatekeeper may require Control-click → Open in Finder. The Windows installer is currently unsigned and may show an “Unknown publisher” SmartScreen warning; download it only from this repository's Releases page and verify the included SHA-256 checksum.
 
-## What's new in 2.1.5
+## What's new in 2.1.6
 
-- Claude like and Lens Design retain their original light appearances instead of changing colour with macOS dark mode at night.
-- The editor, sidebar, title bar, bottom tabs and native window background now stay visually consistent; other light and dark themes keep their existing appearance behaviour.
+- Added a Windows 10 / 11 x64 installer, with silent install, launch, and uninstall smoke validation on a native Windows runner.
+- Added a native Intel Mac x64 DMG and updater ZIP. The macOS update channel now selects the x64 or arm64 ZIP for the machine's processor.
+- Apple Silicon artifacts continue to ship so existing users can update to the same stable release.
 
 ## Major releases
 
@@ -78,10 +85,17 @@ This writes `<name>-marktext.css` (editor), `export/<name>.css` (HTML/PDF), and 
 The build resolves the upstream source tree, applies Reversion's commits, and produces signed artifacts. It pins Node to the version upstream releases with (see `.nvmrc`) and pnpm to the version in upstream's `packageManager` field.
 
 ```bash
-./scripts/build-release-from-source.sh 2.1.5
+REVERSION_ARCH=arm64 ./scripts/build-release-from-source.sh 2.1.6
+REVERSION_ARCH=x64 ./scripts/build-release-from-source.sh 2.1.6
 ```
 
-Artifacts land in `releases/<version>/`: DMG, updater ZIP, `latest-mac.yml`, and SHA-256 sidecars.
+Windows PowerShell:
+
+```powershell
+./scripts/build-windows-release-from-source.ps1 2.1.6
+```
+
+Artifacts land in `releases/<version>/`: macOS DMGs and updater ZIPs, the Windows installer and differential-update file, update manifests, and SHA-256 checksums.
 
 Tests:
 
@@ -96,7 +110,8 @@ The e2e suites drive a real packaged application and assert that the user's actu
 ## Repository layout
 
 - `themes/` — editor and export CSS themes.
-- `scripts/build-release-from-source.sh` — source → DMG / ZIP / `latest-mac.yml` / checksums.
+- `scripts/build-release-from-source.sh` — macOS source → arm64 or x64 DMG / ZIP / `latest-mac.yml` / checksums.
+- `scripts/build-windows-release-from-source.ps1` — Windows source → x64 installer / `latest.yml` / differential-update file / checksum.
 - `scripts/import-typora-theme.mjs`, `scripts/typora-import/`, `scripts/typora-map/` — Typora theme transpiler: six-stage pipeline plus the replaceable mapping data.
 - `scripts/brand-app.sh`, `scripts/build-icon.sh`, `scripts/install-icon.sh` — bundle localization and icon tooling.
 - `quicklook/` — Swift source and XcodeGen definition for the Finder Quick Look Preview Extension.
@@ -117,10 +132,11 @@ Editor source lives in a fork of upstream MarkText that is not committed here; t
 
 ## Compatibility
 
-- App path: `/Applications/Reversion.app`
-- User data: `~/Library/Application Support/marktext` — deliberately unchanged from MarkText, which is what preserves existing preferences and the update chain
-- Bundle identifier: `com.github.marktext.marktext`, also unchanged for the same reason
-- Apple Silicon only; Intel and Universal builds are not currently produced
+- macOS application path: `/Applications/Reversion.app`
+- macOS user data: `~/Library/Application Support/marktext` — deliberately unchanged from MarkText, which is what preserves existing preferences and the update chain
+- macOS Bundle identifier: `com.github.marktext.marktext`, also unchanged for the same reason
+- macOS: separate native Apple Silicon arm64 and Intel x64 releases
+- Windows: Windows 10 / 11 x64; application data and the internal executable name retain the compatibility identifier `marktext`
 
 ## License and notices
 

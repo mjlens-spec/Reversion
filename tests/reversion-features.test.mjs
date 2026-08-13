@@ -130,6 +130,7 @@ test('2.1.0 App Icon is controlled, transparent, and consumed by every macOS pac
   const releaseBuilder = read('scripts/build-release-from-source.sh')
   const generator = read('scripts/generate-macos-icon.mjs')
   assert.match(builder, /mac:[\s\S]*icon:\s*static\/icon\.icns/)
+  assert.match(builder, /win:[\s\S]*icon:\s*static\/icon\.png/)
   assert.match(builder, /linux:[\s\S]*icon:\s*['"]?static\/icon\.png['"]?/)
   assert.match(releaseBuilder, /APP_ICON_SOURCE=.*reversion-hand-pencil-engraving_OC_0807B\.png/)
   assert.match(releaseBuilder, /generate-macos-icon\.mjs/)

@@ -238,7 +238,7 @@ test('technical identifiers the B1 audit whitelisted are still untouched', (t) =
   assert.match(editorBufferStore, /this\.serviceName = 'marktext'/)
 
   // Windows AppUserModelID -- taskbar/notification grouping identity,
-  // analogous to appId; Windows isn't part of the current release scope.
+  // analogous to appId. It remains stable as Windows packaging is introduced.
   const main = read('src/main/index.ts')
   assert.match(main, /setAppUserModelId\('com\.electron\.marktext'\)/)
 
@@ -258,9 +258,24 @@ test('technical identifiers the B1 audit whitelisted are still untouched', (t) =
   const pkg = readJson('package.json')
   assert.equal(pkg.name, 'marktext')
   // Windows/Linux executable names are separate knobs from productName and stay
-  // "marktext" (neither platform is in the current release scope).
+  // "marktext" for internal compatibility, even though user-facing installers
+  // and shortcuts are branded Reversion.
   assert.match(builderConfig, /^ {2}executableName: marktext$/m)
   assert.match(builderConfig, /^ {2}executableName: 'marktext'$/m)
+})
+
+test('Windows installer surfaces are branded Reversion while technical identifiers stay stable', (t) => {
+  if (!upstreamAvailable) return t.skip('upstream/marktext not available')
+  const builderConfig = read('electron-builder.yml')
+  const installer = fs.readFileSync(path.join(desktop, 'build', 'windows', 'installer.nsh'), 'utf8')
+
+  assert.match(builderConfig, /artifactName: 'Reversion-\$\{version\}-windows-\$\{arch\}-setup\.\$\{ext\}'/)
+  assert.match(builderConfig, /win:[\s\S]*icon: static\/icon\.png/)
+  assert.match(installer, /associate Markdown files[^\n]+with Reversion/)
+  assert.match(installer, /Reversion\.Document/)
+  assert.match(installer, /Reversion Markdown Document/)
+  assert.doesNotMatch(installer, /with MarkText\?|MarkText Markdown Document/)
+  assert.match(installer, /\$INSTDIR\\marktext\.exe/)
 })
 
 test('electron-builder.yml productName is Reversion, so macOS names the bundle, executable and helpers after it', (t) => {

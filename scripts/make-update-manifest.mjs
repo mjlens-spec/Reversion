@@ -12,30 +12,44 @@ const assertPlainYamlValue = (name, value) => {
   }
 }
 
-export const createMacUpdateManifest = ({ version, fileName, size, sha512, releaseDate }) => {
+export const createMultiFileMacUpdateManifest = ({ version, files, releaseDate }) => {
   if (!semverPattern.test(version)) {
     throw new Error(`version must be a semantic version: ${version}`)
   }
-  assertPlainYamlValue('fileName', fileName)
-  assertPlainYamlValue('sha512', sha512)
-  if (!Number.isSafeInteger(size) || size <= 0) {
-    throw new Error(`size must be a positive integer: ${size}`)
+  if (!Array.isArray(files) || files.length === 0) {
+    throw new Error('files must contain at least one update ZIP')
+  }
+  for (const [index, file] of files.entries()) {
+    assertPlainYamlValue(`files[${index}].fileName`, file.fileName)
+    assertPlainYamlValue(`files[${index}].sha512`, file.sha512)
+    if (!Number.isSafeInteger(file.size) || file.size <= 0) {
+      throw new Error(`files[${index}].size must be a positive integer: ${file.size}`)
+    }
   }
   if (Number.isNaN(Date.parse(releaseDate))) {
     throw new Error(`releaseDate must be an ISO date: ${releaseDate}`)
   }
 
-  return [
-    `version: ${version}`,
-    'files:',
-    `  - url: ${fileName}`,
-    `    sha512: ${sha512}`,
-    `    size: ${size}`,
-    `path: ${fileName}`,
-    `sha512: ${sha512}`,
+  const preferred = files.find((file) => file.fileName.includes('arm64')) ?? files[0]
+  const lines = [`version: ${version}`, 'files:']
+  for (const file of files) {
+    lines.push(`  - url: ${file.fileName}`, `    sha512: ${file.sha512}`, `    size: ${file.size}`)
+  }
+  lines.push(
+    `path: ${preferred.fileName}`,
+    `sha512: ${preferred.sha512}`,
     `releaseDate: ${releaseDate}`,
     ''
-  ].join('\n')
+  )
+  return lines.join('\n')
+}
+
+export const createMacUpdateManifest = ({ version, fileName, size, sha512, releaseDate }) => {
+  return createMultiFileMacUpdateManifest({
+    version,
+    files: [{ fileName, size, sha512 }],
+    releaseDate
+  })
 }
 
 export const sha512Base64 = (filePath) => {
@@ -47,17 +61,36 @@ export const sha512Base64 = (filePath) => {
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
 
 if (isMain) {
-  const [version, zipPath, outputPath, releaseDate = new Date().toISOString()] = process.argv.slice(2)
-  if (!version || !zipPath || !outputPath) {
-    throw new Error('Usage: make-update-manifest.mjs <version> <zip> <output> [release-date]')
+  const args = process.argv.slice(2)
+  if (args[0] === '--multi') {
+    const [, version, outputPath, ...zipPaths] = args
+    if (!version || !outputPath || zipPaths.length === 0) {
+      throw new Error('Usage: make-update-manifest.mjs --multi <version> <output> <zip> [zip...]')
+    }
+    const manifest = createMultiFileMacUpdateManifest({
+      version,
+      files: zipPaths.map((zipPath) => ({
+        fileName: path.basename(zipPath),
+        size: fs.statSync(zipPath).size,
+        sha512: sha512Base64(zipPath)
+      })),
+      releaseDate: new Date().toISOString()
+    })
+    fs.writeFileSync(outputPath, manifest)
+    console.log(`Created ${outputPath}`)
+  } else {
+    const [version, zipPath, outputPath, releaseDate = new Date().toISOString()] = args
+    if (!version || !zipPath || !outputPath) {
+      throw new Error('Usage: make-update-manifest.mjs <version> <zip> <output> [release-date]')
+    }
+    const manifest = createMacUpdateManifest({
+      version,
+      fileName: path.basename(zipPath),
+      size: fs.statSync(zipPath).size,
+      sha512: sha512Base64(zipPath),
+      releaseDate
+    })
+    fs.writeFileSync(outputPath, manifest)
+    console.log(`Created ${outputPath}`)
   }
-  const manifest = createMacUpdateManifest({
-    version,
-    fileName: path.basename(zipPath),
-    size: fs.statSync(zipPath).size,
-    sha512: sha512Base64(zipPath),
-    releaseDate
-  })
-  fs.writeFileSync(outputPath, manifest)
-  console.log(`Created ${outputPath}`)
 }

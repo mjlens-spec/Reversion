@@ -4,9 +4,9 @@
 
 <img src="icon/reversion-hand-pencil-engraving_OC_0807B.png" alt="反文图标" width="128" align="right" />
 
-Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 所见即所得 Markdown 编辑器。它基于 [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` 与 TypeScript 编辑器引擎 `@muyajs/core`，加入行内实时渲染、原生 Finder Quick Look 扩展、两套排印主题、Typora 主题导入工具，以及 HTML / PDF / DOCX / PNG 长图四种导出格式。
+Reversion 的中文名称是「反文」，是一款面向中文写作的所见即所得 Markdown 编辑器。它基于 [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` 与 TypeScript 编辑器引擎 `@muyajs/core`，加入行内实时渲染、macOS 原生 Finder Quick Look 扩展、两套排印主题、Typora 主题导入工具，以及 HTML / PDF / DOCX / PNG 长图四种导出格式。
 
-当前版本：**2.1.5**（Apple Silicon）。反文沿用 MarkText 的应用数据目录与 Bundle ID，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
+当前版本：**2.1.6**，支持 macOS Apple Silicon、macOS Intel 与 Windows x64。反文沿用 MarkText 的应用数据目录与技术标识，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
 
 ## 核心功能
 
@@ -26,16 +26,23 @@ Reversion 的中文名称是「反文」，是一款面向中文写作的 macOS 
 
 ## 下载
 
-预构建的 `arm64` DMG 发布在 [Releases 页面](https://github.com/mjlens-spec/Reversion/releases)。每个版本同时提供 `Reversion-<版本>-arm64.dmg`、更新用 ZIP、`latest-mac.yml` 与 SHA-256 校验文件。
+预构建安装包发布在 [Releases 页面](https://github.com/mjlens-spec/Reversion/releases)：
+
+- Windows 10 / 11 x64：`Reversion-<版本>-windows-x64-setup.exe`
+- Intel Mac：`Reversion-<版本>-x64.dmg`
+- Apple Silicon Mac：`Reversion-<版本>-arm64.dmg`
+
+同一版本还提供 macOS 更新用 ZIP、Windows 差分更新文件、`latest-mac.yml`、`latest.yml` 与 SHA-256 校验文件。
 
 应用会在首个窗口打开 15 秒后检查本仓库是否有更新的稳定版，没有新版时不打扰。发现新版后，右下方常驻进度卡会显示百分比、已下载容量、速率与预计剩余时间，不阻塞编辑。重启安装前会先处理未保存文档；新版本启动后，更新说明只显示一次。也可随时使用「Reversion → 检查更新」。
 
-应用采用带稳定应用标识的 ad-hoc 签名，**未经 Apple 公证**。该稳定标识用于让相邻版本互相校验；下载另有 GitHub HTTPS 与 `latest-mac.yml` 中的 SHA-512 校验保护。首次启动时，macOS Gatekeeper 可能要求在访达中按住 Control 点击 →「打开」。
+macOS 应用采用带稳定应用标识的 ad-hoc 签名，**未经 Apple 公证**。该稳定标识用于让相邻版本互相校验；下载另有 GitHub HTTPS 与 `latest-mac.yml` 中的 SHA-512 校验保护。首次启动时，macOS Gatekeeper 可能要求在访达中按住 Control 点击 →「打开」。Windows 安装包目前未购买代码签名证书，SmartScreen 可能显示“未知发布者”；请只从本仓库 Releases 下载，并用随附的 SHA-256 校验文件核对完整性。
 
-## 2.1.5 更新内容
+## 2.1.6 更新内容
 
-- Claude like 与 Lens Design 恢复为原始浅色外观，不再随 macOS 夜间深色模式改变颜色。
-- 主题正文、侧栏、标题栏、底部标签区与原生窗口底色保持一致；其他浅色、深色主题仍沿用原有外观逻辑。
+- 新增 Windows 10 / 11 x64 安装包，并完成静默安装、启动和卸载冒烟验证。
+- 新增 Intel Mac 原生 x64 DMG 与更新 ZIP；macOS 更新清单会按处理器选择 x64 或 arm64 文件。
+- Apple Silicon 版本继续发布，保证现有用户可正常升级到同一正式版本。
 
 ## 大版本记录
 
@@ -78,10 +85,17 @@ node scripts/import-typora-theme.mjs <typora主题.css> --name <名称> --out-di
 构建流程会取得上游源码树、应用反文的 commit，并产出已签名的发布产物。Node 版本钉在上游发布所用的版本（见 `.nvmrc`），pnpm 钉在上游 `packageManager` 字段声明的版本。
 
 ```bash
-./scripts/build-release-from-source.sh 2.1.5
+REVERSION_ARCH=arm64 ./scripts/build-release-from-source.sh 2.1.6
+REVERSION_ARCH=x64 ./scripts/build-release-from-source.sh 2.1.6
 ```
 
-产物落在 `releases/<版本>/`：DMG、更新用 ZIP、`latest-mac.yml` 与 SHA-256 校验文件。
+Windows PowerShell：
+
+```powershell
+./scripts/build-windows-release-from-source.ps1 2.1.6
+```
+
+产物落在 `releases/<版本>/`：macOS DMG / 更新 ZIP、Windows 安装包 / 差分更新文件、更新清单与 SHA-256 校验文件。
 
 测试：
 
@@ -96,7 +110,8 @@ e2e 套件驱动的是真实打包应用，并会断言用户实际的 `~/Librar
 ## 仓库结构
 
 - `themes/` — 编辑器与导出 CSS 主题。
-- `scripts/build-release-from-source.sh` — 源码 → DMG / ZIP / `latest-mac.yml` / 校验文件。
+- `scripts/build-release-from-source.sh` — macOS 源码 → arm64 或 x64 DMG / ZIP / `latest-mac.yml` / 校验文件。
+- `scripts/build-windows-release-from-source.ps1` — Windows 源码 → x64 安装包 / `latest.yml` / 差分更新文件 / 校验文件。
 - `scripts/import-typora-theme.mjs`、`scripts/typora-import/`、`scripts/typora-map/` — Typora 主题转译器：六层 pipeline 与可替换的映射数据。
 - `scripts/brand-app.sh`、`scripts/build-icon.sh`、`scripts/install-icon.sh` — 应用包本地化与图标工具。
 - `quicklook/` — Finder Quick Look 预览扩展的 Swift 源码与 XcodeGen 工程定义。
@@ -117,10 +132,11 @@ e2e 套件驱动的是真实打包应用，并会断言用户实际的 `~/Librar
 
 ## 兼容性
 
-- 应用路径：`/Applications/Reversion.app`
-- 用户数据：`~/Library/Application Support/marktext`——刻意与 MarkText 保持一致，这是既有设置与更新链得以延续的原因
-- Bundle ID：`com.github.marktext.marktext`，出于同样原因保持不变
-- 仅 Apple Silicon；目前不产出 Intel 与 Universal 构建
+- macOS 应用路径：`/Applications/Reversion.app`
+- macOS 用户数据：`~/Library/Application Support/marktext`——刻意与 MarkText 保持一致，这是既有设置与更新链得以延续的原因
+- macOS Bundle ID：`com.github.marktext.marktext`，出于同样原因保持不变
+- macOS：Apple Silicon arm64 与 Intel x64 分架构发布
+- Windows：Windows 10 / 11 x64；应用数据与内部可执行文件名继续使用兼容标识 `marktext`
 
 ## 许可证与声明
 

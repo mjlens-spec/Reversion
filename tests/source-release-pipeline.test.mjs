@@ -9,6 +9,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const scriptPath = path.join(root, 'scripts', 'build-release-from-source.sh')
 const script = fs.readFileSync(scriptPath, 'utf8')
+const windowsScriptPath = path.join(root, 'scripts', 'build-windows-release-from-source.ps1')
+const windowsScript = fs.readFileSync(windowsScriptPath, 'utf8')
 const upstreamDesktop = path.join(root, 'upstream', 'marktext', 'packages', 'desktop')
 
 // `upstream/` and `releases/` are git-ignored working directories. Tests that
@@ -43,6 +45,16 @@ test('the source-built release script exists and is executable', () => {
   assert.ok(fs.statSync(scriptPath).mode & 0o111, 'the release script must be executable')
   assert.match(script, /^#!\/usr\/bin\/env bash$/m)
   assert.match(script, /^set -euo pipefail$/m)
+})
+
+test('the Windows source-built release script exists and enforces a native x64 build', () => {
+  assert.ok(fs.existsSync(windowsScriptPath), 'scripts/build-windows-release-from-source.ps1 must exist')
+  assert.match(windowsScript, /Windows x64 build requires an AMD64 runner/)
+  assert.match(windowsScript, /electron-builder --win --x64 --publish never/)
+  assert.match(windowsScript, /Reversion-\$Version-windows-x64-setup\.exe/)
+  assert.match(windowsScript, /latest\.yml/)
+  assert.match(windowsScript, /Get-PeMachine/)
+  assert.match(windowsScript, /REVERSION_WINDOWS_SMOKE_INSTALL/)
 })
 
 test('the legacy binary-patching pipeline is marked as superseded', () => {
@@ -93,6 +105,14 @@ test('the pnpm toolchain is pinned to the upstream packageManager field', () => 
   assert.match(JSON.parse(upstreamPkg).packageManager, /^pnpm@\d+\.\d+\.\d+$/)
 })
 
+test('macOS builds are native and explicitly support Apple Silicon and Intel', () => {
+  assert.match(script, /REVERSION_ARCH:-arm64/)
+  assert.match(script, /arm64\)[\s\S]*APP_OUT_DIR="mac-arm64"/)
+  assert.match(script, /x64\)[\s\S]*APP_OUT_DIR="mac"/)
+  assert.match(script, /native \$ARCH build requires a \$HOST_UNAME macOS runner/)
+  assert.match(script, /grep -q "\$MACHO_ARCH_PATTERN"/)
+})
+
 test('the version is written into the source before the build, not patched afterwards', () => {
   assert.ok(
     script.includes('packages/desktop') && script.includes('DESKTOP_PKG'),
@@ -117,7 +137,7 @@ test('the pipeline derives every bundle path from productName and asserts the re
   // a half-applied rename is a launch-time crash rather than a cosmetic bug.
   assert.ok(script.includes('PRODUCT_NAME="Reversion"'), 'the release script must pin the productName it expects')
   assert.ok(
-    script.includes('BUILT_APP="$UPSTREAM/dist/mac-$ARCH/$PRODUCT_NAME.app"'),
+    script.includes('BUILT_APP="$UPSTREAM/dist/$APP_OUT_DIR/$PRODUCT_NAME.app"'),
     'the built bundle path must derive from productName'
   )
   assert.ok(
@@ -126,7 +146,7 @@ test('the pipeline derives every bundle path from productName and asserts the re
   )
   assert.ok(
     script.includes('Contents/MacOS/$PRODUCT_NAME'),
-    'the arm64 check must run against the renamed executable'
+    'the architecture check must run against the renamed executable'
   )
   assert.ok(
     script.includes('$PRODUCT_NAME Helper$helper.app'),
@@ -184,7 +204,7 @@ test('the shipping bundle keeps a stable ad-hoc signing identity', () => {
     'com.github.marktext.marktext',
     'com.github.marktext.marktext.reversion-quicklook',
     'codesign --verify --deep --strict',
-    "grep -q 'arm64'",
+    'grep -q "$MACHO_ARCH_PATTERN"',
     'xattr -cr'
   ]) {
     assert.ok(script.includes(requirement), `the release script must include ${requirement}`)
@@ -238,6 +258,23 @@ test('the update manifest generator accepts prerelease versions', async () => {
   })
   assert.match(manifest, /^version: 1\.2\.0-beta\.1$/m)
   assert.match(manifest, /^ {2}- url: Reversion-1\.2\.0-beta\.1-arm64-mac\.zip$/m)
+})
+
+test('the update manifest generator emits both macOS architectures in one channel file', async () => {
+  const { createMultiFileMacUpdateManifest } = await import(
+    pathToFileURL(path.join(root, 'scripts', 'make-update-manifest.mjs'))
+  )
+  const manifest = createMultiFileMacUpdateManifest({
+    version: '2.1.6',
+    files: [
+      { fileName: 'Reversion-2.1.6-arm64-mac.zip', size: 10, sha512: 'arm-digest' },
+      { fileName: 'Reversion-2.1.6-x64-mac.zip', size: 20, sha512: 'intel-digest' }
+    ],
+    releaseDate: '2026-08-13T00:00:00.000Z'
+  })
+  assert.match(manifest, /^ {2}- url: Reversion-2\.1\.6-arm64-mac\.zip$/m)
+  assert.match(manifest, /^ {2}- url: Reversion-2\.1\.6-x64-mac\.zip$/m)
+  assert.match(manifest, /^path: Reversion-2\.1\.6-arm64-mac\.zip$/m)
 })
 
 test('a built release directory matches the 1.1.0 latest-mac.yml contract', (t) => {
