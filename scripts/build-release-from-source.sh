@@ -14,6 +14,8 @@ set -euo pipefail
 #   REVERSION_NODE_BIN=/path/to/node   Use this Node binary (must match .nvmrc).
 #   REVERSION_BOOTSTRAP_NODE=1         Provision the pinned Node into .tmp/toolchain.
 #   REVERSION_UPSTREAM_DIR=/path       Override the upstream checkout location.
+#   REVERSION_ARCH=arm64|x64           Build for this macOS architecture. Defaults
+#                                      to arm64 for compatibility with older calls.
 #   REVERSION_KEEP_VERSION=1           Leave the version written into the upstream
 #                                      package.json instead of restoring it.
 #   REVERSION_SKIP_QUICKLOOK=1         Skip the Quick Look extension (needs xcodegen).
@@ -32,7 +34,23 @@ fi
 OUT_DIR="${2:-$ROOT/releases/$VERSION}"
 UPSTREAM="${REVERSION_UPSTREAM_DIR:-$ROOT/upstream/marktext}"
 DESKTOP="$UPSTREAM/packages/desktop"
-ARCH="arm64"
+ARCH="${REVERSION_ARCH:-arm64}"
+case "$ARCH" in
+  arm64)
+    HOST_UNAME="arm64"
+    MACHO_ARCH_PATTERN="arm64"
+    APP_OUT_DIR="mac-arm64"
+    ;;
+  x64)
+    HOST_UNAME="x86_64"
+    MACHO_ARCH_PATTERN="x86_64"
+    APP_OUT_DIR="mac"
+    ;;
+  *)
+    echo "REVERSION_ARCH must be arm64 or x64, got: $ARCH" >&2
+    exit 1
+    ;;
+esac
 APP_NAME="Reversion.app"
 # electron-builder's `productName` (packages/desktop/electron-builder.yml).
 # Since the B2 migration it drives the bundle directory name, CFBundleName,
@@ -55,6 +73,8 @@ fail() { echo "$BUILD_LOG_PREFIX ERROR: $*" >&2; exit 1; }
 [[ -d "$UPSTREAM" ]] || fail "upstream checkout not found: $UPSTREAM"
 [[ -f "$DESKTOP/package.json" ]] || fail "upstream desktop package not found: $DESKTOP/package.json"
 [[ "$(uname -s)" == "Darwin" ]] || fail "this pipeline only builds macOS artifacts"
+[[ "$(uname -m)" == "$HOST_UNAME" ]] \
+  || fail "native $ARCH build requires a $HOST_UNAME macOS runner; found $(uname -m)"
 
 for output in "$ZIP" "$DMG" "$MANIFEST" "$ZIP.sha256" "$DMG.sha256"; do
   [[ -e "$output" ]] && fail "release output already exists: $output"
@@ -255,10 +275,10 @@ BUNDLE_MAIN="$DESKTOP/out/main/index.js"
 grep -q "\"$VERSION\"" "$BUNDLE_MAIN" || fail "MARKTEXT_VERSION was not injected as $VERSION into $BUNDLE_MAIN"
 
 log "packaging the app bundle (electron-builder --dir, ad-hoc signing, no notarization)"
-rm -rf "$UPSTREAM/dist/mac-$ARCH"
+rm -rf "$UPSTREAM/dist/$APP_OUT_DIR"
 ( cd "$DESKTOP" && CSC_IDENTITY_AUTO_DISCOVERY=false pnpm exec electron-builder --mac --"$ARCH" --dir --publish never )
 
-BUILT_APP="$UPSTREAM/dist/mac-$ARCH/$PRODUCT_NAME.app"
+BUILT_APP="$UPSTREAM/dist/$APP_OUT_DIR/$PRODUCT_NAME.app"
 [[ -d "$BUILT_APP" ]] || fail "electron-builder did not produce $BUILT_APP"
 
 # The bundle name above, CFBundleName, and the Helper directory names all come
@@ -337,7 +357,7 @@ fi
 codesign --force --sign - --requirements "=designated => identifier \"$APP_ID\"" "$STAGED_APP"
 codesign --verify --deep --strict --verbose=2 "$STAGED_APP"
 codesign --verify --deep --strict -R "=identifier \"$APP_ID\"" "$STAGED_APP"
-file "$STAGED_APP/Contents/MacOS/$PRODUCT_NAME" | grep -q 'arm64'
+file "$STAGED_APP/Contents/MacOS/$PRODUCT_NAME" | grep -q "$MACHO_ARCH_PATTERN"
 
 # ---------------------------------------------------------------------------
 # 7. Post-conditions on the shipping bundle
