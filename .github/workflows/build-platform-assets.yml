@@ -32,15 +32,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-      - name: Test release tooling
-        run: |
-          npm ci
-          npm test
-      - name: Prove source patch applies to the pinned upstream commit
+      - name: Prepare source and prove the release patch applies
         run: |
           git clone --filter=blob:none --no-checkout https://github.com/marktext/marktext.git upstream/marktext
           git -C upstream/marktext checkout "$UPSTREAM_SHA"
           git -C upstream/marktext apply --check --binary ../../ci/reversion-2.1.6-source.patch
+          git -C upstream/marktext apply --binary ../../ci/reversion-2.1.6-source.patch
+      - name: Test release tooling
+        run: |
+          npm ci
+          node --test tests/auto-update-release.test.mjs tests/source-release-pipeline.test.mjs
 
   build-mac:
     name: Build Mac ${{ matrix.arch }}
