@@ -67,8 +67,10 @@ jobs:
           git -C upstream/marktext checkout "$UPSTREAM_SHA"
           git -C upstream/marktext apply --check --binary ../../ci/reversion-2.1.6-source.patch
           git -C upstream/marktext apply --binary ../../ci/reversion-2.1.6-source.patch
-      - name: Install Quick Look build dependency
-        run: command -v xcodegen >/dev/null || brew install xcodegen
+      - name: Install native packaging dependencies
+        run: |
+          command -v xcodegen >/dev/null || brew install xcodegen
+          command -v magick >/dev/null || brew install imagemagick
       - name: Build and verify native Mac package
         env:
           REVERSION_ARCH: ${{ matrix.arch }}
