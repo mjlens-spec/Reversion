@@ -1,0 +1,196 @@
+name: Build and release Reversion 2.1.7 platforms
+
+on:
+  push:
+    branches:
+      - codex/build-2.1.7-platforms
+    paths:
+      - .gitattributes
+      - .github/workflows/build-platform-assets.yml
+      - ci/reversion-2.1.7-source.patch
+      - ci/reversion-2.1.7-binary-assets.tar.gz
+      - ci/verify-release-assets.mjs
+
+permissions:
+  contents: write
+
+concurrency:
+  group: reversion-2.1.7-platform-release
+  cancel-in-progress: false
+
+env:
+  VERSION: 2.1.7
+  MAIN_SHA: c95ad4378b53a0600052b102997cb493521aa6e1
+  UPSTREAM_SHA: c907b29c9f2cb500d22259339ab64bc3c3a7219e
+  PNPM_VERSION: 10.33.4
+
+jobs:
+  validate-release-source:
+    name: Validate release source
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Prepare source and prove the release patch applies
+        run: |
+          git clone --filter=blob:none --no-checkout https://github.com/marktext/marktext.git upstream/marktext
+          git -C upstream/marktext config core.autocrlf false
+          git -C upstream/marktext checkout "$UPSTREAM_SHA"
+          git -C upstream/marktext apply --check --binary ../../ci/reversion-2.1.7-source.patch
+          git -C upstream/marktext apply --binary ../../ci/reversion-2.1.7-source.patch
+          tar -xzf ci/reversion-2.1.7-binary-assets.tar.gz -C upstream/marktext
+      - name: Test release tooling
+        run: |
+          npm ci
+          node --test tests/auto-update-release.test.mjs tests/source-release-pipeline.test.mjs
+
+  build-mac:
+    name: Build Mac ${{ matrix.arch }}
+    needs: validate-release-source
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm64
+            runner: macos-15
+          - arch: x64
+            runner: macos-15-intel
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Prepare patched Reversion source
+        run: |
+          git clone --filter=blob:none --no-checkout https://github.com/marktext/marktext.git upstream/marktext
+          git -C upstream/marktext config core.autocrlf false
+          git -C upstream/marktext checkout "$UPSTREAM_SHA"
+          git -C upstream/marktext apply --check --binary ../../ci/reversion-2.1.7-source.patch
+          git -C upstream/marktext apply --binary ../../ci/reversion-2.1.7-source.patch
+          tar -xzf ci/reversion-2.1.7-binary-assets.tar.gz -C upstream/marktext
+      - name: Install native packaging dependencies
+        run: |
+          command -v xcodegen >/dev/null || brew install xcodegen
+          command -v magick >/dev/null || brew install imagemagick
+      - name: Build and verify native Mac package
+        env:
+          REVERSION_ARCH: ${{ matrix.arch }}
+          REVERSION_UPSTREAM_DIR: ${{ github.workspace }}/upstream/marktext
+        run: scripts/build-release-from-source.sh "$VERSION" "$RUNNER_TEMP/reversion-artifacts"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reversion-mac-${{ matrix.arch }}
+          retention-days: 7
+          if-no-files-found: error
+          path: |
+            ${{ runner.temp }}/reversion-artifacts/Reversion-${{ env.VERSION }}-${{ matrix.arch }}.dmg
+            ${{ runner.temp }}/reversion-artifacts/Reversion-${{ env.VERSION }}-${{ matrix.arch }}.dmg.sha256
+            ${{ runner.temp }}/reversion-artifacts/Reversion-${{ env.VERSION }}-${{ matrix.arch }}-mac.zip
+            ${{ runner.temp }}/reversion-artifacts/Reversion-${{ env.VERSION }}-${{ matrix.arch }}-mac.zip.sha256
+
+  build-windows:
+    name: Build Windows x64
+    needs: validate-release-source
+    runs-on: windows-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Install pinned pnpm
+        shell: pwsh
+        run: npm install --global "pnpm@$env:PNPM_VERSION"
+      - name: Prepare patched Reversion source
+        shell: bash
+        run: |
+          git clone --filter=blob:none --no-checkout https://github.com/marktext/marktext.git upstream/marktext
+          git -C upstream/marktext config core.autocrlf false
+          git -C upstream/marktext checkout "$UPSTREAM_SHA"
+          git -C upstream/marktext apply --check --binary ../../ci/reversion-2.1.7-source.patch
+          git -C upstream/marktext apply --binary ../../ci/reversion-2.1.7-source.patch
+          tar -xzf ci/reversion-2.1.7-binary-assets.tar.gz -C upstream/marktext
+      - name: Build, install, launch and uninstall Windows package
+        shell: pwsh
+        env:
+          REVERSION_WINDOWS_SMOKE_INSTALL: '1'
+        run: scripts/build-windows-release-from-source.ps1 $env:VERSION "$env:RUNNER_TEMP\reversion-artifacts" -UpstreamDir "$env:GITHUB_WORKSPACE\upstream\marktext"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reversion-windows-x64
+          retention-days: 7
+          if-no-files-found: error
+          path: |
+            ${{ runner.temp }}/reversion-artifacts/Reversion-${{ env.VERSION }}-windows-x64-setup.exe
+            ${{ runner.temp }}/reversion-artifacts/Reversion-${{ env.VERSION }}-windows-x64-setup.exe.blockmap
+            ${{ runner.temp }}/reversion-artifacts/Reversion-${{ env.VERSION }}-windows-x64-setup.exe.sha256
+            ${{ runner.temp }}/reversion-artifacts/latest.yml
+
+  publish-release:
+    name: Verify assets and publish v2.1.7
+    needs:
+      - build-mac
+      - build-windows
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: reversion-*
+          path: dist
+          merge-multiple: true
+      - name: Build combined update manifest and checksum table
+        run: |
+          node scripts/make-update-manifest.mjs --multi "$VERSION" dist/latest-mac.yml \
+            "dist/Reversion-$VERSION-arm64-mac.zip" \
+            "dist/Reversion-$VERSION-x64-mac.zip"
+          cd dist
+          sha256sum \
+            "Reversion-$VERSION-windows-x64-setup.exe" \
+            "Reversion-$VERSION-windows-x64-setup.exe.blockmap" \
+            latest.yml \
+            "Reversion-$VERSION-arm64.dmg" \
+            "Reversion-$VERSION-x64.dmg" \
+            "Reversion-$VERSION-arm64-mac.zip" \
+            "Reversion-$VERSION-x64-mac.zip" \
+            latest-mac.yml > SHA256SUMS.txt
+      - name: Verify every release asset and updater reference
+        run: node ci/verify-release-assets.mjs dist "$VERSION"
+      - name: Confirm release target is the merged main commit
+        run: |
+          git fetch origin main
+          test "$(git rev-parse origin/main)" = "$MAIN_SHA"
+          if git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" >/dev/null 2>&1; then
+            echo "Tag v$VERSION already exists; refusing to overwrite it." >&2
+            exit 1
+          fi
+          if gh release view "v$VERSION" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release v$VERSION already exists; refusing to overwrite it." >&2
+            exit 1
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Create immutable tag and formal GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git tag -a "v$VERSION" "$MAIN_SHA" -m "Reversion $VERSION"
+          git push origin "v$VERSION"
+          gh release create "v$VERSION" dist/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --verify-tag \
+            --title "Reversion $VERSION" \
+            --notes-file 'RELEASE_NOTES_2.1.7_OC_0819[A].md'
