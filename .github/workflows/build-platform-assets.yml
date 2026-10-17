@@ -1,26 +1,26 @@
-name: Build and release Reversion 2.1.7 platforms
+name: Build and release Reversion 2.1.8 platforms
 
 on:
   push:
     branches:
-      - codex/build-2.1.7-platforms
+      - codex/build-2.1.8-platforms
     paths:
       - .gitattributes
       - .github/workflows/build-platform-assets.yml
-      - ci/reversion-2.1.7-source.patch
-      - ci/reversion-2.1.7-binary-assets.tar.gz
+      - ci/reversion-2.1.8-source.patch
+      - ci/reversion-2.1.8-binary-assets.tar.gz
       - ci/verify-release-assets.mjs
 
 permissions:
   contents: write
 
 concurrency:
-  group: reversion-2.1.7-platform-release
+  group: reversion-2.1.8-platform-release
   cancel-in-progress: false
 
 env:
-  VERSION: 2.1.7
-  MAIN_SHA: c95ad4378b53a0600052b102997cb493521aa6e1
+  VERSION: 2.1.8
+  MAIN_SHA: e22e9e7688b74eaac2cc920c86ca6a13f8d15ad9
   UPSTREAM_SHA: c907b29c9f2cb500d22259339ab64bc3c3a7219e
   PNPM_VERSION: 10.33.4
 
@@ -39,9 +39,9 @@ jobs:
           git clone --filter=blob:none --no-checkout https://github.com/marktext/marktext.git upstream/marktext
           git -C upstream/marktext config core.autocrlf false
           git -C upstream/marktext checkout "$UPSTREAM_SHA"
-          git -C upstream/marktext apply --check --binary ../../ci/reversion-2.1.7-source.patch
-          git -C upstream/marktext apply --binary ../../ci/reversion-2.1.7-source.patch
-          tar -xzf ci/reversion-2.1.7-binary-assets.tar.gz -C upstream/marktext
+          git -C upstream/marktext apply --check --binary ../../ci/reversion-2.1.8-source.patch
+          git -C upstream/marktext apply --binary ../../ci/reversion-2.1.8-source.patch
+          tar -xzf ci/reversion-2.1.8-binary-assets.tar.gz -C upstream/marktext
       - name: Test release tooling
         run: |
           npm ci
@@ -70,9 +70,9 @@ jobs:
           git clone --filter=blob:none --no-checkout https://github.com/marktext/marktext.git upstream/marktext
           git -C upstream/marktext config core.autocrlf false
           git -C upstream/marktext checkout "$UPSTREAM_SHA"
-          git -C upstream/marktext apply --check --binary ../../ci/reversion-2.1.7-source.patch
-          git -C upstream/marktext apply --binary ../../ci/reversion-2.1.7-source.patch
-          tar -xzf ci/reversion-2.1.7-binary-assets.tar.gz -C upstream/marktext
+          git -C upstream/marktext apply --check --binary ../../ci/reversion-2.1.8-source.patch
+          git -C upstream/marktext apply --binary ../../ci/reversion-2.1.8-source.patch
+          tar -xzf ci/reversion-2.1.8-binary-assets.tar.gz -C upstream/marktext
       - name: Install native packaging dependencies
         run: |
           command -v xcodegen >/dev/null || brew install xcodegen
@@ -112,9 +112,9 @@ jobs:
           git clone --filter=blob:none --no-checkout https://github.com/marktext/marktext.git upstream/marktext
           git -C upstream/marktext config core.autocrlf false
           git -C upstream/marktext checkout "$UPSTREAM_SHA"
-          git -C upstream/marktext apply --check --binary ../../ci/reversion-2.1.7-source.patch
-          git -C upstream/marktext apply --binary ../../ci/reversion-2.1.7-source.patch
-          tar -xzf ci/reversion-2.1.7-binary-assets.tar.gz -C upstream/marktext
+          git -C upstream/marktext apply --check --binary ../../ci/reversion-2.1.8-source.patch
+          git -C upstream/marktext apply --binary ../../ci/reversion-2.1.8-source.patch
+          tar -xzf ci/reversion-2.1.8-binary-assets.tar.gz -C upstream/marktext
       - name: Build, install, launch and uninstall Windows package
         shell: pwsh
         env:
@@ -132,7 +132,7 @@ jobs:
             ${{ runner.temp }}/reversion-artifacts/latest.yml
 
   publish-release:
-    name: Verify assets and publish v2.1.7
+    name: Verify assets and publish v2.1.8
     needs:
       - build-mac
       - build-windows
@@ -193,4 +193,4 @@ jobs:
             --repo "$GITHUB_REPOSITORY" \
             --verify-tag \
             --title "Reversion $VERSION" \
-            --notes-file 'RELEASE_NOTES_2.1.7_OC_0819[A].md'
+            --notes-file 'RELEASE_NOTES_2.1.8_AC_1018.md'
