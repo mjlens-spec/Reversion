@@ -242,7 +242,7 @@ test('opening a project and bootstrapping a window both land on the table of con
 test('inline live-rendering CSS lives in the desktop global stylesheet', (t) => {
   if (!upstreamAvailable) return t.skip('upstream/marktext not available')
   const css = read('src/renderer/src/assets/styles/index.css')
-  assert.match(css, /\.mu-editor \.mu-hide,\s*\n\.mu-editor \.mu-hide \.mu-highlight,\s*\n\.mu-editor \.mu-hide \.mu-selection \{/)
+  assert.match(css, /\.mu-editor \.mu-hide:not\(\.mu-math, \.mu-ruby, \.mu-emoji-marked-text, \.mu-html-escape\),\s*\n\.mu-editor \.mu-hide \.mu-highlight,\s*\n\.mu-editor \.mu-hide \.mu-selection \{/)
   assert.match(css, /opacity: 0 !important;/)
 })
 

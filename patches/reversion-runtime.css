@@ -1,5 +1,7 @@
 /* Reversion inline live rendering patch start */
-.mu-editor .mu-hide,
+/* Math, ruby, emoji and HTML-entity tokens carry `.mu-hide` while the caret is
+   outside them, but their element is the rendered preview itself (#31). */
+.mu-editor .mu-hide:not(.mu-math, .mu-ruby, .mu-emoji-marked-text, .mu-html-escape),
 .mu-editor .mu-hide .mu-highlight,
 .mu-editor .mu-hide .mu-selection {
   opacity: 0 !important;

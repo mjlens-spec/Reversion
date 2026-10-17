@@ -6,7 +6,7 @@
 
 Reversion 的中文名称是「反文」，是一款面向中文写作的所见即所得 Markdown 编辑器。它基于 [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` 与 TypeScript 编辑器引擎 `@muyajs/core`，加入行内实时渲染、macOS 原生 Finder Quick Look 扩展、两套排印主题、Typora 主题导入工具，以及 HTML / PDF / DOCX / PNG 长图四种导出格式。
 
-当前版本：**2.1.7**，支持 macOS Apple Silicon、macOS Intel 与 Windows x64。反文沿用 MarkText 的应用数据目录与技术标识，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
+当前版本：**2.1.8**，支持 macOS Apple Silicon、macOS Intel 与 Windows x64。反文沿用 MarkText 的应用数据目录与技术标识，因此从旧版本迁移时设置、历史记录与自动更新链均可延续。
 
 ## 核心功能
 
@@ -38,10 +38,12 @@ Reversion 的中文名称是「反文」，是一款面向中文写作的所见�
 
 macOS 应用采用带稳定应用标识的 ad-hoc 签名，**未经 Apple 公证**。该稳定标识用于让相邻版本互相校验；下载另有 GitHub HTTPS 与 `latest-mac.yml` 中的 SHA-512 校验保护。首次启动时，macOS Gatekeeper 可能要求在访达中按住 Control 点击 →「打开」。Windows 安装包目前未购买代码签名证书，SmartScreen 可能显示“未知发布者”；请只从本仓库 Releases 下载，并用随附的 SHA-256 校验文件核对完整性。
 
-## 2.1.7 更新内容
+## 2.1.8 更新内容
 
-- 修复导出对话框打开后整个窗口白屏的问题。此问题会在 PDF、HTML、DOCX 和 PNG 导出开始前遮住所有界面与进度。
-- 新增生产构建级的回归测试，直接校验对话框真实绘制、指针点击与窗口像素，避免再次出现「DOM 存在、画面全白」。
+- 光标离开后，行内公式、注音、emoji 短代码与 HTML 实体恢复正常显示，不再只留下空白（[#31](https://github.com/mjlens-spec/Reversion/issues/31)）
+- 行内公式完整显示，不再被截断并出现横向滚动条；编辑公式时的预览弹层同样修复
+- 单行书写的 `$$…$$` 按展示公式渲染，与 HTML 导出一致，单独成段时居中显示；Markdown 源文保持原样
+- 从 ChatGPT、Gemini、DeepSeek 等使用 KaTeX 渲染的网页以及维基百科复制公式，粘贴后还原为 `$…$` 或 `$$` 公式块，不再变成乱码
 
 ## 大版本记录
 
@@ -84,14 +86,14 @@ node scripts/import-typora-theme.mjs <typora主题.css> --name <名称> --out-di
 构建流程会取得上游源码树、应用反文的 commit，并产出已签名的发布产物。Node 版本钉在上游发布所用的版本（见 `.nvmrc`），pnpm 钉在上游 `packageManager` 字段声明的版本。
 
 ```bash
-REVERSION_ARCH=arm64 ./scripts/build-release-from-source.sh 2.1.7
-REVERSION_ARCH=x64 ./scripts/build-release-from-source.sh 2.1.7
+REVERSION_ARCH=arm64 ./scripts/build-release-from-source.sh 2.1.8
+REVERSION_ARCH=x64 ./scripts/build-release-from-source.sh 2.1.8
 ```
 
 Windows PowerShell：
 
 ```powershell
-./scripts/build-windows-release-from-source.ps1 2.1.7
+./scripts/build-windows-release-from-source.ps1 2.1.8
 ```
 
 产物落在 `releases/<版本>/`：macOS DMG / 更新 ZIP、Windows 安装包 / 差分更新文件、更新清单与 SHA-256 校验文件。

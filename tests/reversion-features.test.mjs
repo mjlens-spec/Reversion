@@ -144,6 +144,10 @@ test('inline live rendering preserves Muya hidden markers and active syntax feed
   const patcher = read('scripts/patch-asar-themes.mjs')
 
   assert.match(css, /\.mu-editor \.mu-hide[\s\S]*opacity: 0 !important/s)
+  // Rendered previews (inline math, ruby, emoji, HTML entities) reuse
+  // `.mu-hide` on their own element; fading them blanks the text (#31).
+  assert.match(css, /\.mu-editor \.mu-hide:not\(\.mu-math, \.mu-ruby, \.mu-emoji-marked-text, \.mu-html-escape\),/)
+  assert.doesNotMatch(css, /^\.mu-editor \.mu-hide,$/m)
   assert.match(css, /\.mu-editor \.mu-active \.mu-gray/)
   assert.match(css, /\.mu-editor \.mu-active \.mu-inline-rule/)
   assert.doesNotMatch(css, /#ag-editor-id|\.ag-/)

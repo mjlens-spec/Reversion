@@ -6,7 +6,7 @@
 
 Reversion, Chinese name `反文`, is a WYSIWYG Markdown editor for Chinese-language writing. It is based on [MarkText](https://github.com/marktext/marktext) `v0.20.0-rc.1` and its TypeScript editor engine, `@muyajs/core`, with inline live rendering, a native macOS Finder Quick Look extension, two typographic themes, an importer for Typora themes, and export to HTML, PDF, DOCX and a single long PNG.
 
-Current release: **2.1.7**, for macOS Apple Silicon, macOS Intel, and Windows x64. Reversion keeps MarkText's application data directory and technical identifiers, so preferences, history, and updater continuity survive migration from earlier versions.
+Current release: **2.1.8**, for macOS Apple Silicon, macOS Intel, and Windows x64. Reversion keeps MarkText's application data directory and technical identifiers, so preferences, history, and updater continuity survive migration from earlier versions.
 
 ## Core features
 
@@ -38,10 +38,12 @@ The app checks this repository for a newer stable release 15 seconds after the f
 
 The macOS app is ad-hoc signed with a stable application requirement and is **not Apple notarized**. The stable requirement is what lets one release validate the next; downloads are additionally covered by GitHub HTTPS and the SHA-512 digest in `latest-mac.yml`. On first launch macOS Gatekeeper may require Control-click → Open in Finder. The Windows installer is currently unsigned and may show an “Unknown publisher” SmartScreen warning; download it only from this repository's Releases page and verify the included SHA-256 checksum.
 
-## What's new in 2.1.7
+## What's new in 2.1.8
 
-- Fixed export dialogs opening as a blank white window, which blocked PDF, HTML, DOCX and PNG export before any progress or controls could appear.
-- Added a production-rendering regression test that verifies the dialog is painted, receives pointer input, and never collapses the renderer into a flat white frame.
+- Rendered inline formulas, ruby annotations, emoji shortcodes and HTML entities are visible again once the caret leaves them, instead of leaving blank gaps ([#31](https://github.com/mjlens-spec/Reversion/issues/31)).
+- Inline formulas are no longer clipped with a horizontal scrollbar; the formula preview shown while editing is fixed too.
+- A single-line `$$…$$` formula renders as display math, matching HTML export, and is centred when it is the only content of its paragraph. The Markdown source is left as written.
+- Formulas copied from KaTeX-rendered pages (ChatGPT, Gemini, DeepSeek) and from Wikipedia paste back as `$…$` or a `$$` math block instead of garbled glyph text.
 
 ## Major releases
 
@@ -84,14 +86,14 @@ This writes `<name>-marktext.css` (editor), `export/<name>.css` (HTML/PDF), and 
 The build resolves the upstream source tree, applies Reversion's commits, and produces signed artifacts. It pins Node to the version upstream releases with (see `.nvmrc`) and pnpm to the version in upstream's `packageManager` field.
 
 ```bash
-REVERSION_ARCH=arm64 ./scripts/build-release-from-source.sh 2.1.7
-REVERSION_ARCH=x64 ./scripts/build-release-from-source.sh 2.1.7
+REVERSION_ARCH=arm64 ./scripts/build-release-from-source.sh 2.1.8
+REVERSION_ARCH=x64 ./scripts/build-release-from-source.sh 2.1.8
 ```
 
 Windows PowerShell:
 
 ```powershell
-./scripts/build-windows-release-from-source.ps1 2.1.7
+./scripts/build-windows-release-from-source.ps1 2.1.8
 ```
 
 Artifacts land in `releases/<version>/`: macOS DMGs and updater ZIPs, the Windows installer and differential-update file, update manifests, and SHA-256 checksums.

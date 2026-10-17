@@ -136,6 +136,13 @@ test.describe.serial('Reversion e2e smoke', () => {
     await expect(editor.locator('.katex').first(), 'inline formula should render via KaTeX').toBeVisible({
       timeout: 15_000
     })
+    // toBeVisible() ignores opacity: 2.1.7 shipped with every rendered inline
+    // formula at opacity 0 behind the live-rendering fade rule (issue #31).
+    const hiddenMathOpacity = await editor
+      .locator('.mu-hide.mu-math')
+      .evaluateAll((nodes) => nodes.map((node) => getComputedStyle(node).opacity))
+    expect(hiddenMathOpacity.length, 'fixture should have an inline formula outside the caret').toBeGreaterThan(0)
+    expect(hiddenMathOpacity, 'rendered inline formulas must stay opaque').toEqual(hiddenMathOpacity.map(() => '1'))
 
     await window.screenshot({ path: screenshotPath('02-fixture-content-rendered.png'), fullPage: true })
 
